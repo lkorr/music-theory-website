@@ -550,196 +550,592 @@ export default function Level3Page() {
               </button>
             </div>
 
-            {/* Chord Legend */}
+            {/* Chord Legend with All Inversions */}
             <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 lg:w-1/2">
-              <h3 className="text-2xl font-bold text-black mb-6 text-center">All Triad Inversions</h3>
-              <div className="space-y-6">
-                {/* Major Triad All Inversions */}
-                <div className="bg-white/30 rounded-xl p-4">
-                  <h4 className="font-bold text-black mb-3 text-center">Major (C)</h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { name: 'Root', notation: 'C', midiNotes: [60, 64, 67] }, // C4, E4, G4
-                      { name: '1st Inv', notation: 'C/1', midiNotes: [64, 67, 72] }, // E4, G4, C5
-                      { name: '2nd Inv', notation: 'C/2', midiNotes: [67, 72, 76] } // G4, C5, E5
-                    ].map((chord, i) => {
-                      const minNote = Math.min(...chord.midiNotes);
-                      const maxNote = Math.max(...chord.midiNotes);
-                      const low = minNote - 1;
-                      const high = maxNote + 1;
-                      const totalSemitones = high - low + 1;
-                      const getMidiNoteName = (midi) => {
-                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-                        const octave = Math.floor(midi / 12) - 1;
-                        return notes[midi % 12] + octave;
-                      };
-                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
-                      
-                      return (
-                        <div key={i} className="bg-white/30 rounded-lg p-2">
-                          <h5 className="font-bold text-black mb-1 text-xs text-center">{chord.name}</h5>
-                          <div className="flex justify-center mb-1">
-                            <div className="bg-white rounded shadow-lg overflow-hidden" style={{ width: '100px', height: `${Math.max(40, totalSemitones * 6)}px` }}>
+              <h3 className="text-2xl font-bold text-black mb-6 text-center">All Inversions</h3>
+              <div className="space-y-3">
+                {/* Major Triad Row */}
+                <div className="bg-white/30 rounded-xl p-3">
+                  <h4 className="font-bold text-black mb-2 text-center text-sm">Major Triads</h4>
+                  <div className="flex justify-center gap-3">
+                    {/* Root Position */}
+                    <div className="text-center">
+                      <div className="mb-1">
+                        {(() => {
+                          const midiNotes = [60, 64, 67]; // C4, E4, G4
+                          const minNote = Math.min(...midiNotes);
+                          const maxNote = Math.max(...midiNotes);
+                          const low = minNote - 1;
+                          const high = maxNote + 1;
+                          const totalSemitones = high - low + 1;
+                          const getMidiNoteName = (midi) => {
+                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const octave = Math.floor(midi / 12) - 1;
+                            return notes[midi % 12] + octave;
+                          };
+                          const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                          
+                          const noteHeight = 10;
+                          const containerHeight = totalSemitones * noteHeight;
+                          return (
+                            <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '90px', height: `${containerHeight}px` }}>
                               <div className="flex h-full">
-                                <div className="w-6 border-r border-gray-300 bg-white">
+                                <div className="w-6 border-r-2 border-gray-300 bg-white">
                                   {Array.from({ length: totalSemitones }, (_, j) => {
                                     const midiNote = high - j;
                                     const noteName = getMidiNoteName(midiNote);
                                     return (
                                       <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
                                         isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                      }`} style={{ height: '6px' }}>
-                                        <span className="text-xs" style={{ fontSize: '5px' }}>{noteName}</span>
+                                      }`} style={{ height: `${noteHeight}px` }}>
+                                        <span style={{ fontSize: '5px' }}>{noteName}</span>
                                       </div>
                                     );
                                   })}
                                 </div>
                                 <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
                                   {Array.from({ length: totalSemitones }, (_, j) => (
-                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 6}px` }} />
+                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * noteHeight}px` }} />
                                   ))}
-                                  {chord.midiNotes.map((midiNote, j) => {
-                                    const position = (high - midiNote) * 6;
+                                  {midiNotes.map((midiNote, j) => {
+                                    const position = (high - midiNote) * noteHeight;
                                     const isCNote = (midiNote % 12 === 0);
                                     return (
-                                      <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
-                                           style={{ left: '1px', top: `${position + 1}px`, width: '50px', height: '4px' }}></div>
+                                      <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-purple-500'}`} 
+                                           style={{ left: '2px', top: `${position + 1}px`, width: '40px', height: `${noteHeight - 2}px` }}></div>
                                     );
                                   })}
                                 </div>
                               </div>
                             </div>
-                          </div>
-                          <p className="text-xs text-black/70 text-center">{chord.notation}</p>
-                        </div>
-                      );
-                    })}
+                          );
+                        })()}
+                      </div>
+                      <p className="text-xs text-black/70">C</p>
+                    </div>
+
+                    {/* First Inversion */}
+                    <div className="text-center">
+                      <div className="mb-1">
+                        {(() => {
+                          const midiNotes = [64, 67, 72]; // E4, G4, C5
+                          const minNote = Math.min(...midiNotes);
+                          const maxNote = Math.max(...midiNotes);
+                          const low = minNote - 1;
+                          const high = maxNote + 1;
+                          const totalSemitones = high - low + 1;
+                          const getMidiNoteName = (midi) => {
+                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const octave = Math.floor(midi / 12) - 1;
+                            return notes[midi % 12] + octave;
+                          };
+                          const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                          
+                          const noteHeight = 10;
+                          const containerHeight = totalSemitones * noteHeight;
+                          return (
+                            <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '90px', height: `${containerHeight}px` }}>
+                              <div className="flex h-full">
+                                <div className="w-6 border-r-2 border-gray-300 bg-white">
+                                  {Array.from({ length: totalSemitones }, (_, j) => {
+                                    const midiNote = high - j;
+                                    const noteName = getMidiNoteName(midiNote);
+                                    return (
+                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
+                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
+                                      }`} style={{ height: `${noteHeight}px` }}>
+                                        <span style={{ fontSize: '5px' }}>{noteName}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
+                                  {Array.from({ length: totalSemitones }, (_, j) => (
+                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * noteHeight}px` }} />
+                                  ))}
+                                  {midiNotes.map((midiNote, j) => {
+                                    const position = (high - midiNote) * noteHeight;
+                                    const isCNote = (midiNote % 12 === 0);
+                                    return (
+                                      <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-purple-500'}`} 
+                                           style={{ left: '2px', top: `${position + 1}px`, width: '40px', height: `${noteHeight - 2}px` }}></div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      <p className="text-xs text-black/70">C/1</p>
+                    </div>
+
+                    {/* Second Inversion */}
+                    <div className="text-center">
+                      <div className="mb-1">
+                        {(() => {
+                          const midiNotes = [67, 72, 76]; // G4, C5, E5
+                          const minNote = Math.min(...midiNotes);
+                          const maxNote = Math.max(...midiNotes);
+                          const low = minNote - 1;
+                          const high = maxNote + 1;
+                          const totalSemitones = high - low + 1;
+                          const getMidiNoteName = (midi) => {
+                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const octave = Math.floor(midi / 12) - 1;
+                            return notes[midi % 12] + octave;
+                          };
+                          const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                          
+                          const noteHeight = 10;
+                          const containerHeight = totalSemitones * noteHeight;
+                          return (
+                            <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '90px', height: `${containerHeight}px` }}>
+                              <div className="flex h-full">
+                                <div className="w-6 border-r-2 border-gray-300 bg-white">
+                                  {Array.from({ length: totalSemitones }, (_, j) => {
+                                    const midiNote = high - j;
+                                    const noteName = getMidiNoteName(midiNote);
+                                    return (
+                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
+                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
+                                      }`} style={{ height: `${noteHeight}px` }}>
+                                        <span style={{ fontSize: '5px' }}>{noteName}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
+                                  {Array.from({ length: totalSemitones }, (_, j) => (
+                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * noteHeight}px` }} />
+                                  ))}
+                                  {midiNotes.map((midiNote, j) => {
+                                    const position = (high - midiNote) * noteHeight;
+                                    const isCNote = (midiNote % 12 === 0);
+                                    return (
+                                      <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-purple-500'}`} 
+                                           style={{ left: '2px', top: `${position + 1}px`, width: '40px', height: `${noteHeight - 2}px` }}></div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      <p className="text-xs text-black/70">C/2</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Minor Triad All Inversions */}
-                <div className="bg-white/30 rounded-xl p-4">
-                  <h4 className="font-bold text-black mb-3 text-center">Minor (Cm)</h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { name: 'Root', notation: 'Cm', midiNotes: [60, 63, 67] }, // C4, Eb4, G4
-                      { name: '1st Inv', notation: 'Cm/1', midiNotes: [63, 67, 72] }, // Eb4, G4, C5
-                      { name: '2nd Inv', notation: 'Cm/2', midiNotes: [67, 72, 75] } // G4, C5, Eb5
-                    ].map((chord, i) => {
-                      const minNote = Math.min(...chord.midiNotes);
-                      const maxNote = Math.max(...chord.midiNotes);
-                      const low = minNote - 1;
-                      const high = maxNote + 1;
-                      const totalSemitones = high - low + 1;
-                      const getMidiNoteName = (midi) => {
-                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-                        const octave = Math.floor(midi / 12) - 1;
-                        return notes[midi % 12] + octave;
-                      };
-                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
-                      
-                      return (
-                        <div key={i} className="bg-white/30 rounded-lg p-2">
-                          <h5 className="font-bold text-black mb-1 text-xs text-center">{chord.name}</h5>
-                          <div className="flex justify-center mb-1">
-                            <div className="bg-white rounded shadow-lg overflow-hidden" style={{ width: '100px', height: `${Math.max(40, totalSemitones * 6)}px` }}>
+                {/* Minor Triad Row */}
+                <div className="bg-white/30 rounded-xl p-3">
+                  <h4 className="font-bold text-black mb-2 text-center text-sm">Minor Triads</h4>
+                  <div className="flex justify-center gap-3">
+                    {/* Root Position */}
+                    <div className="text-center">
+                      <div className="mb-1">
+                        {(() => {
+                          const midiNotes = [62, 65, 69]; // D4, F4, A4
+                          const minNote = Math.min(...midiNotes);
+                          const maxNote = Math.max(...midiNotes);
+                          const low = minNote - 1;
+                          const high = maxNote + 1;
+                          const totalSemitones = high - low + 1;
+                          const getMidiNoteName = (midi) => {
+                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const octave = Math.floor(midi / 12) - 1;
+                            return notes[midi % 12] + octave;
+                          };
+                          const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                          
+                          const noteHeight = 10;
+                          const containerHeight = totalSemitones * noteHeight;
+                          return (
+                            <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '90px', height: `${containerHeight}px` }}>
                               <div className="flex h-full">
-                                <div className="w-6 border-r border-gray-300 bg-white">
+                                <div className="w-6 border-r-2 border-gray-300 bg-white">
                                   {Array.from({ length: totalSemitones }, (_, j) => {
                                     const midiNote = high - j;
                                     const noteName = getMidiNoteName(midiNote);
                                     return (
                                       <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
                                         isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                      }`} style={{ height: '6px' }}>
-                                        <span className="text-xs" style={{ fontSize: '5px' }}>{noteName}</span>
+                                      }`} style={{ height: `${noteHeight}px` }}>
+                                        <span style={{ fontSize: '5px' }}>{noteName}</span>
                                       </div>
                                     );
                                   })}
                                 </div>
                                 <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
                                   {Array.from({ length: totalSemitones }, (_, j) => (
-                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 6}px` }} />
+                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * noteHeight}px` }} />
                                   ))}
-                                  {chord.midiNotes.map((midiNote, j) => {
-                                    const position = (high - midiNote) * 6;
-                                    const isCNote = (midiNote % 12 === 0);
+                                  {midiNotes.map((midiNote, j) => {
+                                    const position = (high - midiNote) * noteHeight;
+                                    const isDNote = (midiNote % 12 === 2);
                                     return (
-                                      <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
-                                           style={{ left: '1px', top: `${position + 1}px`, width: '50px', height: '4px' }}></div>
+                                      <div key={j} className={`absolute rounded shadow-lg ${isDNote ? 'bg-red-500' : 'bg-purple-500'}`} 
+                                           style={{ left: '2px', top: `${position + 1}px`, width: '40px', height: `${noteHeight - 2}px` }}></div>
                                     );
                                   })}
                                 </div>
                               </div>
                             </div>
-                          </div>
-                          <p className="text-xs text-black/70 text-center">{chord.notation}</p>
-                        </div>
-                      );
-                    })}
+                          );
+                        })()}
+                      </div>
+                      <p className="text-xs text-black/70">Dm</p>
+                    </div>
+
+                    {/* First Inversion */}
+                    <div className="text-center">
+                      <div className="mb-1">
+                        {(() => {
+                          const midiNotes = [65, 69, 74]; // F4, A4, D5
+                          const minNote = Math.min(...midiNotes);
+                          const maxNote = Math.max(...midiNotes);
+                          const low = minNote - 1;
+                          const high = maxNote + 1;
+                          const totalSemitones = high - low + 1;
+                          const getMidiNoteName = (midi) => {
+                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const octave = Math.floor(midi / 12) - 1;
+                            return notes[midi % 12] + octave;
+                          };
+                          const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                          
+                          const noteHeight = 10;
+                          const containerHeight = totalSemitones * noteHeight;
+                          return (
+                            <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '90px', height: `${containerHeight}px` }}>
+                              <div className="flex h-full">
+                                <div className="w-6 border-r-2 border-gray-300 bg-white">
+                                  {Array.from({ length: totalSemitones }, (_, j) => {
+                                    const midiNote = high - j;
+                                    const noteName = getMidiNoteName(midiNote);
+                                    return (
+                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
+                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
+                                      }`} style={{ height: `${noteHeight}px` }}>
+                                        <span style={{ fontSize: '5px' }}>{noteName}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
+                                  {Array.from({ length: totalSemitones }, (_, j) => (
+                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * noteHeight}px` }} />
+                                  ))}
+                                  {midiNotes.map((midiNote, j) => {
+                                    const position = (high - midiNote) * noteHeight;
+                                    const isDNote = (midiNote % 12 === 2);
+                                    return (
+                                      <div key={j} className={`absolute rounded shadow-lg ${isDNote ? 'bg-red-500' : 'bg-purple-500'}`} 
+                                           style={{ left: '2px', top: `${position + 1}px`, width: '40px', height: `${noteHeight - 2}px` }}></div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      <p className="text-xs text-black/70">Dm/1</p>
+                    </div>
+
+                    {/* Second Inversion */}
+                    <div className="text-center">
+                      <div className="mb-1">
+                        {(() => {
+                          const midiNotes = [69, 74, 77]; // A4, D5, F5
+                          const minNote = Math.min(...midiNotes);
+                          const maxNote = Math.max(...midiNotes);
+                          const low = minNote - 1;
+                          const high = maxNote + 1;
+                          const totalSemitones = high - low + 1;
+                          const getMidiNoteName = (midi) => {
+                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const octave = Math.floor(midi / 12) - 1;
+                            return notes[midi % 12] + octave;
+                          };
+                          const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                          
+                          const noteHeight = 10;
+                          const containerHeight = totalSemitones * noteHeight;
+                          return (
+                            <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '90px', height: `${containerHeight}px` }}>
+                              <div className="flex h-full">
+                                <div className="w-6 border-r-2 border-gray-300 bg-white">
+                                  {Array.from({ length: totalSemitones }, (_, j) => {
+                                    const midiNote = high - j;
+                                    const noteName = getMidiNoteName(midiNote);
+                                    return (
+                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
+                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
+                                      }`} style={{ height: `${noteHeight}px` }}>
+                                        <span style={{ fontSize: '5px' }}>{noteName}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
+                                  {Array.from({ length: totalSemitones }, (_, j) => (
+                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * noteHeight}px` }} />
+                                  ))}
+                                  {midiNotes.map((midiNote, j) => {
+                                    const position = (high - midiNote) * noteHeight;
+                                    const isDNote = (midiNote % 12 === 2);
+                                    return (
+                                      <div key={j} className={`absolute rounded shadow-lg ${isDNote ? 'bg-red-500' : 'bg-purple-500'}`} 
+                                           style={{ left: '2px', top: `${position + 1}px`, width: '40px', height: `${noteHeight - 2}px` }}></div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      <p className="text-xs text-black/70">Dm/2</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Diminished Triad All Inversions */}
-                <div className="bg-white/30 rounded-xl p-4">
-                  <h4 className="font-bold text-black mb-3 text-center">Diminished (Cdim)</h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { name: 'Root', notation: 'Cdim', midiNotes: [60, 63, 66] }, // C4, Eb4, Gb4
-                      { name: '1st Inv', notation: 'Cdim/1', midiNotes: [63, 66, 72] }, // Eb4, Gb4, C5
-                      { name: '2nd Inv', notation: 'Cdim/2', midiNotes: [66, 72, 75] } // Gb4, C5, Eb5
-                    ].map((chord, i) => {
-                      const minNote = Math.min(...chord.midiNotes);
-                      const maxNote = Math.max(...chord.midiNotes);
-                      const low = minNote - 1;
-                      const high = maxNote + 1;
-                      const totalSemitones = high - low + 1;
-                      const getMidiNoteName = (midi) => {
-                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-                        const octave = Math.floor(midi / 12) - 1;
-                        return notes[midi % 12] + octave;
-                      };
-                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
-                      
-                      return (
-                        <div key={i} className="bg-white/30 rounded-lg p-2">
-                          <h5 className="font-bold text-black mb-1 text-xs text-center">{chord.name}</h5>
-                          <div className="flex justify-center mb-1">
-                            <div className="bg-white rounded shadow-lg overflow-hidden" style={{ width: '100px', height: `${Math.max(40, totalSemitones * 6)}px` }}>
+                {/* Diminished Triad Row */}
+                <div className="bg-white/30 rounded-xl p-3">
+                  <h4 className="font-bold text-black mb-2 text-center text-sm">Diminished Triads</h4>
+                  <div className="flex justify-center gap-3">
+                    {/* Root Position */}
+                    <div className="text-center">
+                      <div className="mb-1">
+                        {(() => {
+                          const midiNotes = [59, 62, 65]; // B3, D4, F4
+                          const minNote = Math.min(...midiNotes);
+                          const maxNote = Math.max(...midiNotes);
+                          const low = minNote - 1;
+                          const high = maxNote + 1;
+                          const totalSemitones = high - low + 1;
+                          const getMidiNoteName = (midi) => {
+                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const octave = Math.floor(midi / 12) - 1;
+                            return notes[midi % 12] + octave;
+                          };
+                          const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                          
+                          const noteHeight = 10;
+                          const containerHeight = totalSemitones * noteHeight;
+                          return (
+                            <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '90px', height: `${containerHeight}px` }}>
                               <div className="flex h-full">
-                                <div className="w-6 border-r border-gray-300 bg-white">
+                                <div className="w-6 border-r-2 border-gray-300 bg-white">
                                   {Array.from({ length: totalSemitones }, (_, j) => {
                                     const midiNote = high - j;
                                     const noteName = getMidiNoteName(midiNote);
                                     return (
                                       <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
                                         isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                      }`} style={{ height: '6px' }}>
-                                        <span className="text-xs" style={{ fontSize: '5px' }}>{noteName}</span>
+                                      }`} style={{ height: `${noteHeight}px` }}>
+                                        <span style={{ fontSize: '5px' }}>{noteName}</span>
                                       </div>
                                     );
                                   })}
                                 </div>
                                 <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
                                   {Array.from({ length: totalSemitones }, (_, j) => (
-                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 6}px` }} />
+                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * noteHeight}px` }} />
                                   ))}
-                                  {chord.midiNotes.map((midiNote, j) => {
-                                    const position = (high - midiNote) * 6;
-                                    const isCNote = (midiNote % 12 === 0);
+                                  {midiNotes.map((midiNote, j) => {
+                                    const position = (high - midiNote) * noteHeight;
+                                    const isBNote = (midiNote % 12 === 11);
                                     return (
-                                      <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
-                                           style={{ left: '1px', top: `${position + 1}px`, width: '50px', height: '4px' }}></div>
+                                      <div key={j} className={`absolute rounded shadow-lg ${isBNote ? 'bg-red-500' : 'bg-purple-500'}`} 
+                                           style={{ left: '2px', top: `${position + 1}px`, width: '40px', height: `${noteHeight - 2}px` }}></div>
                                     );
                                   })}
                                 </div>
                               </div>
                             </div>
-                          </div>
-                          <p className="text-xs text-black/70 text-center">{chord.notation}</p>
-                        </div>
-                      );
-                    })}
+                          );
+                        })()}
+                      </div>
+                      <p className="text-xs text-black/70">Bdim</p>
+                    </div>
+
+                    {/* First Inversion */}
+                    <div className="text-center">
+                      <div className="mb-1">
+                        {(() => {
+                          const midiNotes = [62, 65, 71]; // D4, F4, B4
+                          const minNote = Math.min(...midiNotes);
+                          const maxNote = Math.max(...midiNotes);
+                          const low = minNote - 1;
+                          const high = maxNote + 1;
+                          const totalSemitones = high - low + 1;
+                          const getMidiNoteName = (midi) => {
+                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const octave = Math.floor(midi / 12) - 1;
+                            return notes[midi % 12] + octave;
+                          };
+                          const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                          
+                          const noteHeight = 10;
+                          const containerHeight = totalSemitones * noteHeight;
+                          return (
+                            <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '90px', height: `${containerHeight}px` }}>
+                              <div className="flex h-full">
+                                <div className="w-6 border-r-2 border-gray-300 bg-white">
+                                  {Array.from({ length: totalSemitones }, (_, j) => {
+                                    const midiNote = high - j;
+                                    const noteName = getMidiNoteName(midiNote);
+                                    return (
+                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
+                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
+                                      }`} style={{ height: `${noteHeight}px` }}>
+                                        <span style={{ fontSize: '5px' }}>{noteName}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
+                                  {Array.from({ length: totalSemitones }, (_, j) => (
+                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * noteHeight}px` }} />
+                                  ))}
+                                  {midiNotes.map((midiNote, j) => {
+                                    const position = (high - midiNote) * noteHeight;
+                                    const isBNote = (midiNote % 12 === 11);
+                                    return (
+                                      <div key={j} className={`absolute rounded shadow-lg ${isBNote ? 'bg-red-500' : 'bg-purple-500'}`} 
+                                           style={{ left: '2px', top: `${position + 1}px`, width: '40px', height: `${noteHeight - 2}px` }}></div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      <p className="text-xs text-black/70">Bdim/1</p>
+                    </div>
+
+                    {/* Second Inversion */}
+                    <div className="text-center">
+                      <div className="mb-1">
+                        {(() => {
+                          const midiNotes = [65, 71, 74]; // F4, B4, D5
+                          const minNote = Math.min(...midiNotes);
+                          const maxNote = Math.max(...midiNotes);
+                          const low = minNote - 1;
+                          const high = maxNote + 1;
+                          const totalSemitones = high - low + 1;
+                          const getMidiNoteName = (midi) => {
+                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const octave = Math.floor(midi / 12) - 1;
+                            return notes[midi % 12] + octave;
+                          };
+                          const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                          
+                          const noteHeight = 10;
+                          const containerHeight = totalSemitones * noteHeight;
+                          return (
+                            <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '90px', height: `${containerHeight}px` }}>
+                              <div className="flex h-full">
+                                <div className="w-6 border-r-2 border-gray-300 bg-white">
+                                  {Array.from({ length: totalSemitones }, (_, j) => {
+                                    const midiNote = high - j;
+                                    const noteName = getMidiNoteName(midiNote);
+                                    return (
+                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
+                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
+                                      }`} style={{ height: `${noteHeight}px` }}>
+                                        <span style={{ fontSize: '5px' }}>{noteName}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
+                                  {Array.from({ length: totalSemitones }, (_, j) => (
+                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * noteHeight}px` }} />
+                                  ))}
+                                  {midiNotes.map((midiNote, j) => {
+                                    const position = (high - midiNote) * noteHeight;
+                                    const isBNote = (midiNote % 12 === 11);
+                                    return (
+                                      <div key={j} className={`absolute rounded shadow-lg ${isBNote ? 'bg-red-500' : 'bg-purple-500'}`} 
+                                           style={{ left: '2px', top: `${position + 1}px`, width: '40px', height: `${noteHeight - 2}px` }}></div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      <p className="text-xs text-black/70">Bdim/2</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Augmented Triad Row */}
+                <div className="bg-white/30 rounded-xl p-3">
+                  <h4 className="font-bold text-black mb-2 text-center text-sm">Augmented Triads</h4>
+                  <div className="flex justify-center">
+                    {/* Only Root Position for Augmented */}
+                    <div className="text-center">
+                      <div className="mb-1">
+                        {(() => {
+                          const midiNotes = [60, 64, 68]; // C4, E4, G#4
+                          const minNote = Math.min(...midiNotes);
+                          const maxNote = Math.max(...midiNotes);
+                          const low = minNote - 1;
+                          const high = maxNote + 1;
+                          const totalSemitones = high - low + 1;
+                          const getMidiNoteName = (midi) => {
+                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const octave = Math.floor(midi / 12) - 1;
+                            return notes[midi % 12] + octave;
+                          };
+                          const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                          
+                          const noteHeight = 10;
+                          const containerHeight = totalSemitones * noteHeight;
+                          return (
+                            <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '90px', height: `${containerHeight}px` }}>
+                              <div className="flex h-full">
+                                <div className="w-6 border-r-2 border-gray-300 bg-white">
+                                  {Array.from({ length: totalSemitones }, (_, j) => {
+                                    const midiNote = high - j;
+                                    const noteName = getMidiNoteName(midiNote);
+                                    return (
+                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
+                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
+                                      }`} style={{ height: `${noteHeight}px` }}>
+                                        <span style={{ fontSize: '5px' }}>{noteName}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
+                                  {Array.from({ length: totalSemitones }, (_, j) => (
+                                    <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * noteHeight}px` }} />
+                                  ))}
+                                  {midiNotes.map((midiNote, j) => {
+                                    const position = (high - midiNote) * noteHeight;
+                                    const isCNote = (midiNote % 12 === 0);
+                                    return (
+                                      <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-purple-500'}`} 
+                                           style={{ left: '2px', top: `${position + 1}px`, width: '40px', height: `${noteHeight - 2}px` }}></div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      <p className="text-xs text-black/70">Caug</p>
+                      <p className="text-xs text-black/50">(no inversions in Level 3)</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -955,11 +1351,6 @@ export default function Level3Page() {
         </div>
       </main>
 
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800@display=swap');
-        * { font-family: 'Urbanist', sans-serif; }
-        html { scroll-behavior: smooth; }
-      `}</style>
     </div>
   );
 }
