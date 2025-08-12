@@ -438,21 +438,250 @@ export default function Level1Page() {
           </div>
         </header>
         
-        <main className="max-w-2xl mx-auto p-6 flex items-center justify-center min-h-[80vh]">
-          <div className="text-center bg-white/20 backdrop-blur-sm rounded-2xl p-8">
-            <h2 className="text-3xl font-bold text-black mb-6">Ready to Start Level 1?</h2>
-            <div className="text-lg text-black/80 mb-8 space-y-2">
-              <p><strong>{TOTAL_PROBLEMS} problems</strong> to complete</p>
-              <p>Identify basic triads (Major, Minor, Diminished, Augmented)</p>
-              <p>Need <strong>{PASS_ACCURACY}% accuracy</strong> to pass</p>
-              <p>Average time must be under <strong>{PASS_TIME} seconds</strong></p>
+        <main className="max-w-6xl mx-auto p-6">
+          <div className="flex flex-col lg:flex-row gap-8 items-start justify-center min-h-[80vh]">
+            {/* Main content */}
+            <div className="text-center bg-white/20 backdrop-blur-sm rounded-2xl p-8 lg:w-1/2">
+              <h2 className="text-3xl font-bold text-black mb-6">Ready to Start Level 1?</h2>
+              <div className="text-lg text-black/80 mb-8 space-y-2">
+                <p><strong>{TOTAL_PROBLEMS} problems</strong> to complete</p>
+                <p>Identify basic triads (Major, Minor, Diminished, Augmented)</p>
+                <p>Need <strong>{PASS_ACCURACY}% accuracy</strong> to pass</p>
+                <p>Average time must be under <strong>{PASS_TIME} seconds</strong></p>
+              </div>
+              <button
+                onClick={startLevel}
+                className="px-12 py-4 bg-green-500 text-white text-xl font-bold rounded-xl hover:bg-green-600 transition-colors shadow-lg"
+              >
+                Start Level 1
+              </button>
             </div>
-            <button
-              onClick={startLevel}
-              className="px-12 py-4 bg-green-500 text-white text-xl font-bold rounded-xl hover:bg-green-600 transition-colors shadow-lg"
-            >
-              Start Level 1
-            </button>
+
+            {/* Chord Legend */}
+            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 lg:w-1/2">
+              <h3 className="text-2xl font-bold text-black mb-6 text-center">Basic Triad Types</h3>
+              <div className="space-y-4">
+                {/* Major Triad */}
+                <div className="bg-white/30 rounded-xl p-4">
+                  <h4 className="font-bold text-black mb-3">Major (C)</h4>
+                  <div className="flex justify-center">
+                    {(() => {
+                      const midiNotes = [60, 64, 67]; // C4, E4, G4
+                      const minNote = Math.min(...midiNotes);
+                      const maxNote = Math.max(...midiNotes);
+                      const low = minNote - 1;
+                      const high = maxNote + 1;
+                      const totalSemitones = high - low + 1;
+                      const getMidiNoteName = (midi) => {
+                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                        const octave = Math.floor(midi / 12) - 1;
+                        return notes[midi % 12] + octave;
+                      };
+                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                      
+                      return (
+                        <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '160px', height: `${Math.max(60, totalSemitones * 10)}px` }}>
+                          <div className="flex h-full">
+                            <div className="w-12 border-r-2 border-gray-300 bg-white">
+                              {Array.from({ length: totalSemitones }, (_, j) => {
+                                const midiNote = high - j;
+                                const noteName = getMidiNoteName(midiNote);
+                                return (
+                                  <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
+                                    isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
+                                  }`} style={{ height: '10px' }}>
+                                    <span className="text-xs" style={{ fontSize: '8px' }}>{noteName}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
+                              {Array.from({ length: totalSemitones }, (_, j) => (
+                                <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 10}px` }} />
+                              ))}
+                              {midiNotes.map((midiNote, j) => {
+                                const position = (high - midiNote) * 10;
+                                const isCNote = (midiNote % 12 === 0);
+                                return (
+                                  <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
+                                       style={{ left: '4px', top: `${position + 1}px`, width: '80px', height: '8px' }}></div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                  <p className="text-xs text-black/70 text-center mt-2">Root + Major 3rd + Perfect 5th</p>
+                </div>
+
+                {/* Minor Triad */}
+                <div className="bg-white/30 rounded-xl p-4">
+                  <h4 className="font-bold text-black mb-3">Minor (Cm)</h4>
+                  <div className="flex justify-center">
+                    {(() => {
+                      const midiNotes = [60, 63, 67]; // C4, Eb4, G4
+                      const minNote = Math.min(...midiNotes);
+                      const maxNote = Math.max(...midiNotes);
+                      const low = minNote - 1;
+                      const high = maxNote + 1;
+                      const totalSemitones = high - low + 1;
+                      const getMidiNoteName = (midi) => {
+                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                        const octave = Math.floor(midi / 12) - 1;
+                        return notes[midi % 12] + octave;
+                      };
+                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                      
+                      return (
+                        <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '160px', height: `${Math.max(60, totalSemitones * 10)}px` }}>
+                          <div className="flex h-full">
+                            <div className="w-12 border-r-2 border-gray-300 bg-white">
+                              {Array.from({ length: totalSemitones }, (_, j) => {
+                                const midiNote = high - j;
+                                const noteName = getMidiNoteName(midiNote);
+                                return (
+                                  <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
+                                    isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
+                                  }`} style={{ height: '10px' }}>
+                                    <span className="text-xs" style={{ fontSize: '8px' }}>{noteName}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
+                              {Array.from({ length: totalSemitones }, (_, j) => (
+                                <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 10}px` }} />
+                              ))}
+                              {midiNotes.map((midiNote, j) => {
+                                const position = (high - midiNote) * 10;
+                                const isCNote = (midiNote % 12 === 0);
+                                return (
+                                  <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
+                                       style={{ left: '4px', top: `${position + 1}px`, width: '80px', height: '8px' }}></div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                  <p className="text-xs text-black/70 text-center mt-2">Root + Minor 3rd + Perfect 5th</p>
+                </div>
+
+                {/* Diminished Triad */}
+                <div className="bg-white/30 rounded-xl p-4">
+                  <h4 className="font-bold text-black mb-3">Diminished (Cdim)</h4>
+                  <div className="flex justify-center">
+                    {(() => {
+                      const midiNotes = [60, 63, 66]; // C4, Eb4, Gb4
+                      const minNote = Math.min(...midiNotes);
+                      const maxNote = Math.max(...midiNotes);
+                      const low = minNote - 1;
+                      const high = maxNote + 1;
+                      const totalSemitones = high - low + 1;
+                      const getMidiNoteName = (midi) => {
+                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                        const octave = Math.floor(midi / 12) - 1;
+                        return notes[midi % 12] + octave;
+                      };
+                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                      
+                      return (
+                        <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '160px', height: `${Math.max(60, totalSemitones * 10)}px` }}>
+                          <div className="flex h-full">
+                            <div className="w-12 border-r-2 border-gray-300 bg-white">
+                              {Array.from({ length: totalSemitones }, (_, j) => {
+                                const midiNote = high - j;
+                                const noteName = getMidiNoteName(midiNote);
+                                return (
+                                  <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
+                                    isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
+                                  }`} style={{ height: '10px' }}>
+                                    <span className="text-xs" style={{ fontSize: '8px' }}>{noteName}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
+                              {Array.from({ length: totalSemitones }, (_, j) => (
+                                <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 10}px` }} />
+                              ))}
+                              {midiNotes.map((midiNote, j) => {
+                                const position = (high - midiNote) * 10;
+                                const isCNote = (midiNote % 12 === 0);
+                                return (
+                                  <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
+                                       style={{ left: '4px', top: `${position + 1}px`, width: '80px', height: '8px' }}></div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                  <p className="text-xs text-black/70 text-center mt-2">Root + Minor 3rd + Diminished 5th</p>
+                </div>
+
+                {/* Augmented Triad */}
+                <div className="bg-white/30 rounded-xl p-4">
+                  <h4 className="font-bold text-black mb-3">Augmented (Caug)</h4>
+                  <div className="flex justify-center">
+                    {(() => {
+                      const midiNotes = [60, 64, 68]; // C4, E4, G#4
+                      const minNote = Math.min(...midiNotes);
+                      const maxNote = Math.max(...midiNotes);
+                      const low = minNote - 1;
+                      const high = maxNote + 1;
+                      const totalSemitones = high - low + 1;
+                      const getMidiNoteName = (midi) => {
+                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                        const octave = Math.floor(midi / 12) - 1;
+                        return notes[midi % 12] + octave;
+                      };
+                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
+                      
+                      return (
+                        <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '160px', height: `${Math.max(60, totalSemitones * 10)}px` }}>
+                          <div className="flex h-full">
+                            <div className="w-12 border-r-2 border-gray-300 bg-white">
+                              {Array.from({ length: totalSemitones }, (_, j) => {
+                                const midiNote = high - j;
+                                const noteName = getMidiNoteName(midiNote);
+                                return (
+                                  <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
+                                    isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
+                                  }`} style={{ height: '10px' }}>
+                                    <span className="text-xs" style={{ fontSize: '8px' }}>{noteName}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
+                              {Array.from({ length: totalSemitones }, (_, j) => (
+                                <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 10}px` }} />
+                              ))}
+                              {midiNotes.map((midiNote, j) => {
+                                const position = (high - midiNote) * 10;
+                                const isCNote = (midiNote % 12 === 0);
+                                return (
+                                  <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
+                                       style={{ left: '4px', top: `${position + 1}px`, width: '80px', height: '8px' }}></div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                  <p className="text-xs text-black/70 text-center mt-2">Root + Major 3rd + Augmented 5th</p>
+                </div>
+              </div>
+            </div>
           </div>
         </main>
       </div>
