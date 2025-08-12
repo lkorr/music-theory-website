@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run install:all:*)",
+      "Bash(npm run dev:web:*)"
+    ],
+    "deny": []
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "midi-training-app",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:mobile\"",
+    "dev:web": "cd apps/web && npm run dev",
+    "dev:mobile": "cd apps/mobile && npx expo start",
+    "install:all": "npm install && npm run install:web && npm run install:mobile",
+    "install:web": "cd apps/web && npm install", 
+    "install:mobile": "cd apps/mobile && npm install",
+    "build": "npm run build:web",
+    "build:web": "cd apps/web && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
