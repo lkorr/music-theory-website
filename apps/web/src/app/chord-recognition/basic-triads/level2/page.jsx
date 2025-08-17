@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router";
 
 // Music theory utilities
@@ -21,7 +22,7 @@ const inversionTypes = {
 
 // Helper functions
 const getMidiNoteName = (midiNote) => {
-    const noteNames = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+    const noteNames = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
     const octave = Math.floor(midiNote / 12) - 1;
     const note = noteNames[midiNote % 12];
     return `${note}${octave}`;
@@ -33,7 +34,7 @@ const isBlackKey = (midiNote) => {
 };
 
 // Piano roll display component for chord recognition
-function ChordPianoDisplay({ notes }) {
+function ChordPianoDisplay({ notes, showLabels, setShowLabels }) {
   const pianoKeysRef = useRef(null);
   const pianoRollRef = useRef(null);
   const noteHeight = 18;
@@ -72,7 +73,16 @@ function ChordPianoDisplay({ notes }) {
   
   return (
     <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-8">
-      <h3 className="text-xl font-semibold text-black mb-6 text-center">Chord Notes</h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold text-black text-center flex-1">Chord Notes</h3>
+        <button
+          onClick={() => setShowLabels(!showLabels)}
+          className="w-10 h-10 rounded-lg bg-white/30 hover:bg-white/40 transition-colors flex items-center justify-center"
+          title={showLabels ? "Hide note labels" : "Show note labels"}
+        >
+          {showLabels ? <EyeOff size={20} className="text-black" /> : <Eye size={20} className="text-black" />}
+        </button>
+      </div>
       
       <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-auto" style={{ width: '550px', height: `${containerHeight}px` }}>
         <div className="flex">
@@ -86,19 +96,20 @@ function ChordPianoDisplay({ notes }) {
                 return (
                   <div 
                     key={midiNote} 
-                    className={`border-b border-gray-200 flex items-center justify-end pr-3 ${
-                      isBlackKey(midiNote) 
-                        ? "bg-gray-800"
-                        : "bg-white text-gray-700"
-                    }`} 
-                    style={{ height: `${noteHeight}px` }}
+                    className="border-b border-gray-200 flex items-center justify-end pr-3"
+                    style={{ 
+                      height: `${noteHeight}px`,
+                      backgroundColor: isBlackKey(midiNote) ? '#6b7280' : '#ffffff',
+                      color: isBlackKey(midiNote) ? '#ffffff' : '#000000',
+                      fontSize: '12px'
+                    }}
                   >
                     <span className={`${
                       isBlackKey(midiNote) 
-                        ? "text-xs text-gray-400" 
-                        : "text-xs text-gray-700"
+                        ? "text-xs text-white" 
+                        : "text-xs text-black"
                     }`}>
-                      {noteName}
+                      {showLabels ? noteName : ''}
                     </span>
                   </div>
                 );
@@ -221,6 +232,7 @@ export default function Level2Page() {
   const [startTime, setStartTime] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [avgTime, setAvgTime] = useState(0);
+  const [showLabels, setShowLabels] = useState(true);
   const [totalTime, setTotalTime] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -233,26 +245,38 @@ export default function Level2Page() {
   const PASS_TIME = 5; // 5 seconds
 
   // Generate a random chord with inversion in a random octave within the display range
-  const generateChord = useCallback(() => {
+  const generateChord = useCallback((previousChord = null) => {
     const roots = ['C', 'D', 'E', 'F', 'G', 'A', 'B']; // Natural notes only
     
-    const root = roots[Math.floor(Math.random() * roots.length)];
+    let root, chordType, inversion, attempt = 0;
     
-    // For Level 2: only root position and first inversion
-    // Exclude augmented chords from inversions (they're confusing for beginners)
-    let chordType, inversion;
-    
-    if (Math.random() < 0.5) {
-      // 50% chance of root position (any chord type)
-      const chordTypeKeys = Object.keys(chordTypes);
-      chordType = chordTypeKeys[Math.floor(Math.random() * chordTypeKeys.length)];
-      inversion = 'root';
-    } else {
-      // 50% chance of first inversion (exclude augmented)
-      const nonAugmentedChords = ['major', 'minor', 'diminished'];
-      chordType = nonAugmentedChords[Math.floor(Math.random() * nonAugmentedChords.length)];
-      inversion = 'first';
-    }
+    // Prevent exact same chord appearing twice in a row
+    do {
+      root = roots[Math.floor(Math.random() * roots.length)];
+      
+      // For Level 2: only root position and first inversion
+      // Exclude augmented chords from inversions (they're confusing for beginners)
+      if (Math.random() < 0.5) {
+        // 50% chance of root position (any chord type)
+        const chordTypeKeys = Object.keys(chordTypes);
+        chordType = chordTypeKeys[Math.floor(Math.random() * chordTypeKeys.length)];
+        inversion = 'root';
+      } else {
+        // 50% chance of first inversion (exclude augmented)
+        const nonAugmentedChords = ['major', 'minor', 'diminished'];
+        chordType = nonAugmentedChords[Math.floor(Math.random() * nonAugmentedChords.length)];
+        inversion = 'first';
+      }
+      
+      attempt++;
+      
+      // If we've tried many times, just accept any different combination
+      if (attempt > 20) break;
+      
+    } while (previousChord && 
+             previousChord.root === root && 
+             previousChord.chordType === chordType &&
+             previousChord.inversion === inversion);
     
     // Choose a random octave from 2, 3, or 4 (C2=36, C3=48, C4=60)
     const possibleOctaves = [36, 48, 60]; // C2, C3, C4
@@ -341,7 +365,7 @@ export default function Level2Page() {
 
   const startLevel = () => {
     setHasStarted(true);
-    setCurrentChord(generateChord());
+    setCurrentChord(generateChord(currentChord));
     // Start timer for first problem
     const now = Date.now();
     setStartTime(now);
@@ -355,7 +379,7 @@ export default function Level2Page() {
   };
 
   const nextChord = () => {
-    setCurrentChord(generateChord());
+    setCurrentChord(generateChord(currentChord));
     setUserAnswer('');
     setFeedback(null);
     setIsAnswered(false);
@@ -605,7 +629,7 @@ export default function Level2Page() {
                           const high = maxNote + 1;
                           const totalSemitones = high - low + 1;
                           const getMidiNoteName = (midi) => {
-                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const notes = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
                             const octave = Math.floor(midi / 12) - 1;
                             return notes[midi % 12] + octave;
                           };
@@ -621,9 +645,11 @@ export default function Level2Page() {
                                     const midiNote = high - j;
                                     const noteName = getMidiNoteName(midiNote);
                                     return (
-                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
-                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                      }`} style={{ height: `${noteHeight}px` }}>
+                                      <div key={j} className="border-b border-gray-200 flex items-center justify-end pr-1 text-xs" style={{ 
+                                        height: `${noteHeight}px`,
+                                        backgroundColor: isBlackKey(midiNote) ? '#6b7280' : '#ffffff',
+                                        color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
+                                      }}>
                                         <span style={{ fontSize: '6px' }}>{noteName}</span>
                                       </div>
                                     );
@@ -661,7 +687,7 @@ export default function Level2Page() {
                           const high = maxNote + 1;
                           const totalSemitones = high - low + 1;
                           const getMidiNoteName = (midi) => {
-                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const notes = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
                             const octave = Math.floor(midi / 12) - 1;
                             return notes[midi % 12] + octave;
                           };
@@ -677,9 +703,11 @@ export default function Level2Page() {
                                     const midiNote = high - j;
                                     const noteName = getMidiNoteName(midiNote);
                                     return (
-                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
-                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                      }`} style={{ height: `${noteHeight}px` }}>
+                                      <div key={j} className="border-b border-gray-200 flex items-center justify-end pr-1 text-xs" style={{ 
+                                        height: `${noteHeight}px`,
+                                        backgroundColor: isBlackKey(midiNote) ? '#6b7280' : '#ffffff',
+                                        color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
+                                      }}>
                                         <span style={{ fontSize: '6px' }}>{noteName}</span>
                                       </div>
                                     );
@@ -723,7 +751,7 @@ export default function Level2Page() {
                           const high = maxNote + 1;
                           const totalSemitones = high - low + 1;
                           const getMidiNoteName = (midi) => {
-                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const notes = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
                             const octave = Math.floor(midi / 12) - 1;
                             return notes[midi % 12] + octave;
                           };
@@ -739,9 +767,11 @@ export default function Level2Page() {
                                     const midiNote = high - j;
                                     const noteName = getMidiNoteName(midiNote);
                                     return (
-                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
-                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                      }`} style={{ height: `${noteHeight}px` }}>
+                                      <div key={j} className="border-b border-gray-200 flex items-center justify-end pr-1 text-xs" style={{ 
+                                        height: `${noteHeight}px`,
+                                        backgroundColor: isBlackKey(midiNote) ? '#6b7280' : '#ffffff',
+                                        color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
+                                      }}>
                                         <span style={{ fontSize: '6px' }}>{noteName}</span>
                                       </div>
                                     );
@@ -779,7 +809,7 @@ export default function Level2Page() {
                           const high = maxNote + 1;
                           const totalSemitones = high - low + 1;
                           const getMidiNoteName = (midi) => {
-                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const notes = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
                             const octave = Math.floor(midi / 12) - 1;
                             return notes[midi % 12] + octave;
                           };
@@ -795,9 +825,11 @@ export default function Level2Page() {
                                     const midiNote = high - j;
                                     const noteName = getMidiNoteName(midiNote);
                                     return (
-                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
-                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                      }`} style={{ height: `${noteHeight}px` }}>
+                                      <div key={j} className="border-b border-gray-200 flex items-center justify-end pr-1 text-xs" style={{ 
+                                        height: `${noteHeight}px`,
+                                        backgroundColor: isBlackKey(midiNote) ? '#6b7280' : '#ffffff',
+                                        color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
+                                      }}>
                                         <span style={{ fontSize: '6px' }}>{noteName}</span>
                                       </div>
                                     );
@@ -841,7 +873,7 @@ export default function Level2Page() {
                           const high = maxNote + 1;
                           const totalSemitones = high - low + 1;
                           const getMidiNoteName = (midi) => {
-                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const notes = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
                             const octave = Math.floor(midi / 12) - 1;
                             return notes[midi % 12] + octave;
                           };
@@ -857,9 +889,11 @@ export default function Level2Page() {
                                     const midiNote = high - j;
                                     const noteName = getMidiNoteName(midiNote);
                                     return (
-                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
-                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                      }`} style={{ height: `${noteHeight}px` }}>
+                                      <div key={j} className="border-b border-gray-200 flex items-center justify-end pr-1 text-xs" style={{ 
+                                        height: `${noteHeight}px`,
+                                        backgroundColor: isBlackKey(midiNote) ? '#6b7280' : '#ffffff',
+                                        color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
+                                      }}>
                                         <span style={{ fontSize: '6px' }}>{noteName}</span>
                                       </div>
                                     );
@@ -897,7 +931,7 @@ export default function Level2Page() {
                           const high = maxNote + 1;
                           const totalSemitones = high - low + 1;
                           const getMidiNoteName = (midi) => {
-                            const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+                            const notes = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
                             const octave = Math.floor(midi / 12) - 1;
                             return notes[midi % 12] + octave;
                           };
@@ -913,9 +947,11 @@ export default function Level2Page() {
                                     const midiNote = high - j;
                                     const noteName = getMidiNoteName(midiNote);
                                     return (
-                                      <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-1 text-xs ${
-                                        isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                      }`} style={{ height: `${noteHeight}px` }}>
+                                      <div key={j} className="border-b border-gray-200 flex items-center justify-end pr-1 text-xs" style={{ 
+                                        height: `${noteHeight}px`,
+                                        backgroundColor: isBlackKey(midiNote) ? '#6b7280' : '#ffffff',
+                                        color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
+                                      }}>
                                         <span style={{ fontSize: '6px' }}>{noteName}</span>
                                       </div>
                                     );
@@ -1064,7 +1100,7 @@ export default function Level2Page() {
       <main className="max-w-4xl mx-auto p-6">
         <ScoreDisplay {...score} currentTime={currentTime} avgTime={avgTime} isAnswered={isAnswered} totalProblems={TOTAL_PROBLEMS} />
         
-        <ChordPianoDisplay notes={currentChord.notes} />
+        <ChordPianoDisplay notes={currentChord.notes} showLabels={showLabels} setShowLabels={setShowLabels} />
 
         {/* Question section */}
         <div className="mt-6 text-center mb-8">

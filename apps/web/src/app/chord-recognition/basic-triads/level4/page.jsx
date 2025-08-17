@@ -1,31 +1,164 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router";
-import { generateChord, validateAnswer, levelConfigs } from "../shared/chordLogic.js";
 
-// Import shared components
-const ChordPianoDisplay = ({ notes }) => {
-  const pianoKeysRef = useRef(null);
-  const pianoRollRef = useRef(null);
-  const noteHeight = 18;
-  // Show full range from C1 to C6 (MIDI 24-84) for scrolling
-  const lowestNote = 24;  // C1
-  const highestNote = 84; // C6
-  const totalNotes = highestNote - lowestNote + 1; // 61 notes total
-  const containerHeight = 600; // Fixed container height for scrolling (50% bigger)
-  
-  const getMidiNoteName = (midiNote) => {
-    const noteNames = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+// Music theory utilities
+const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+const chordTypes = {
+  major: { name: '', intervals: [0, 4, 7], symbol: '' },
+  minor: { name: 'Minor', intervals: [0, 3, 7], symbol: 'm' },
+  diminished: { name: 'Diminished', intervals: [0, 3, 6], symbol: 'dim' },
+  augmented: { name: 'Augmented', intervals: [0, 4, 8], symbol: 'aug' }
+};
+
+// Helper functions
+const getMidiNoteName = (midiNote) => {
+    const noteNames = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
     const octave = Math.floor(midiNote / 12) - 1;
     const note = noteNames[midiNote % 12];
     return `${note}${octave}`;
-  };
+};
 
-  const isBlackKey = (midiNote) => {
+const isBlackKey = (midiNote) => {
     const noteInOctave = midiNote % 12;
     return [1, 3, 6, 8, 10].includes(noteInOctave);
+};
+
+// Generate open voicing chord with octave doubling and wide spacing
+const generateOpenVoicingChord = (previousChord = null) => {
+  const rootNotes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // All 12 notes
+  const chordTypeKeys = Object.keys(chordTypes);
+  
+  let rootNote, chordTypeKey, attempt = 0;
+  
+  // Prevent exact same chord appearing twice in a row
+  do {
+    rootNote = rootNotes[Math.floor(Math.random() * rootNotes.length)];
+    chordTypeKey = chordTypeKeys[Math.floor(Math.random() * chordTypeKeys.length)];
+    attempt++;
+    
+    // If we've tried many times, just accept any different combination
+    if (attempt > 20) break;
+    
+  } while (previousChord && 
+           previousChord.rootNote === rootNote && 
+           previousChord.chordTypeKey === chordTypeKey);
+  
+  const chordType = chordTypes[chordTypeKey];
+  
+  // Generate base notes in middle register
+  const baseOctave = 4;
+  const baseNotes = chordType.intervals.map(interval => 
+    (rootNote + interval) % 12 + (baseOctave * 12)
+  );
+  
+  // Create open voicing with octave doubling and wide spacing
+  const openVoicingNotes = [];
+  
+  // Strategy 1: Wide spacing (30% chance)
+  if (Math.random() < 0.3) {
+    // Spread notes across 2-3 octaves with gaps
+    const lowOctave = 3;
+    const midOctave = 4;
+    const highOctave = 5;
+    
+    // Root in bass
+    openVoicingNotes.push((rootNote % 12) + (lowOctave * 12));
+    
+    // Some chord tones in middle register
+    const midNotes = chordType.intervals.slice(1).map(interval => 
+      (rootNote + interval) % 12 + (midOctave * 12)
+    );
+    openVoicingNotes.push(...midNotes);
+    
+    // Possible octave doubling in higher register
+    if (Math.random() < 0.5) {
+      openVoicingNotes.push((rootNote % 12) + (highOctave * 12));
+    }
+  }
+  // Strategy 2: Octave doubling (40% chance)
+  else if (Math.random() < 0.4) {
+    // Standard voicing with octave doubling
+    openVoicingNotes.push(...baseNotes);
+    
+    // Add octave doubling of root or fifth
+    const doublingTarget = Math.random() < 0.7 ? 0 : 2; // Root or fifth
+    const doublingInterval = chordType.intervals[doublingTarget];
+    const octaveDoubling = (rootNote + doublingInterval) % 12 + ((baseOctave + 1) * 12);
+    openVoicingNotes.push(octaveDoubling);
+  }
+  // Strategy 3: Mixed open voicing (30% chance)
+  else {
+    // Lower notes
+    const lowOctave = 3;
+    openVoicingNotes.push((rootNote % 12) + (lowOctave * 12));
+    
+    // Middle notes - include all chord tones but spread them out
+    chordType.intervals.slice(1).forEach(interval => {
+      openVoicingNotes.push((rootNote + interval) % 12 + (baseOctave * 12));
+    });
+    
+    // High register - add octave doubling of root or another chord tone
+    const doublingInterval = chordType.intervals[Math.floor(Math.random() * chordType.intervals.length)];
+    const highNote = (rootNote + doublingInterval) % 12 + ((baseOctave + 1) * 12);
+    openVoicingNotes.push(highNote);
+  }
+  
+  // Remove exact duplicates and sort, but ensure all chord tones are represented
+  const uniqueNotes = [...new Set(openVoicingNotes)].sort((a, b) => a - b);
+  
+  // Verify all chord tones are present (check interval classes)
+  const presentIntervalClasses = new Set(uniqueNotes.map(note => note % 12));
+  const requiredIntervalClasses = new Set(chordType.intervals.map(interval => (rootNote + interval) % 12));
+  
+  // If any chord tone is missing, add it in a suitable octave
+  for (const requiredInterval of chordType.intervals) {
+    const requiredNote = (rootNote + requiredInterval) % 12;
+    if (!presentIntervalClasses.has(requiredNote)) {
+      // Add the missing note in the middle octave
+      const missingNote = requiredNote + (baseOctave * 12);
+      uniqueNotes.push(missingNote);
+    }
+  }
+  
+  // Sort again after potentially adding missing notes
+  uniqueNotes.sort((a, b) => a - b);
+  
+  const expectedAnswer = noteNames[rootNote] + chordType.symbol;
+  
+  // Debug logging to verify all chord tones are present
+  const finalIntervalClasses = uniqueNotes.map(note => note % 12);
+  const expectedIntervalClasses = chordType.intervals.map(interval => (rootNote + interval) % 12);
+  console.log('Open voicing debug:', {
+    chord: expectedAnswer,
+    expectedIntervals: expectedIntervalClasses,
+    presentIntervals: finalIntervalClasses,
+    allTonesPresent: expectedIntervalClasses.every(interval => finalIntervalClasses.includes(interval)),
+    notes: uniqueNotes.map(note => getMidiNoteName(note))
+  });
+  
+  return {
+    notes: uniqueNotes,
+    expectedAnswer: expectedAnswer,
+    explanation: `${noteNames[rootNote]} ${chordType.name || 'Major'} (Open Voicing)`,
+    rootNote: rootNote,
+    chordTypeKey: chordTypeKey
   };
+};
+
+// Piano roll display component for chord recognition
+function ChordPianoDisplay({ notes, showLabels, setShowLabels }) {
+  const pianoKeysRef = useRef(null);
+  const pianoRollRef = useRef(null);
+  const noteHeight = 18;
+  // Show full range from C1 to C7 (MIDI 24-96) for open voicings
+  const lowestNote = 24;  // C1
+  const highestNote = 96; // C7
+  const totalNotes = highestNote - lowestNote + 1; // 73 notes total
+  const containerHeight = 600; // Fixed container height for scrolling
   
   // Auto-scroll to center the chord when notes change (with random offset)
   useEffect(() => {
@@ -56,7 +189,7 @@ const ChordPianoDisplay = ({ notes }) => {
   
   return (
     <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-8">
-      <h3 className="text-xl font-semibold text-black mb-6 text-center">Chord Notes</h3>
+      <h3 className="text-xl font-semibold text-black mb-6 text-center">Open Voicing Chord</h3>
       
       <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-auto" style={{ width: '550px', height: `${containerHeight}px` }}>
         <div className="flex">
@@ -70,17 +203,19 @@ const ChordPianoDisplay = ({ notes }) => {
                 return (
                   <div 
                     key={midiNote} 
-                    className={`border-b border-gray-200 flex items-center justify-end pr-3 text-xs ${
+                    className={`border-b border-gray-200 flex items-center justify-end pr-3 ${
                       isBlackKey(midiNote) 
-                        ? "bg-gray-800 text-white"
+                        ? "bg-gray-800"
                         : "bg-white text-gray-700"
                     }`} 
                     style={{ height: `${noteHeight}px` }}
                   >
-                    <span className={`text-xs ${
-                      isBlackKey(midiNote) ? "text-gray-400" : ""
+                    <span className={`${
+                      isBlackKey(midiNote) 
+                        ? "text-xs text-white" 
+                        : "text-xs text-black"
                     }`}>
-                      {noteName}
+                      {showLabels ? noteName : ''}
                     </span>
                   </div>
                 );
@@ -118,7 +253,7 @@ const ChordPianoDisplay = ({ notes }) => {
                 return (
                   <div
                     key={`note-${index}`}
-                    className="absolute bg-blue-500 border-blue-600 rounded-lg shadow-lg"
+                    className="absolute bg-orange-500 border-orange-600 rounded-lg shadow-lg"
                     style={{
                       left: '20px',
                       top: `${yPos + 2}px`,
@@ -135,7 +270,7 @@ const ChordPianoDisplay = ({ notes }) => {
       </div>
     </div>
   );
-};
+}
 
 // Score display component
 function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered, totalProblems }) {
@@ -152,7 +287,7 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
-            className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+            className="bg-orange-500 h-2 rounded-full transition-all duration-300" 
             style={{ width: `${progress}%` }}
           ></div>
         </div>
@@ -167,7 +302,7 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
         </div>
         <div>
           <div className={`text-2xl font-bold ${
-            avgTime > 0 && avgTime <= 5 ? 'text-green-600' : avgTime > 5 ? 'text-red-600' : 'text-black'
+            avgTime > 0 && avgTime <= 8 ? 'text-green-600' : avgTime > 8 ? 'text-red-600' : 'text-black'
           }`}>
             {avgTime > 0 ? avgTime.toFixed(1) : '0.0'}s
           </div>
@@ -175,18 +310,24 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
         </div>
         <div>
           <div className={`text-2xl font-bold ${
-            accuracy >= 90 ? 'text-green-600' : accuracy >= 70 ? 'text-yellow-600' : 'text-red-600'
+            accuracy >= 85 ? 'text-green-600' : accuracy >= 70 ? 'text-yellow-600' : 'text-red-600'
           }`}>
             {accuracy}%
           </div>
           <div className="text-sm text-black/70">Accuracy</div>
         </div>
         <div>
-          <div className="text-2xl font-bold text-black">{correct}/{total}</div>
+          <div className="text-2xl font-bold text-black">
+            {correct}
+          </div>
           <div className="text-sm text-black/70">Correct</div>
         </div>
         <div>
-          <div className="text-2xl font-bold text-black">{streak}</div>
+          <div className={`text-2xl font-bold ${
+            streak >= 5 ? 'text-green-600' : streak >= 3 ? 'text-yellow-600' : 'text-black'
+          }`}>
+            {streak}
+          </div>
           <div className="text-sm text-black/70">Streak</div>
         </div>
       </div>
@@ -194,7 +335,63 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
   );
 }
 
-export default function Level4Page() {
+// Validate user's answer against expected answer
+const validateAnswer = (userAnswer, expectedAnswer) => {
+  const normalizeAnswer = (answer) => {
+    return answer.toLowerCase()
+      .replace(/\s+/g, '')
+      .replace(/♯/g, '#')
+      .replace(/♭/g, 'b')
+      .replace(/°/g, 'dim')
+      .replace(/∘/g, 'dim')
+      .replace(/\+/g, 'aug');
+  };
+
+  const normalized = normalizeAnswer(userAnswer);
+  const expected = normalizeAnswer(expectedAnswer);
+  
+  // Create a set of acceptable answers
+  const acceptableAnswers = new Set();
+  
+  // Parse the expected answer to get root note and chord type
+  const match = expected.match(/^([a-g][#b]?)(.*)$/i);
+  if (!match) return false;
+  
+  const [, rootNote, chordTypePart] = match;
+  
+  // Major chord variations
+  if (chordTypePart === '' || chordTypePart === 'maj' || chordTypePart === 'major') {
+    acceptableAnswers.add(normalizeAnswer(rootNote)); // Just "C"
+    acceptableAnswers.add(normalizeAnswer(rootNote + 'maj')); // "Cmaj"
+    acceptableAnswers.add(normalizeAnswer(rootNote + 'major')); // "Cmajor"
+    acceptableAnswers.add(normalizeAnswer(rootNote + 'M')); // "CM"
+  }
+  
+  // Minor chord variations  
+  if (chordTypePart === 'm' || chordTypePart === 'min' || chordTypePart === 'minor') {
+    acceptableAnswers.add(normalizeAnswer(rootNote + 'm')); // "Cm"
+    acceptableAnswers.add(normalizeAnswer(rootNote + 'min')); // "Cmin"
+    acceptableAnswers.add(normalizeAnswer(rootNote + 'minor')); // "Cminor"
+  }
+  
+  // Diminished chord variations
+  if (chordTypePart === 'dim' || chordTypePart === 'diminished') {
+    acceptableAnswers.add(normalizeAnswer(rootNote + 'dim')); // "Cdim"
+    acceptableAnswers.add(normalizeAnswer(rootNote + 'diminished')); // "Cdiminished"
+    acceptableAnswers.add(normalizeAnswer(rootNote + '°')); // "C°"
+  }
+  
+  // Augmented chord variations
+  if (chordTypePart === 'aug' || chordTypePart === 'augmented') {
+    acceptableAnswers.add(normalizeAnswer(rootNote + 'aug')); // "Caug"
+    acceptableAnswers.add(normalizeAnswer(rootNote + 'augmented')); // "Caugmented"
+    acceptableAnswers.add(normalizeAnswer(rootNote + '+')); // "C+"
+  }
+  
+  return acceptableAnswers.has(normalized);
+};
+
+export default function Level4OpenVoicings() {
   const [currentChord, setCurrentChord] = useState(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState(null);
@@ -203,6 +400,7 @@ export default function Level4Page() {
   const [startTime, setStartTime] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [avgTime, setAvgTime] = useState(0);
+  const [showLabels, setShowLabels] = useState(true);
   const [totalTime, setTotalTime] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -211,12 +409,14 @@ export default function Level4Page() {
   const timerRef = useRef(null);
   
   const TOTAL_PROBLEMS = 30;
-  const PASS_ACCURACY = 85; // 85% for 7th chords
-  const PASS_TIME = 8; // 8 seconds for 7th chords
+  const PASS_ACCURACY = 75; // 75% for open voicings
+  const PASS_TIME = 12; // 12 seconds for open voicings
 
   const startLevel = () => {
     setHasStarted(true);
-    setCurrentChord(generateChord(levelConfigs.level4));
+    const chord = generateOpenVoicingChord(currentChord);
+    console.log('Generated open voicing chord:', chord);
+    setCurrentChord(chord);
     // Start timer for first problem
     const now = Date.now();
     setStartTime(now);
@@ -230,7 +430,9 @@ export default function Level4Page() {
   };
 
   const nextChord = () => {
-    setCurrentChord(generateChord(levelConfigs.level4));
+    const chord = generateOpenVoicingChord(currentChord);
+    console.log('Next open voicing chord generated:', chord);
+    setCurrentChord(chord);
     setUserAnswer('');
     setFeedback(null);
     setIsAnswered(false);
@@ -284,40 +486,42 @@ export default function Level4Page() {
     setScore(prev => {
       const newTotal = prev.total + 1;
       const newTotalTime = totalTime + timeTaken;
-      setTotalTime(newTotalTime);
-      setAvgTime(newTotalTime / newTotal);
+      const newAvgTime = newTotalTime / newTotal;
       
-      const newScore = {
-        correct: prev.correct + (isCorrect ? 1 : 0),
-        total: newTotal,
-        streak: isCorrect ? prev.streak + 1 : 0
-      };
+      setTotalTime(newTotalTime);
+      setAvgTime(newAvgTime);
+      
+      const newCorrect = prev.correct + (isCorrect ? 1 : 0);
+      const newStreak = isCorrect ? prev.streak + 1 : 0;
       
       // Check if level is completed
       if (newTotal >= TOTAL_PROBLEMS) {
-        const finalAccuracy = (newScore.correct / newTotal) * 100;
-        const finalAvgTime = newTotalTime / newTotal;
-        const passed = finalAccuracy >= PASS_ACCURACY && finalAvgTime <= PASS_TIME;
+        const finalAccuracy = (newCorrect / newTotal) * 100;
+        const passed = finalAccuracy >= PASS_ACCURACY && newAvgTime <= PASS_TIME;
         
         setLevelResult({
           passed,
           accuracy: finalAccuracy,
-          avgTime: finalAvgTime,
-          score: newScore
+          avgTime: newAvgTime,
+          totalCorrect: newCorrect,
+          totalQuestions: newTotal
         });
         setIsCompleted(true);
       }
       
-      return newScore;
+      return {
+        correct: newCorrect,
+        total: newTotal,
+        streak: newStreak
+      };
     });
     
     setIsAnswered(true);
     
-    // Auto-advance: 0.5 seconds if correct, 4 seconds if incorrect
+    // Auto-advance to next chord after delay
     const delay = isCorrect ? 500 : 4000;
-    const currentTotal = score.total + 1; // Use the new total value
     setTimeout(() => {
-      if (currentTotal < TOTAL_PROBLEMS) {
+      if (score.total + 1 < TOTAL_PROBLEMS) {
         nextChord();
       }
     }, delay);
@@ -340,7 +544,7 @@ export default function Level4Page() {
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
               <h1 className="text-xl font-bold text-black">
-                Level 4: 7th Chords
+                Level 4: Open Voicings
               </h1>
             </div>
             <Link to="/" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
@@ -356,296 +560,50 @@ export default function Level4Page() {
               <h2 className="text-3xl font-bold text-black mb-6">Ready to Start Level 4?</h2>
               <div className="text-lg text-black/80 mb-8 space-y-2">
                 <p><strong>{TOTAL_PROBLEMS} problems</strong> to complete</p>
-                <p>Identify 7th chords in root position</p>
-                <p>Types: Major7, Minor7, Dominant7, Diminished7, Half-Diminished7</p>
+                <p>Identify triads in <strong>open voicings</strong> with octave doubling and wide spacing</p>
                 <p>Need <strong>{PASS_ACCURACY}% accuracy</strong> to pass</p>
                 <p>Average time must be under <strong>{PASS_TIME} seconds</strong></p>
               </div>
               <button
                 onClick={startLevel}
-                className="px-12 py-4 bg-green-500 text-white text-xl font-bold rounded-xl hover:bg-green-600 transition-colors shadow-lg"
+                className="px-12 py-4 bg-orange-500 text-white text-xl font-bold rounded-xl hover:bg-orange-600 transition-colors shadow-lg"
               >
                 Start Level 4
               </button>
             </div>
 
-            {/* Chord Legend */}
+            {/* Open Voicing Examples */}
             <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 lg:w-1/2">
-              <h3 className="text-2xl font-bold text-black mb-6 text-center">7th Chord Types</h3>
-              <div className="space-y-4">
-                {/* Major 7th */}
+              <h3 className="text-2xl font-bold text-black mb-6 text-center">Open Voicing Examples</h3>
+              <div className="space-y-4 text-black/80">
                 <div className="bg-white/30 rounded-xl p-4">
-                  <h4 className="font-bold text-black mb-3">Major 7th (Cmaj7)</h4>
-                  <div className="flex justify-center">
-                    {(() => {
-                      const midiNotes = [60, 64, 67, 71]; // C4, E4, G4, B4
-                      const minNote = Math.min(...midiNotes);
-                      const maxNote = Math.max(...midiNotes);
-                      const low = minNote - 1;
-                      const high = maxNote + 1;
-                      const totalSemitones = high - low + 1;
-                      const getMidiNoteName = (midi) => {
-                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-                        const octave = Math.floor(midi / 12) - 1;
-                        return notes[midi % 12] + octave;
-                      };
-                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
-                      
-                      return (
-                        <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '200px', height: `${Math.max(80, totalSemitones * 12)}px` }}>
-                          <div className="flex h-full">
-                            <div className="w-16 border-r-2 border-gray-300 bg-white">
-                              {Array.from({ length: totalSemitones }, (_, j) => {
-                                const midiNote = high - j;
-                                const noteName = getMidiNoteName(midiNote);
-                                return (
-                                  <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-2 text-xs ${
-                                    isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                  }`} style={{ height: '12px' }}>
-                                    <span className="text-xs">{noteName}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                            <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
-                              {Array.from({ length: totalSemitones }, (_, j) => (
-                                <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 12}px` }} />
-                              ))}
-                              {midiNotes.map((midiNote, j) => {
-                                const position = (high - midiNote) * 12;
-                                const isCNote = (midiNote % 12 === 0);
-                                return (
-                                  <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
-                                       style={{ left: '8px', top: `${position + 1}px`, width: '110px', height: '10px' }}></div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                  <p className="text-xs text-black/70 text-center mt-2">Root + Major 3rd + Perfect 5th + Major 7th</p>
+                  <h4 className="font-bold mb-2">What are Open Voicings?</h4>
+                  <p className="text-sm">Open voicings spread chord tones across multiple octaves with gaps between notes, creating a fuller, more resonant sound than close voicings.</p>
                 </div>
-
-                {/* Minor 7th */}
+                
                 <div className="bg-white/30 rounded-xl p-4">
-                  <h4 className="font-bold text-black mb-3">Minor 7th (Cm7)</h4>
-                  <div className="flex justify-center">
-                    {(() => {
-                      const midiNotes = [60, 63, 67, 70]; // C4, Eb4, G4, Bb4
-                      const minNote = Math.min(...midiNotes);
-                      const maxNote = Math.max(...midiNotes);
-                      const low = minNote - 1;
-                      const high = maxNote + 1;
-                      const totalSemitones = high - low + 1;
-                      const getMidiNoteName = (midi) => {
-                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-                        const octave = Math.floor(midi / 12) - 1;
-                        return notes[midi % 12] + octave;
-                      };
-                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
-                      
-                      return (
-                        <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '200px', height: `${Math.max(80, totalSemitones * 12)}px` }}>
-                          <div className="flex h-full">
-                            <div className="w-16 border-r-2 border-gray-300 bg-white">
-                              {Array.from({ length: totalSemitones }, (_, j) => {
-                                const midiNote = high - j;
-                                const noteName = getMidiNoteName(midiNote);
-                                return (
-                                  <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-2 text-xs ${
-                                    isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                  }`} style={{ height: '12px' }}>
-                                    <span className="text-xs">{noteName}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                            <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
-                              {Array.from({ length: totalSemitones }, (_, j) => (
-                                <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 12}px` }} />
-                              ))}
-                              {midiNotes.map((midiNote, j) => {
-                                const position = (high - midiNote) * 12;
-                                const isCNote = (midiNote % 12 === 0);
-                                return (
-                                  <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
-                                       style={{ left: '8px', top: `${position + 1}px`, width: '110px', height: '10px' }}></div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                  <p className="text-xs text-black/70 text-center mt-2">Root + Minor 3rd + Perfect 5th + Minor 7th</p>
+                  <h4 className="font-bold mb-2">Features You'll Encounter:</h4>
+                  <ul className="text-sm space-y-1">
+                    <li>• <strong>Wide spacing:</strong> Notes spread across 2-3 octaves</li>
+                    <li>• <strong>Octave doubling:</strong> Same note in different octaves</li>
+                    <li>• <strong>Root in bass:</strong> Often with higher chord tones</li>
+                    <li>• <strong>Missing notes:</strong> Some chord tones may be omitted</li>
+                  </ul>
                 </div>
-
-                {/* Dominant 7th */}
+                
                 <div className="bg-white/30 rounded-xl p-4">
-                  <h4 className="font-bold text-black mb-3">Dominant 7th (C7)</h4>
-                  <div className="flex justify-center">
-                    {(() => {
-                      const midiNotes = [60, 64, 67, 70]; // C4, E4, G4, Bb4
-                      const minNote = Math.min(...midiNotes);
-                      const maxNote = Math.max(...midiNotes);
-                      const low = minNote - 1;
-                      const high = maxNote + 1;
-                      const totalSemitones = high - low + 1;
-                      const getMidiNoteName = (midi) => {
-                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-                        const octave = Math.floor(midi / 12) - 1;
-                        return notes[midi % 12] + octave;
-                      };
-                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
-                      
-                      return (
-                        <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '200px', height: `${Math.max(80, totalSemitones * 12)}px` }}>
-                          <div className="flex h-full">
-                            <div className="w-16 border-r-2 border-gray-300 bg-white">
-                              {Array.from({ length: totalSemitones }, (_, j) => {
-                                const midiNote = high - j;
-                                const noteName = getMidiNoteName(midiNote);
-                                return (
-                                  <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-2 text-xs ${
-                                    isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                  }`} style={{ height: '12px' }}>
-                                    <span className="text-xs">{noteName}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                            <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
-                              {Array.from({ length: totalSemitones }, (_, j) => (
-                                <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 12}px` }} />
-                              ))}
-                              {midiNotes.map((midiNote, j) => {
-                                const position = (high - midiNote) * 12;
-                                const isCNote = (midiNote % 12 === 0);
-                                return (
-                                  <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
-                                       style={{ left: '8px', top: `${position + 1}px`, width: '110px', height: '10px' }}></div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                  <p className="text-xs text-black/70 text-center mt-2">Root + Major 3rd + Perfect 5th + Minor 7th</p>
+                  <h4 className="font-bold mb-2">Tips for Success:</h4>
+                  <ul className="text-sm space-y-1">
+                    <li>• Focus on the <strong>lowest note</strong> (usually the root)</li>
+                    <li>• Identify the <strong>chord quality</strong> (major, minor, dim, aug)</li>
+                    <li>• Don't be distracted by <strong>octave doublings</strong></li>
+                    <li>• Listen for the overall <strong>harmonic color</strong></li>
+                  </ul>
                 </div>
-
-                {/* Diminished 7th */}
+                
                 <div className="bg-white/30 rounded-xl p-4">
-                  <h4 className="font-bold text-black mb-3">Diminished 7th (Cdim7)</h4>
-                  <div className="flex justify-center">
-                    {(() => {
-                      const midiNotes = [60, 63, 66, 69]; // C4, Eb4, Gb4, A4
-                      const minNote = Math.min(...midiNotes);
-                      const maxNote = Math.max(...midiNotes);
-                      const low = minNote - 1;
-                      const high = maxNote + 1;
-                      const totalSemitones = high - low + 1;
-                      const getMidiNoteName = (midi) => {
-                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-                        const octave = Math.floor(midi / 12) - 1;
-                        return notes[midi % 12] + octave;
-                      };
-                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
-                      
-                      return (
-                        <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '200px', height: `${Math.max(80, totalSemitones * 12)}px` }}>
-                          <div className="flex h-full">
-                            <div className="w-16 border-r-2 border-gray-300 bg-white">
-                              {Array.from({ length: totalSemitones }, (_, j) => {
-                                const midiNote = high - j;
-                                const noteName = getMidiNoteName(midiNote);
-                                return (
-                                  <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-2 text-xs ${
-                                    isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                  }`} style={{ height: '12px' }}>
-                                    <span className="text-xs">{noteName}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                            <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
-                              {Array.from({ length: totalSemitones }, (_, j) => (
-                                <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 12}px` }} />
-                              ))}
-                              {midiNotes.map((midiNote, j) => {
-                                const position = (high - midiNote) * 12;
-                                const isCNote = (midiNote % 12 === 0);
-                                return (
-                                  <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
-                                       style={{ left: '8px', top: `${position + 1}px`, width: '110px', height: '10px' }}></div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                  <p className="text-xs text-black/70 text-center mt-2">Root + Minor 3rd + Dim 5th + Dim 7th</p>
-                </div>
-
-                {/* Half Diminished 7th */}
-                <div className="bg-white/30 rounded-xl p-4">
-                  <h4 className="font-bold text-black mb-3">Half Diminished 7th (Cm7♭5)</h4>
-                  <div className="flex justify-center">
-                    {(() => {
-                      const midiNotes = [60, 63, 66, 70]; // C4, Eb4, Gb4, Bb4
-                      const minNote = Math.min(...midiNotes);
-                      const maxNote = Math.max(...midiNotes);
-                      const low = minNote - 1;
-                      const high = maxNote + 1;
-                      const totalSemitones = high - low + 1;
-                      const getMidiNoteName = (midi) => {
-                        const notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-                        const octave = Math.floor(midi / 12) - 1;
-                        return notes[midi % 12] + octave;
-                      };
-                      const isBlackKey = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
-                      
-                      return (
-                        <div className="bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '200px', height: `${Math.max(80, totalSemitones * 12)}px` }}>
-                          <div className="flex h-full">
-                            <div className="w-16 border-r-2 border-gray-300 bg-white">
-                              {Array.from({ length: totalSemitones }, (_, j) => {
-                                const midiNote = high - j;
-                                const noteName = getMidiNoteName(midiNote);
-                                return (
-                                  <div key={j} className={`border-b border-gray-200 flex items-center justify-end pr-2 text-xs ${
-                                    isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-gray-700"
-                                  }`} style={{ height: '12px' }}>
-                                    <span className="text-xs">{noteName}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                            <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 relative">
-                              {Array.from({ length: totalSemitones }, (_, j) => (
-                                <div key={j} className="absolute left-0 right-0 border-b border-gray-200" style={{ top: `${j * 12}px` }} />
-                              ))}
-                              {midiNotes.map((midiNote, j) => {
-                                const position = (high - midiNote) * 12;
-                                const isCNote = (midiNote % 12 === 0);
-                                return (
-                                  <div key={j} className={`absolute rounded shadow-lg ${isCNote ? 'bg-red-500' : 'bg-blue-500'}`} 
-                                       style={{ left: '8px', top: `${position + 1}px`, width: '110px', height: '10px' }}></div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                  <p className="text-xs text-black/70 text-center mt-2">Root + Minor 3rd + Dim 5th + Minor 7th</p>
+                  <h4 className="font-bold mb-2">Example:</h4>
+                  <p className="text-sm">C major open voicing might have: C3, E4, G4, C5 - same chord as close voicing C4-E4-G4, but with wider spacing and octave doubling.</p>
                 </div>
               </div>
             </div>
@@ -718,7 +676,7 @@ export default function Level4Page() {
                   setCurrentChord(null);
                   setFeedback(null);
                 }}
-                className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors"
+                className="px-6 py-3 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 transition-colors"
               >
                 Try Again
               </button>
@@ -730,10 +688,10 @@ export default function Level4Page() {
               </Link>
               {levelResult.passed && (
                 <Link
-                  to="/chord-recognition/basic-triads/level5"
+                  to="/chord-recognition/extended-chords"
                   className="px-6 py-3 bg-green-500 text-white font-semibold rounded-xl hover:bg-green-600 transition-colors"
                 >
-                  Next Level
+                  Continue to Extended Chords
                 </Link>
               )}
             </div>
@@ -756,7 +714,7 @@ export default function Level4Page() {
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-black">
-              Level 4: 7th Chords
+              Level 4: Open Voicings
             </h1>
           </div>
           <Link to="/" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
@@ -766,108 +724,79 @@ export default function Level4Page() {
       </header>
 
       <main className="max-w-4xl mx-auto p-6">
-        <ScoreDisplay {...score} currentTime={currentTime} avgTime={avgTime} isAnswered={isAnswered} totalProblems={TOTAL_PROBLEMS} />
-        
-        <ChordPianoDisplay notes={currentChord.notes} />
+        <ScoreDisplay 
+          correct={score.correct}
+          total={score.total}
+          streak={score.streak}
+          currentTime={currentTime}
+          avgTime={avgTime}
+          isAnswered={isAnswered}
+          totalProblems={TOTAL_PROBLEMS}
+        />
 
-        {/* Question section */}
-        <div className="mt-6 text-center mb-8">
-          <h2 className="text-2xl font-bold text-black mb-4">
-            What 7th chord is this?
-          </h2>
-          <p className="text-black/70 mb-6">
-            Type the 7th chord name (e.g., Cmaj7, Dm7, G7, Fdim7, Em7b5)
-          </p>
-          
-          {/* Input and button */}
-          <div className="max-w-md mx-auto mb-6">
+        <ChordPianoDisplay notes={currentChord.notes} showLabels={showLabels} setShowLabels={setShowLabels} />
+
+        <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-black mb-2">What chord is this?</h2>
+            <p className="text-black/70">Listen to the open voicing and identify the chord type</p>
+          </div>
+
+          <div className="max-w-md mx-auto">
             <input
               ref={inputRef}
               type="text"
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Enter 7th chord name..."
-              className="w-full px-4 py-3 text-lg text-center bg-white/30 backdrop-blur-sm border-2 border-white/20 rounded-xl focus:outline-none focus:border-black/40 text-black placeholder-black/50 mb-4"
+              placeholder="Enter chord name (e.g., C, Dm, F#dim, Aaug)"
+              className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:outline-none"
               disabled={isAnswered}
             />
             
-            {!isAnswered && (
-              <button
-                onClick={handleSubmit}
-                disabled={!userAnswer.trim()}
-                className="px-8 py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Check Answer
-              </button>
-            )}
+            <button
+              onClick={handleSubmit}
+              disabled={isAnswered || !userAnswer.trim()}
+              className="w-full mt-4 px-6 py-3 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              Submit Answer
+            </button>
           </div>
-        </div>
 
-        {feedback && (
-          <div className={`max-w-md mx-auto p-6 rounded-2xl text-center mb-6 ${
-            feedback.isCorrect 
-              ? 'bg-green-100/80 border-2 border-green-300' 
-              : 'bg-red-100/80 border-2 border-red-300'
-          }`}>
-            <div className={`text-2xl font-bold mb-2 ${
-              feedback.isCorrect ? 'text-green-800' : 'text-red-800'
+          {feedback && (
+            <div className={`mt-6 p-4 rounded-xl ${
+              feedback.isCorrect 
+                ? 'bg-green-100 border border-green-300' 
+                : 'bg-red-100 border border-red-300'
             }`}>
-              {feedback.isCorrect ? 'Correct!' : 'Not quite...'}
-            </div>
-            
-            {!feedback.isCorrect && (
-              <>
-                <div className="text-red-700 mb-2">
-                  Your answer: <strong>{feedback.userAnswer}</strong>
+              <div className="text-center">
+                <div className={`text-xl font-bold mb-2 ${
+                  feedback.isCorrect ? 'text-green-800' : 'text-red-800'
+                }`}>
+                  {feedback.isCorrect ? 'Correct!' : 'Incorrect'}
                 </div>
-                <div className="text-red-700">
-                  Correct answer: <strong>{feedback.correctAnswer}</strong>
+                
+                {!feedback.isCorrect && (
+                  <div className="text-red-700 mb-2">
+                    <div>Your answer: <strong>{feedback.userAnswer}</strong></div>
+                    <div>Correct answer: <strong>{feedback.correctAnswer}</strong></div>
+                  </div>
+                )}
+                
+                <div className="text-gray-700">
+                  Time: <strong>{feedback.timeTaken.toFixed(1)}s</strong>
                 </div>
-              </>
-            )}
-            
-            <div className={`text-sm mt-2 ${
-              feedback.isCorrect ? 'text-green-700' : 'text-red-700'
-            }`}>
-              {feedback.timeTaken?.toFixed(1)}s
-            </div>
-            
-            {feedback.isCorrect && score.streak > 1 && (
-              <div className="text-green-700">
-                {score.streak} in a row! Keep it up!
+                
+                {feedback.isCorrect && (
+                  <div className="text-green-700 mt-2">
+                    Great job identifying the open voicing!
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        )}
-
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mt-12">
-          <h3 className="text-lg font-semibold text-black mb-4">Level 4: 7th Chords</h3>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-sm">
-            <div className="text-center p-3 bg-white/20 rounded-xl">
-              <div className="font-bold text-black mb-1">Major 7th</div>
-              <div className="text-black/70">Cmaj7, M7</div>
             </div>
-            <div className="text-center p-3 bg-white/20 rounded-xl">
-              <div className="font-bold text-black mb-1">Minor 7th</div>
-              <div className="text-black/70">Cm7, m7</div>
-            </div>
-            <div className="text-center p-3 bg-white/20 rounded-xl">
-              <div className="font-bold text-black mb-1">Dominant 7th</div>
-              <div className="text-black/70">C7</div>
-            </div>
-            <div className="text-center p-3 bg-white/20 rounded-xl">
-              <div className="font-bold text-black mb-1">Diminished 7th</div>
-              <div className="text-black/70">Cdim7, °7</div>
-            </div>
-            <div className="text-center p-3 bg-white/20 rounded-xl">
-              <div className="font-bold text-black mb-1">Half Dim 7th</div>
-              <div className="text-black/70">Cm7b5, ø7</div>
-            </div>
-          </div>
+          )}
         </div>
       </main>
-
     </div>
   );
 }

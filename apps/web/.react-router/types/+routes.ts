@@ -34,16 +34,40 @@ type Pages = {
   "/chord-recognition/basic-triads/level5": {
     params: {};
   };
+  "/chord-recognition/basic-triads/level6": {
+    params: {};
+  };
+  "/chord-recognition/basic-triads/level7": {
+    params: {};
+  };
   "/chord-recognition/chord-progressions": {
     params: {};
   };
+  "/chord-recognition/chord-progressions/level1": {
+    params: {};
+  };
+  "/chord-recognition/chord-progressions/level2": {
+    params: {};
+  };
+  "/chord-recognition/chord-progressions/level3": {
+    params: {};
+  };
   "/chord-recognition/extended-chords": {
+    params: {};
+  };
+  "/chord-recognition/extended-chords/level1": {
+    params: {};
+  };
+  "/chord-recognition/extended-chords/level2": {
     params: {};
   };
   "/chord-recognition/jazz-chords": {
     params: {};
   };
   "/counterpoint": {
+    params: {};
+  };
+  "/midi-training": {
     params: {};
   };
   "/*": {
@@ -56,7 +80,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/chord-recognition" | "/chord-recognition/basic-triads" | "/chord-recognition/basic-triads/level1" | "/chord-recognition/basic-triads/level2" | "/chord-recognition/basic-triads/level3" | "/chord-recognition/basic-triads/level4" | "/chord-recognition/basic-triads/level5" | "/chord-recognition/chord-progressions" | "/chord-recognition/extended-chords" | "/chord-recognition/jazz-chords" | "/counterpoint" | "/*";
+    page: "/" | "/chord-recognition" | "/chord-recognition/basic-triads" | "/chord-recognition/basic-triads/level1" | "/chord-recognition/basic-triads/level2" | "/chord-recognition/basic-triads/level3" | "/chord-recognition/basic-triads/level4" | "/chord-recognition/basic-triads/level5" | "/chord-recognition/basic-triads/level6" | "/chord-recognition/basic-triads/level7" | "/chord-recognition/chord-progressions" | "/chord-recognition/chord-progressions/level1" | "/chord-recognition/chord-progressions/level2" | "/chord-recognition/chord-progressions/level3" | "/chord-recognition/extended-chords" | "/chord-recognition/extended-chords/level1" | "/chord-recognition/extended-chords/level2" | "/chord-recognition/jazz-chords" | "/counterpoint" | "/midi-training" | "/*";
   };
   "./page.jsx": {
     id: "page";
@@ -90,13 +114,41 @@ type RouteFiles = {
     id: "chord-recognition/basic-triads/level5/page";
     page: "/chord-recognition/basic-triads/level5";
   };
+  "./chord-recognition/basic-triads/level6/page.jsx": {
+    id: "chord-recognition/basic-triads/level6/page";
+    page: "/chord-recognition/basic-triads/level6";
+  };
+  "./chord-recognition/basic-triads/level7/page.jsx": {
+    id: "chord-recognition/basic-triads/level7/page";
+    page: "/chord-recognition/basic-triads/level7";
+  };
   "./chord-recognition/chord-progressions/page.jsx": {
     id: "chord-recognition/chord-progressions/page";
     page: "/chord-recognition/chord-progressions";
   };
+  "./chord-recognition/chord-progressions/level1/page.jsx": {
+    id: "chord-recognition/chord-progressions/level1/page";
+    page: "/chord-recognition/chord-progressions/level1";
+  };
+  "./chord-recognition/chord-progressions/level2/page.jsx": {
+    id: "chord-recognition/chord-progressions/level2/page";
+    page: "/chord-recognition/chord-progressions/level2";
+  };
+  "./chord-recognition/chord-progressions/level3/page.jsx": {
+    id: "chord-recognition/chord-progressions/level3/page";
+    page: "/chord-recognition/chord-progressions/level3";
+  };
   "./chord-recognition/extended-chords/page.jsx": {
     id: "chord-recognition/extended-chords/page";
     page: "/chord-recognition/extended-chords";
+  };
+  "./chord-recognition/extended-chords/level1/page.jsx": {
+    id: "chord-recognition/extended-chords/level1/page";
+    page: "/chord-recognition/extended-chords/level1";
+  };
+  "./chord-recognition/extended-chords/level2/page.jsx": {
+    id: "chord-recognition/extended-chords/level2/page";
+    page: "/chord-recognition/extended-chords/level2";
   };
   "./chord-recognition/jazz-chords/page.jsx": {
     id: "chord-recognition/jazz-chords/page";
@@ -105,6 +157,10 @@ type RouteFiles = {
   "./counterpoint/page.jsx": {
     id: "counterpoint/page";
     page: "/counterpoint";
+  };
+  "./midi-training/page.jsx": {
+    id: "midi-training/page";
+    page: "/midi-training";
   };
   "./__create/not-found.tsx": {
     id: "__create/not-found";

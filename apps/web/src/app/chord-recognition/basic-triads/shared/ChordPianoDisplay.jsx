@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 // Helper functions
 const getMidiNoteName = (midiNote) => {
-    const noteNames = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+    const noteNames = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
     const octave = Math.floor(midiNote / 12) - 1;
     const note = noteNames[midiNote % 12];
     return `${note}${octave}`;
@@ -17,6 +18,7 @@ const isBlackKey = (midiNote) => {
 export default function ChordPianoDisplay({ notes }) {
   const pianoKeysRef = useRef(null);
   const pianoRollRef = useRef(null);
+  const [showLabels, setShowLabels] = useState(true);
   const noteHeight = 18;
   // Show full range from C1 to C6 (MIDI 24-84) for scrolling
   const lowestNote = 24;  // C1
@@ -53,7 +55,16 @@ export default function ChordPianoDisplay({ notes }) {
   
   return (
     <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-8">
-      <h3 className="text-xl font-semibold text-black mb-6 text-center">Chord Notes</h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold text-black text-center flex-1">Chord Notes</h3>
+        <button
+          onClick={() => setShowLabels(!showLabels)}
+          className="w-10 h-10 rounded-lg bg-white/30 hover:bg-white/40 transition-colors flex items-center justify-center"
+          title={showLabels ? "Hide note labels" : "Show note labels"}
+        >
+          {showLabels ? <EyeOff size={20} className="text-black" /> : <Eye size={20} className="text-black" />}
+        </button>
+      </div>
       
       <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-auto" style={{ width: '550px', height: `${containerHeight}px` }}>
         <div className="flex">
@@ -67,19 +78,19 @@ export default function ChordPianoDisplay({ notes }) {
                 return (
                   <div 
                     key={midiNote} 
-                    className={`border-b border-gray-200 flex items-center justify-end pr-3 ${
-                      isBlackKey(midiNote) 
-                        ? "bg-gray-800"
-                        : "bg-white text-gray-700"
-                    }`} 
-                    style={{ height: `${noteHeight}px` }}
+                    className="border-b border-gray-200 flex items-center justify-end pr-3"
+                    style={{ 
+                      height: `${noteHeight}px`,
+                      backgroundColor: isBlackKey(midiNote) ? '#6b7280' : '#ffffff',
+                      color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
+                    }}
                   >
                     <span className={`${
                       isBlackKey(midiNote) 
-                        ? "text-xs text-gray-400" 
-                        : "text-xs text-gray-700"
+                        ? "text-xs text-black" 
+                        : "text-xs text-black"
                     }`}>
-                      {noteName}
+                      {showLabels ? noteName : ''}
                     </span>
                   </div>
                 );

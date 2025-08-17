@@ -1,8 +1,8 @@
 import { useRef, useState, useCallback, useEffect, useMemo } from "react";
-import { Play, Pause, Square, RotateCcw, Volume2, ChevronRight, ChevronLeft, ZoomIn, ZoomOut } from "lucide-react";
+import { Play, Pause, Square, RotateCcw, Volume2, ChevronRight, ChevronLeft, ZoomIn, ZoomOut, Eye, EyeOff } from "lucide-react";
 
 const getMidiNoteName = (midiNote) => {
-    const noteNames = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+    const noteNames = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
     const octave = Math.floor(midiNote / 12) - 1;
     const note = noteNames[midiNote % 12];
     return `${note}${octave}`;
@@ -39,6 +39,7 @@ export default function PianoRoll({
     setDraggedNote,
     playNote,
 }) {
+    const [showLabels, setShowLabels] = useState(true);
     const pianoRollRef = useRef(null);
     const scrollContainerRef = useRef(null);
     const noteLabelsRef = useRef(null);
@@ -241,6 +242,12 @@ export default function PianoRoll({
                             <ZoomIn size={16} className="text-black" />
                         </button>
                     </div>
+                    <div className="flex items-center space-x-2 ml-4">
+                        <button onClick={() => setShowLabels(!showLabels)} className="w-8 h-8 rounded bg-white/30 flex items-center justify-center hover:bg-white/40 transition-colors" title={showLabels ? "Hide note labels" : "Show note labels"}>
+                            {showLabels ? <EyeOff size={16} className="text-black" /> : <Eye size={16} className="text-black" />}
+                        </button>
+                        <span className="text-xs text-black/60 px-2">Labels</span>
+                    </div>
                 </div>
                 <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
@@ -257,8 +264,13 @@ export default function PianoRoll({
                             {Array.from({ length: totalNotes }, (_, i) => {
                                 const midiNote = startNote + totalNotes - 1 - i;
                                 return (
-                                    <div key={midiNote} className={`h-5 border-b border-gray-200 flex items-center justify-end pr-2 text-xs ${isBlackKey(midiNote) ? "bg-gray-800 text-white" : "bg-white text-black"}`} style={{ height: `${noteHeight}px` }}>
-                                        {!isBlackKey(midiNote) && <span>{getMidiNoteName(midiNote)}</span>}
+                                    <div key={midiNote} className="h-5 border-b border-gray-200 flex items-center justify-end pr-2 text-xs" style={{ 
+                                      height: `${noteHeight}px`,
+                                      backgroundColor: isBlackKey(midiNote) ? '#000000' : '#ffffff',
+                                      color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
+                                    }}>
+                                        {!isBlackKey(midiNote) && <span style={{ color: '#000000' }}>{showLabels ? getMidiNoteName(midiNote) : ''}</span>}
+                                        {isBlackKey(midiNote) && <span style={{ color: '#ffffff' }}>{showLabels ? getMidiNoteName(midiNote) : ''}</span>}
                                     </div>
                                 );
                             })}

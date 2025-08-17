@@ -43,8 +43,8 @@ export default function ChordRecognitionPage() {
       <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link to="/" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
-              <span className="text-white text-sm font-bold">♪</span>
+            <Link to="/midi-training" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
+              <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-black">
               MIDI Chord Recognition
