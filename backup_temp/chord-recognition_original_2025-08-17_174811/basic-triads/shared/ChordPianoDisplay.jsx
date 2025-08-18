@@ -1,26 +1,29 @@
 import { useState, useEffect, useRef } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { getMidiNoteName, isBlackKey } from "./chordLogic.js";
 
-// Shared ChordPianoDisplay component for all chord recognition levels
-export default function ChordPianoDisplay({ 
-  notes, 
-  showLabels, 
-  setShowLabels, 
-  noteBlockColor = 'bg-blue-500', // Customizable note block color
-  noteBorderColor = 'border-blue-600', // Customizable note border color
-  title = 'Chord Notes', // Customizable title
-  showLabelToggle = true, // Whether to show the label toggle button
-  lowestMidi = 24, // Lowest MIDI note (C1)
-  highestMidi = 84 // Highest MIDI note (C6)
-}) {
+// Helper functions
+const getMidiNoteName = (midiNote) => {
+    const noteNames = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
+    const octave = Math.floor(midiNote / 12) - 1;
+    const note = noteNames[midiNote % 12];
+    return `${note}${octave}`;
+};
+
+const isBlackKey = (midiNote) => {
+    const noteInOctave = midiNote % 12;
+    return [1, 3, 6, 8, 10].includes(noteInOctave);
+};
+
+// Piano roll display component for chord recognition
+export default function ChordPianoDisplay({ notes }) {
   const pianoKeysRef = useRef(null);
   const pianoRollRef = useRef(null);
+  const [showLabels, setShowLabels] = useState(true);
   const noteHeight = 18;
-  // Use parameterized MIDI range
-  const lowestNote = lowestMidi;
-  const highestNote = highestMidi;
-  const totalNotes = highestNote - lowestNote + 1;
+  // Show full range from C1 to C6 (MIDI 24-84) for scrolling
+  const lowestNote = 24;  // C1
+  const highestNote = 84; // C6
+  const totalNotes = highestNote - lowestNote + 1; // 61 notes total
   const containerHeight = 600; // Fixed container height for scrolling (50% bigger)
   
   // Auto-scroll to center the chord when notes change (with random offset)
@@ -53,16 +56,14 @@ export default function ChordPianoDisplay({
   return (
     <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-8">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-black text-center flex-1">{title}</h3>
-        {showLabelToggle && (
-          <button
-            onClick={() => setShowLabels(!showLabels)}
-            className="w-10 h-10 rounded-lg bg-white/30 hover:bg-white/40 transition-colors flex items-center justify-center"
-            title={showLabels ? "Hide note labels" : "Show note labels"}
-          >
-            {showLabels ? <EyeOff size={20} className="text-black" /> : <Eye size={20} className="text-black" />}
-          </button>
-        )}
+        <h3 className="text-xl font-semibold text-black text-center flex-1">Chord Notes</h3>
+        <button
+          onClick={() => setShowLabels(!showLabels)}
+          className="w-10 h-10 rounded-lg bg-white/30 hover:bg-white/40 transition-colors flex items-center justify-center"
+          title={showLabels ? "Hide note labels" : "Show note labels"}
+        >
+          {showLabels ? <EyeOff size={20} className="text-black" /> : <Eye size={20} className="text-black" />}
+        </button>
       </div>
       
       <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-auto" style={{ width: '550px', height: `${containerHeight}px` }}>
@@ -84,8 +85,10 @@ export default function ChordPianoDisplay({
                       color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
                     }}
                   >
-                    <span className={`text-xs ${
-                      isBlackKey(midiNote) ? "text-white" : "text-black"
+                    <span className={`${
+                      isBlackKey(midiNote) 
+                        ? "text-xs text-black" 
+                        : "text-xs text-black"
                     }`}>
                       {showLabels ? noteName : ''}
                     </span>
@@ -125,7 +128,7 @@ export default function ChordPianoDisplay({
                 return (
                   <div
                     key={`note-${index}`}
-                    className={`absolute ${noteBlockColor} ${noteBorderColor} rounded-lg shadow-lg`}
+                    className="absolute bg-blue-500 border-blue-600 rounded-lg shadow-lg"
                     style={{
                       left: '20px',
                       top: `${yPos + 2}px`,

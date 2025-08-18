@@ -1,68 +1,212 @@
-# Project Memory - Chord Recognition Inversion Toggle
+# CLAUDE.md
 
-## Inversion Labeling Toggle System
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-### Overview
-A toggleable boolean system has been implemented to disable inversion labeling requirements across all chord recognition levels while preserving the inversion functionality for future use.
+## AI Guidance
 
-### Configuration Locations
-- **Basic Triads & Extended Chords**: `apps/web/src/app/chord-recognition/basic-triads/shared/chordLogic.js:6`
-  ```js
-  export const REQUIRE_INVERSION_LABELING = false;
-  ```
-- **Chord Progressions Level 2**: `apps/web/src/app/chord-recognition/chord-progressions/level2/page.jsx:11`
-  ```js
-  const REQUIRE_INVERSION_LABELING = false;
-  ```
+* Ignore GEMINI.md and GEMINI-*.md files
+* To save main context space, for code searches, inspections, troubleshooting or analysis, use code-searcher subagent where appropriate - giving the subagent full context background for the task(s) you assign it.
+* After receiving tool results, carefully reflect on their quality and determine optimal next steps before proceeding. Use your thinking to plan and iterate based on this new information, and then take the best next action.
+* For maximum efficiency, whenever you need to perform multiple independent operations, invoke all relevant tools simultaneously rather than sequentially.
+* Before you finish, please verify your solution
+* Do what has been asked; nothing more, nothing less.
+* NEVER create files unless they're absolutely necessary for achieving your goal.
+* ALWAYS prefer editing an existing file to creating a new one.
+* NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+* When you update or modify core context files, also update markdown documentation and memory bank
+* When asked to commit changes, exclude CLAUDE.md and CLAUDE-*.md referenced memory bank system files from any commits. Never delete these files.
 
-### How It Works
-When `REQUIRE_INVERSION_LABELING = false`:
-- **Basic triads/extended chords**: Validation accepts base chord names (e.g., "C", "Dm") instead of requiring inversion notation (e.g., "C/1", "Dm/2")
-- **Chord progressions**: Generates progressions without inversions and accepts roman numerals without figured bass notation (e.g., "I V vi IV" instead of "I V6 vi IV64")
+## Memory Bank System
 
-When `REQUIRE_INVERSION_LABELING = true`:
-- **Basic triads/extended chords**: Validation requires inversion notation and accepts multiple formats:
-  - Numbered inversions: "C/1", "C/2", "C/3"
-  - Descriptive inversions: "C/first", "C first inversion", "C 1st inversion"
-  - **Slash chord notation**: "C/E" (first inversion), "C/G" (second inversion), "Cmaj7/B" (third inversion)
-- **Chord progressions**: Requires figured bass notation (e.g., "I V6 vi IV64")
+This project uses a structured memory bank system with specialized context files. Always check these files for relevant information before starting work:
 
-### Affected Levels
-1. **Basic Triads Level 2** (first inversions)
-2. **Basic Triads Level 3** (all inversions) 
-3. **Basic Triads Level 6** (7th chord inversions)
-4. **Extended Chords Levels 1-2**
-5. **Chord Progressions Level 2** (progressions with inversions)
+### Core Context Files
 
-### Code Changes Made
-- Modified `validateAnswer()` function to strip inversion notation when flag is disabled
-- Updated progression generation to use basic progressions without inversions
-- Modified instruction text to reflect optional inversion labeling
-- All inversion code preserved - no deletion, only conditional behavior
+* **CLAUDE-activeContext.md** - Current session state, goals, and progress (if exists)
+* **CLAUDE-patterns.md** - Established code patterns and conventions (if exists)
+* **CLAUDE-decisions.md** - Architecture decisions and rationale (if exists)
+* **CLAUDE-troubleshooting.md** - Common issues and proven solutions (if exists)
+* **CLAUDE-config-variables.md** - Configuration variables reference (if exists)
+* **CLAUDE-temp.md** - Temporary scratch pad (only read when referenced)
 
-### How to Toggle
-- **Current state** (disabled): Both flags set to `false`
-- **To re-enable**: Change both flags to `true`
-- **Result when enabled**: Full inversion requirements restored (C/1, Dm/2, I V6 vi IV64, etc.)
+**Important:** Always reference the active context file first to understand what's currently being worked on and maintain session continuity.
 
-### Why This Was Implemented
-User requested to disable inversion labeling requirements across all levels while preserving the code for potential future reversion. This allows students to focus on chord type identification without needing to specify inversion positions.
+### Memory Bank System Backups
 
-### Slash Chord Notation Feature
-When inversion labeling is enabled, the system now accepts slash chord notation where the bass note is specified:
-- **First inversion examples**: "C/E" (C major with E in bass), "Dm/F" (D minor with F in bass)
-- **Second inversion examples**: "C/G" (C major with G in bass), "F/C" (F major with C in bass)
-- **Third inversion examples**: "Cmaj7/B" (C major 7 with B in bass), "Dm7/C" (D minor 7 with C in bass)
+When asked to backup Memory Bank System files, you will copy the core context files above and @.claude settings directory to directory @/path/to/backup-directory. If files already exist in the backup directory, you will overwrite them.
 
-The system automatically calculates the correct bass note for each inversion:
-- **First inversion**: Third of the chord in bass
-- **Second inversion**: Fifth of the chord in bass
-- **Third inversion**: Seventh of the chord in bass (for 7th chords)
+## Project Overview
 
-### Technical Implementation Details
-- Uses conditional logic based on the boolean flag
-- Validation functions check the flag and adjust expected answers accordingly
-- Progression generation selects different chord sets based on the flag
-- `getBassNoteForInversion()` function calculates correct bass notes for slash chord notation
-- Instructions updated to reflect the simplified requirements
-- No functionality deleted - complete reversibility maintained
+This is a **MIDI Training App** - a music education platform focused on chord recognition and counterpoint training. The project is a monorepo with web and mobile applications.
+
+### Project Structure
+```
+apps/
+├── web/          # React-Router SSR web application
+│   ├── src/app/  # File-based routing structure
+│   └── ...
+├── mobile/       # React Native Expo application
+└── ...
+```
+
+### Core Applications
+
+**Web App (apps/web/)**
+- **Framework**: React Router 7 with SSR
+- **Styling**: Tailwind CSS + Chakra UI components
+- **Build**: Vite + TypeScript
+- **Testing**: Vitest with jsdom
+
+**Mobile App (apps/mobile/)**
+- **Framework**: React Native with Expo
+- **Shared Logic**: Cross-platform polyfills and utilities
+
+## Development Commands
+
+### Root Level Commands
+```bash
+# Start both web and mobile development servers
+npm run dev
+
+# Individual apps
+npm run dev:web      # Web app only
+npm run dev:mobile   # Mobile app only
+
+# Install dependencies for all apps
+npm run install:all
+npm run install:web
+npm run install:mobile
+
+# Build production
+npm run build        # Web app build
+npm run build:web
+```
+
+### Web App Commands (apps/web/)
+```bash
+cd apps/web
+
+# Development
+npm run dev          # Start development server
+
+# Type checking
+npm run typecheck    # React Router typegen + TypeScript check
+
+# Testing
+npx vitest           # Run tests
+npx vitest --ui      # Test UI dashboard
+```
+
+### Mobile App Commands (apps/mobile/)
+```bash
+cd apps/mobile
+
+npx expo start       # Start Expo development server
+npx expo start --web # Web version
+npx expo start --ios # iOS simulator
+```
+
+## Architecture Overview
+
+### Chord Recognition System
+
+The app's core functionality centers around **music theory education** with a sophisticated chord recognition system:
+
+**Key Components:**
+- **chordLogic.js** (457 lines) - Core music theory utilities for chord generation and validation
+- **Level-based progression** - 7 levels of increasing complexity (basic triads → 7th chords → inversions)
+- **Real-time validation** - Supports multiple chord notation formats including slash chords
+- **Inversion system** - Configurable via `REQUIRE_INVERSION_LABELING` toggle
+
+**Critical Configuration:**
+```javascript
+// Location: apps/web/src/app/chord-recognition/basic-triads/shared/chordLogic.js:6
+export const REQUIRE_INVERSION_LABELING = false;
+
+// Also in: apps/web/src/app/chord-recognition/chord-progressions/level2/page.jsx:11
+const REQUIRE_INVERSION_LABELING = false;
+```
+
+### File-Based Routing System
+
+**Route Structure** (apps/web/src/app/):
+```
+/                           # Landing page
+/chord-recognition/         # Main chord training hub
+  /basic-triads/           
+    /level1-7/             # Individual level implementations
+    /shared/chordLogic.js  # Core music theory utilities
+  /chord-progressions/
+    /level1-3/             # Roman numeral progressions
+  /extended-chords/
+    /level1-2/             # 7th chords and extensions
+/counterpoint/             # Counterpoint composition training
+/midi-training/            # General MIDI exercises
+```
+
+**Route Generation**: Custom TypeScript route builder (`routes.ts`) that:
+- Scans directories for `page.jsx` files
+- Handles dynamic routes with `[param]` syntax
+- Supports catch-all routes with `[...param]`
+- Auto-generates React Router configuration
+
+### Music Theory Architecture
+
+**Code Duplication Issue** (Architectural Debt):
+The codebase has extensive duplication of music theory utilities across 14+ files instead of proper imports. Key duplicated code:
+- `noteNames`, `chordTypes` constants
+- `getMidiNoteName()`, `isBlackKey()` helper functions
+- Chord validation logic
+
+**Shared Components:**
+- **ChordPianoDisplay** - Visual piano interface
+- **ScoreDisplay** - Musical notation rendering  
+- **PianoRoll** - Interactive note placement for counterpoint
+
+### Counterpoint System
+
+**Advanced Music Composition Training:**
+- Species counterpoint validation (1st-5th species)
+- Real-time rule checking against traditional counterpoint rules
+- Interactive piano roll for note placement
+- API-based validation via `/api/validate-counterpoint`
+
+### Testing Strategy
+
+**Current State**: Minimal test coverage
+**Framework**: Vitest with jsdom environment
+**Setup**: `apps/web/test/setupTests.ts` with @testing-library/jest-dom
+
+**Critical Gap**: No tests for core music theory logic in chordLogic.js (should be priority for refactoring)
+
+## Known Issues & Technical Debt
+
+### TypeScript Integration Issues
+Current typecheck fails with 20+ errors due to React Router type generation conflicts with .jsx files.
+
+### Configuration Inconsistency  
+`REQUIRE_INVERSION_LABELING` is defined in multiple locations, violating single source of truth.
+
+### Code Duplication
+Music theory utilities are duplicated across 14+ level files instead of using shared imports from chordLogic.js.
+
+### Large Functions
+- `validateAnswer()` function: 214 lines with high cyclomatic complexity
+- `generateChord()` function: 140 lines with complex inversion logic
+
+## Important Notes for Development
+
+### Inversion Toggle System
+The app has a toggleable system to disable inversion labeling requirements. When `REQUIRE_INVERSION_LABELING = false`:
+- Accepts basic chord names (e.g., "C", "Dm") 
+- When `true`: Requires inversion notation (e.g., "C/1", "Dm/2", "C/E")
+
+### Music Theory Validation
+The `validateAnswer()` function supports multiple input formats:
+- Numbered inversions: "C/1", "C/2", "C/3"  
+- Descriptive: "C first inversion", "C 1st inversion"
+- Slash chord notation: "C/E" (first inversion), "C/G" (second inversion)
+- Enharmonic equivalents: C# ↔ Db
+
+### Cross-Platform Considerations
+Mobile app uses polyfills in `apps/mobile/polyfills/` for web-specific APIs (notifications, maps, etc.) when running on web.
