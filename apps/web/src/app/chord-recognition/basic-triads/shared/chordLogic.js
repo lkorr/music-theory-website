@@ -5,7 +5,16 @@ export const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 
 // Set to false to disable inversion labeling requirements across all levels
 export const REQUIRE_INVERSION_LABELING = false;
 
+// Basic triad chord types (for basic-triads levels)
 export const chordTypes = {
+  major: { name: '', intervals: [0, 4, 7], symbol: '' },
+  minor: { name: 'Minor', intervals: [0, 3, 7], symbol: 'm' },
+  diminished: { name: 'Diminished', intervals: [0, 3, 6], symbol: 'dim' },
+  augmented: { name: 'Augmented', intervals: [0, 4, 8], symbol: 'aug' }
+};
+
+// Extended chord types (includes 7th chords for extended-chords levels)
+export const extendedChordTypes = {
   major: { name: '', intervals: [0, 4, 7], symbol: '' },
   minor: { name: 'Minor', intervals: [0, 3, 7], symbol: 'm' },
   diminished: { name: 'Diminished', intervals: [0, 3, 6], symbol: 'dim' },
@@ -24,6 +33,25 @@ export const inversionTypes = {
   first: { name: '1st Inversion', intervalOrder: [1, 2, 3, 0] },
   second: { name: '2nd Inversion', intervalOrder: [2, 3, 0, 1] },
   third: { name: '3rd Inversion', intervalOrder: [3, 0, 1, 2] }
+};
+
+// Helper functions for MIDI note handling
+export const getMidiNoteName = (midiNote) => {
+    const noteNames = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
+    const octave = Math.floor(midiNote / 12) - 1;
+    const note = noteNames[midiNote % 12];
+    return `${note}${octave}`;
+};
+
+export const isBlackKey = (midiNote) => {
+    const noteInOctave = midiNote % 12;
+    return [1, 3, 6, 8, 10].includes(noteInOctave);
+};
+
+// Helper function to get the appropriate chord types object
+const getChordTypesForChord = (chordType) => {
+    const seventhChords = ['major7', 'minor7', 'dominant7', 'diminished7', 'halfDiminished7', 'minor7b5'];
+    return seventhChords.includes(chordType) ? extendedChordTypes : chordTypes;
 };
 
 // Generate chord based on level configuration
@@ -52,14 +80,15 @@ export const generateChord = (levelConfig) => {
   // Build the chord from the chosen root and octave
   const rootNoteNumber = noteNames.indexOf(root);
   const baseRoot = rootNoteNumber + baseOctave;
-  const intervals = chordTypes[chordType].intervals;
+  const chordTypesObj = getChordTypesForChord(chordType);
+  const intervals = chordTypesObj[chordType].intervals;
   
   let notes, expectedAnswer, finalIntervals;
   
   if (inversion === 'root') {
     // Root position
     notes = intervals.map(interval => baseRoot + interval);
-    expectedAnswer = root + chordTypes[chordType].symbol;
+    expectedAnswer = root + chordTypesObj[chordType].symbol;
     finalIntervals = intervals;
   } else {
     // Apply inversion - reorder the intervals according to inversion type
@@ -95,16 +124,16 @@ export const generateChord = (levelConfig) => {
         // 1st inversion of augmented chord = augmented chord starting on the 3rd
         const thirdIndex = (noteNames.indexOf(root) + 4) % 12; // Major third up
         const newRoot = noteNames[thirdIndex];
-        expectedAnswer = newRoot + chordTypes[chordType].symbol;
+        expectedAnswer = newRoot + chordTypesObj[chordType].symbol;
       } else if (inversion === 'second') {
         // 2nd inversion of augmented chord = augmented chord starting on the 5th
         const fifthIndex = (noteNames.indexOf(root) + 8) % 12; // Augmented fifth up
         const newRoot = noteNames[fifthIndex];
-        expectedAnswer = newRoot + chordTypes[chordType].symbol;
+        expectedAnswer = newRoot + chordTypesObj[chordType].symbol;
       }
     } else {
       // Normal chord inversion notation for major, minor, diminished, and 7th chords
-      expectedAnswer = root + chordTypes[chordType].symbol;
+      expectedAnswer = root + chordTypesObj[chordType].symbol;
       if (inversion === 'first') {
         expectedAnswer += '/1';
       } else if (inversion === 'second') {
@@ -187,7 +216,8 @@ export const validateAnswer = (answer, expectedAnswer) => {
       chordType = 'halfDiminished7';
     }
     
-    const intervals = chordTypes[chordType]?.intervals || [0, 4, 7];
+    const chordTypesObj = getChordTypesForChord(chordType);
+    const intervals = chordTypesObj[chordType]?.intervals || [0, 4, 7];
     const rootIndex = noteNames.indexOf(rootNote);
     
     if (inversionPart === '1') {
@@ -361,9 +391,9 @@ export const levelConfigs = {
   level1: {
     name: "Level 1: Basic Triads",
     selectChordAndInversion: () => {
-      // Level 1: Only root position
-      const chordTypeKeys = Object.keys(chordTypes);
-      const chordType = chordTypeKeys[Math.floor(Math.random() * chordTypeKeys.length)];
+      // Level 1: Only root position - basic triads only
+      const basicTriadKeys = ['major', 'minor', 'diminished', 'augmented'];
+      const chordType = basicTriadKeys[Math.floor(Math.random() * basicTriadKeys.length)];
       return { chordType, inversion: 'root' };
     }
   },
@@ -371,11 +401,11 @@ export const levelConfigs = {
   level2: {
     name: "Level 2: First Inversions",
     selectChordAndInversion: () => {
-      // Level 2: Root position and first inversion (no augmented inversions)
+      // Level 2: Root position and first inversion (no augmented inversions) - basic triads only
       if (Math.random() < 0.5) {
-        // 50% chance of root position (any chord type)
-        const chordTypeKeys = Object.keys(chordTypes);
-        const chordType = chordTypeKeys[Math.floor(Math.random() * chordTypeKeys.length)];
+        // 50% chance of root position (any basic triad type)
+        const basicTriadKeys = ['major', 'minor', 'diminished', 'augmented'];
+        const chordType = basicTriadKeys[Math.floor(Math.random() * basicTriadKeys.length)];
         return { chordType, inversion: 'root' };
       } else {
         // 50% chance of first inversion (exclude augmented)
@@ -389,12 +419,12 @@ export const levelConfigs = {
   level3: {
     name: "Level 3: All Inversions",
     selectChordAndInversion: () => {
-      // Level 3: Root position, first inversion, and second inversion (no augmented inversions)
+      // Level 3: Root position, first inversion, and second inversion (no augmented inversions) - basic triads only
       const inversionChoice = Math.random();
       if (inversionChoice < 0.33) {
-        // 33% chance of root position (any chord type)
-        const chordTypeKeys = Object.keys(chordTypes);
-        const chordType = chordTypeKeys[Math.floor(Math.random() * chordTypeKeys.length)];
+        // 33% chance of root position (any basic triad type)
+        const basicTriadKeys = ['major', 'minor', 'diminished', 'augmented'];
+        const chordType = basicTriadKeys[Math.floor(Math.random() * basicTriadKeys.length)];
         return { chordType, inversion: 'root' };
       } else if (inversionChoice < 0.67) {
         // 33% chance of first inversion (exclude augmented)

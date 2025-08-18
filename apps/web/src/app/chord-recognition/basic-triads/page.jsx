@@ -103,7 +103,7 @@ export default function BasicTriadsLevelsPage() {
             {levels.map((level) => (
             <div key={level.id} className="relative">
               <Link
-                to={level.available ? `/chord-recognition/basic-triads/${level.id}` : '#'}
+                to={level.available ? `/chord-recognition/basic-triads/recognition/${level.id}` : '#'}
                 className={`block p-6 rounded-2xl transition-all duration-300 transform hover:scale-105 ${
                   level.available 
                     ? 'bg-white/30 backdrop-blur-sm border-2 border-white/20 hover:shadow-xl cursor-pointer' 
@@ -156,7 +156,7 @@ export default function BasicTriadsLevelsPage() {
             {constructionLevels.map((level) => (
             <div key={level.id} className="relative">
               <Link
-                to={level.available ? `/chord-recognition/basic-triads/${level.id}` : '#'}
+                to={level.available ? `/chord-recognition/basic-triads/construction/${level.id}` : '#'}
                 className={`block p-6 rounded-2xl transition-all duration-300 transform hover:scale-105 ${
                   level.available 
                     ? 'bg-white/30 backdrop-blur-sm border-2 border-white/20 hover:shadow-xl cursor-pointer' 

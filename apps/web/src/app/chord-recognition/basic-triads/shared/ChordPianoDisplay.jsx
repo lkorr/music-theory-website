@@ -1,24 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { getMidiNoteName, isBlackKey } from "./chordLogic.js";
 
-// Helper functions
-const getMidiNoteName = (midiNote) => {
-    const noteNames = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
-    const octave = Math.floor(midiNote / 12) - 1;
-    const note = noteNames[midiNote % 12];
-    return `${note}${octave}`;
-};
-
-const isBlackKey = (midiNote) => {
-    const noteInOctave = midiNote % 12;
-    return [1, 3, 6, 8, 10].includes(noteInOctave);
-};
-
-// Piano roll display component for chord recognition
-export default function ChordPianoDisplay({ notes }) {
+// Shared ChordPianoDisplay component for basic-triads levels
+export default function ChordPianoDisplay({ 
+  notes, 
+  showLabels, 
+  setShowLabels, 
+  noteBlockColor = 'bg-blue-500', // Customizable note block color
+  noteBorderColor = 'border-blue-600' // Customizable note border color
+}) {
   const pianoKeysRef = useRef(null);
   const pianoRollRef = useRef(null);
-  const [showLabels, setShowLabels] = useState(true);
   const noteHeight = 18;
   // Show full range from C1 to C6 (MIDI 24-84) for scrolling
   const lowestNote = 24;  // C1
@@ -85,10 +78,8 @@ export default function ChordPianoDisplay({ notes }) {
                       color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
                     }}
                   >
-                    <span className={`${
-                      isBlackKey(midiNote) 
-                        ? "text-xs text-black" 
-                        : "text-xs text-black"
+                    <span className={`text-xs ${
+                      isBlackKey(midiNote) ? "text-white" : "text-black"
                     }`}>
                       {showLabels ? noteName : ''}
                     </span>
@@ -128,7 +119,7 @@ export default function ChordPianoDisplay({ notes }) {
                 return (
                   <div
                     key={`note-${index}`}
-                    className="absolute bg-blue-500 border-blue-600 rounded-lg shadow-lg"
+                    className={`absolute ${noteBlockColor} ${noteBorderColor} rounded-lg shadow-lg`}
                     style={{
                       left: '20px',
                       top: `${yPos + 2}px`,

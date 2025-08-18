@@ -1,5 +1,16 @@
 // Score display component
-export default function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered, totalProblems, progressColor = "bg-blue-500" }) {
+export default function ScoreDisplay({ 
+  correct, 
+  total, 
+  streak, 
+  currentTime, 
+  avgTime, 
+  isAnswered, 
+  totalProblems, 
+  progressColor = "bg-blue-500",
+  avgTimeThreshold = 5,
+  accuracyThresholds = { high: 90, medium: 70 }
+}) {
   const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
   const progress = Math.round((total / totalProblems) * 100);
   
@@ -28,7 +39,7 @@ export default function ScoreDisplay({ correct, total, streak, currentTime, avgT
         </div>
         <div>
           <div className={`text-2xl font-bold ${
-            avgTime > 0 && avgTime <= 5 ? 'text-green-600' : avgTime > 5 ? 'text-red-600' : 'text-black'
+            avgTime > 0 && avgTime <= avgTimeThreshold ? 'text-green-600' : avgTime > avgTimeThreshold ? 'text-red-600' : 'text-black'
           }`}>
             {avgTime > 0 ? avgTime.toFixed(1) : '0.0'}s
           </div>
@@ -36,7 +47,7 @@ export default function ScoreDisplay({ correct, total, streak, currentTime, avgT
         </div>
         <div>
           <div className={`text-2xl font-bold ${
-            accuracy >= 90 ? 'text-green-600' : accuracy >= 70 ? 'text-yellow-600' : 'text-red-600'
+            accuracy >= accuracyThresholds.high ? 'text-green-600' : accuracy >= accuracyThresholds.medium ? 'text-yellow-600' : 'text-red-600'
           }`}>
             {accuracy}%
           </div>
