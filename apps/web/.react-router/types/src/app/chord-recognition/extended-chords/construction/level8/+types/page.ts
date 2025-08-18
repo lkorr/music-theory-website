@@ -5,15 +5,15 @@ import type { GetInfo, GetAnnotations } from "react-router/internal";
 type Module = typeof import("../page.js")
 
 type Info = GetInfo<{
-  file: "./chord-recognition/extended-chords/level1/page.jsx",
+  file: "./chord-recognition/extended-chords/construction/level8/page.jsx",
   module: Module
 }>
 
 type Matches = [{
   id: "root";
-  module: typeof import("../../../../root.js");
+  module: typeof import("../../../../../root.js");
 }, {
-  id: "chord-recognition/extended-chords/level1/page";
+  id: "chord-recognition/extended-chords/construction/level8/page";
   module: typeof import("../page.js");
 }];
 

@@ -1,25 +1,24 @@
 /**
- * Level 2 Specific Utilities
+ * Level 2 Specific Utilities for Extended Chords
  * 
  * Contains chord generation and validation logic specific to Level 2
- * (Basic Triads with First Inversions - natural notes only)
+ * (Advanced 7th Chords with chromatic roots)
  */
 
-import { noteNames, chordTypes, inversionTypes, generateChord, validateAnswer, levelConfigs } from '../../shared/chordLogic.js';
-import { generateChordWithDuplicatePrevention } from '../../shared/generationUtils.js';
+import { generateSeventhChord, validateSeventhChordAnswer, extendedLevelConfigs } from '../../shared/chordLogic.js';
+import { generateChordWithDuplicatePrevention } from '../../../basic-triads/shared/generationUtils.js';
 
 /**
- * Generate a random chord with potential first inversion for Level 2 using shared functions
+ * Generate a random 7th chord for Level 2 using shared functions
  * @param {Object} previousChord - Previous chord to avoid duplicates
  * @returns {Object} Chord object with notes, name, and expected answer
  */
 export const generateLevel2Chord = (previousChord = null) => {
   return generateChordWithDuplicatePrevention(
-    () => generateChord(levelConfigs.level2),
+    () => generateSeventhChord(extendedLevelConfigs.level2),
     previousChord
   );
 };
-
 
 /**
  * Validate answer for Level 2 using shared validation functions
@@ -28,6 +27,5 @@ export const generateLevel2Chord = (previousChord = null) => {
  * @returns {boolean} True if answer is correct
  */
 export const validateLevel2Answer = (answer, expectedAnswer) => {
-  return validateAnswer(answer, expectedAnswer, levelConfigs.level2);
+  return validateSeventhChordAnswer(answer, expectedAnswer, extendedLevelConfigs.level2);
 };
-

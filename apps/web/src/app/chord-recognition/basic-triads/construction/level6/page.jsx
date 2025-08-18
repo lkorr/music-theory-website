@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
+import { Eye, EyeOff } from "lucide-react";
 import { noteNames, chordTypes, inversionTypes, getMidiNoteName, isBlackKey } from "../../shared/chordLogic.js";
 
 // Generate random chord construction task with inversions
@@ -78,10 +79,15 @@ const generateConstructionTask = (previousTask = null) => {
   // Ensure notes are within piano range
   const validNotes = expectedNotes.filter(note => note >= 36 && note <= 84); // C2 to C6
   
-  // Create chord name with inversion
+  // Create chord name with inversion using slash chord notation
   let chordName = root + chordTypes[chordType].symbol;
   if (inversion === 'first') {
-    chordName += '/1';
+    // Calculate bass note for slash notation (3rd of the chord)
+    const intervals = chordTypes[chordType].intervals;
+    const rootIndex = noteNames.indexOf(root);
+    const bassInterval = intervals[1]; // First inversion has 3rd in bass
+    const bassNote = noteNames[(rootIndex + bassInterval) % 12];
+    chordName += `/${bassNote}`;
   }
   
   return {
@@ -96,7 +102,7 @@ const generateConstructionTask = (previousTask = null) => {
 };
 
 // Interactive Piano Roll Component (same as Level 5)
-function InteractivePianoRoll({ placedNotes, onNoteToggle, currentTask, showSolution, feedback }) {
+function InteractivePianoRoll({ placedNotes, onNoteToggle, currentTask, showSolution, feedback, showLabels, setShowLabels }) {
   const pianoKeysRef = useRef(null);
   const pianoRollRef = useRef(null);
   const noteHeight = 20;
@@ -135,7 +141,16 @@ function InteractivePianoRoll({ placedNotes, onNoteToggle, currentTask, showSolu
   
   return (
     <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-8">
-      <h3 className="text-xl font-semibold text-black mb-6 text-center">Interactive Piano Roll</h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold text-black text-center flex-1">Interactive Piano Roll</h3>
+        <button
+          onClick={() => setShowLabels(!showLabels)}
+          className="w-10 h-10 rounded-lg bg-white/30 hover:bg-white/40 transition-colors flex items-center justify-center"
+          title={showLabels ? "Hide note labels" : "Show note labels"}
+        >
+          {showLabels ? <EyeOff size={20} className="text-black" /> : <Eye size={20} className="text-black" />}
+        </button>
+      </div>
       <p className="text-center text-black/70 mb-4">Click on the piano roll to place notes</p>
       
       <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-auto" style={{ width: '600px', height: `${containerHeight}px` }}>
@@ -160,7 +175,7 @@ function InteractivePianoRoll({ placedNotes, onNoteToggle, currentTask, showSolu
                       fontSize: '12px',
                       color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
                     }}>
-                      {noteName}
+                      {showLabels ? noteName : ''}
                     </span>
                   </div>
                 );
@@ -199,9 +214,13 @@ function InteractivePianoRoll({ placedNotes, onNoteToggle, currentTask, showSolu
                 let noteColorClass;
                 if (feedback && feedback.isCorrect !== undefined) {
                   // After submission - show green for correct, red for incorrect
-                  noteColorClass = isCorrect 
-                    ? 'bg-green-500 border-green-600' 
-                    : 'bg-red-500 border-red-600';
+                  if (feedback.isCorrect) {
+                    noteColorClass = 'bg-green-500 border-green-600';
+                  } else {
+                    noteColorClass = isCorrect 
+                      ? 'bg-green-500 border-green-600' 
+                      : 'bg-red-500 border-red-600';
+                  }
                 } else {
                   // While placing - show blue for all notes
                   noteColorClass = 'bg-blue-500 border-blue-600';
@@ -327,6 +346,7 @@ export default function Level6Construction() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [levelResult, setLevelResult] = useState(null);
   const [showSolution, setShowSolution] = useState(false);
+  const [showLabels, setShowLabels] = useState(true);
   const timerRef = useRef(null);
   
   const TOTAL_PROBLEMS = 25;
@@ -705,6 +725,8 @@ export default function Level6Construction() {
           currentTask={currentTask}
           showSolution={showSolution}
           feedback={feedback}
+          showLabels={showLabels}
+          setShowLabels={setShowLabels}
         />
 
         <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8">

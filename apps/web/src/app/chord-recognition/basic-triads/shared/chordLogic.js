@@ -56,22 +56,13 @@ const getChordTypesForChord = (chordType) => {
 
 // Generate chord based on level configuration
 export const generateChord = (levelConfig) => {
-  const roots = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']; // Include all chromatic notes
+  // Select roots based on level config (Level 1 uses natural notes only)
+  const roots = levelConfig.roots || ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   
-  // Add some logging to debug the randomization
-  const rootRandom = Math.random();
-  const root = roots[Math.floor(rootRandom * roots.length)];
+  const root = roots[Math.floor(Math.random() * roots.length)];
   
   // Select chord type and inversion based on level configuration
   const { chordType, inversion } = levelConfig.selectChordAndInversion();
-  
-  console.log('Debug generateChord:', { 
-    rootRandom, 
-    root, 
-    chordType, 
-    inversion,
-    timestamp: Date.now()
-  });
   
   // Choose a random octave from 2, 3, or 4 (C2=36, C3=48, C4=60)
   const possibleOctaves = [36, 48, 60]; // C2, C3, C4
@@ -93,8 +84,8 @@ export const generateChord = (levelConfig) => {
   } else {
     // Apply inversion - reorder the intervals according to inversion type
     const inversionOrder = inversionTypes[inversion].intervalOrder;
-    // Only use the number of intervals that exist in the chord (3 for triads, 4 for 7ths)
-    const actualIntervalOrder = inversionOrder.slice(0, intervals.length);
+    // Only use intervals that exist in the chord (filter out indices >= intervals.length)
+    const actualIntervalOrder = inversionOrder.filter(index => index < intervals.length);
     const reorderedIntervals = actualIntervalOrder.map(index => intervals[index]);
     finalIntervals = reorderedIntervals;
     
@@ -164,19 +155,27 @@ export const generateChord = (levelConfig) => {
     inversion,
     notes,
     expectedAnswer,
+    name: expectedAnswer, // Alias for compatibility
     intervals: finalIntervals
   };
 };
 
 // Validate answer with inversion support
-export const validateAnswer = (answer, expectedAnswer) => {
+export const validateAnswer = (answer, expectedAnswer, levelConfig = null) => {
+  // Support both 2-param and 3-param calls for backward compatibility
+  const config = levelConfig || {};
   const normalizeAnswer = (str) => str.toLowerCase().replace(/\s+/g, '');
   
   const normalized = normalizeAnswer(answer);
   let expectedNormalized = normalizeAnswer(expectedAnswer);
   
+  // Use level-specific inversion labeling requirement, fall back to global setting
+  const requireInversionLabeling = config.requireInversionLabeling !== undefined 
+    ? config.requireInversionLabeling 
+    : REQUIRE_INVERSION_LABELING;
+  
   // If inversion labeling is disabled, strip inversion notation from expected answer
-  if (!REQUIRE_INVERSION_LABELING) {
+  if (!requireInversionLabeling) {
     expectedNormalized = expectedNormalized.replace(/\/[123]/g, ''); // Remove /1, /2, /3
   }
   
@@ -242,37 +241,46 @@ export const validateAnswer = (answer, expectedAnswer) => {
     // Always add the base chord without inversion notation
     acceptableAnswers.add(normalizeAnswer(baseChord));
     
-    // Only add inversion-specific variations if inversion labeling is required
-    if (REQUIRE_INVERSION_LABELING) {
-      if (inversionPart === '1') {
+    // Always add slash chord notation regardless of requireInversionLabeling setting
+    if (inversionPart === '1') {
+      // Add slash chord notation (e.g., C/E for C major first inversion)
+      const bassNote = getBassNoteForInversion(rootNote, chordTypePart, inversionPart);
+      acceptableAnswers.add(normalizeAnswer(baseChord + '/' + bassNote));
+      
+      // Only add numbered/descriptive inversion notations if inversion labeling is required
+      if (requireInversionLabeling) {
         acceptableAnswers.add(normalizeAnswer(baseChord + '/1'));
         acceptableAnswers.add(normalizeAnswer(baseChord + '/first'));
         acceptableAnswers.add(normalizeAnswer(baseChord + ' first inversion'));
         acceptableAnswers.add(normalizeAnswer(baseChord + ' 1st inversion'));
-        
-        // Add slash chord notation (e.g., C/E for C major first inversion)
-        const bassNote = getBassNoteForInversion(rootNote, chordTypePart, inversionPart);
-        acceptableAnswers.add(normalizeAnswer(baseChord + '/' + bassNote));
-      } else if (inversionPart === '2') {
+      }
+    } else if (inversionPart === '2') {
+      // Add slash chord notation (e.g., C/G for C major second inversion)
+      const bassNote = getBassNoteForInversion(rootNote, chordTypePart, inversionPart);
+      acceptableAnswers.add(normalizeAnswer(baseChord + '/' + bassNote));
+      
+      // Only add numbered/descriptive inversion notations if inversion labeling is required
+      if (requireInversionLabeling) {
         acceptableAnswers.add(normalizeAnswer(baseChord + '/2'));
         acceptableAnswers.add(normalizeAnswer(baseChord + '/second'));
         acceptableAnswers.add(normalizeAnswer(baseChord + ' second inversion'));
         acceptableAnswers.add(normalizeAnswer(baseChord + ' 2nd inversion'));
-        
-        // Add slash chord notation (e.g., C/G for C major second inversion)
-        const bassNote = getBassNoteForInversion(rootNote, chordTypePart, inversionPart);
-        acceptableAnswers.add(normalizeAnswer(baseChord + '/' + bassNote));
-      } else if (inversionPart === '3') {
+      }
+    } else if (inversionPart === '3') {
+      // Add slash chord notation (e.g., Cmaj7/B for C major 7 third inversion)
+      const bassNote = getBassNoteForInversion(rootNote, chordTypePart, inversionPart);
+      acceptableAnswers.add(normalizeAnswer(baseChord + '/' + bassNote));
+      
+      // Only add numbered/descriptive inversion notations if inversion labeling is required
+      if (requireInversionLabeling) {
         acceptableAnswers.add(normalizeAnswer(baseChord + '/3'));
         acceptableAnswers.add(normalizeAnswer(baseChord + '/third'));
         acceptableAnswers.add(normalizeAnswer(baseChord + ' third inversion'));
         acceptableAnswers.add(normalizeAnswer(baseChord + ' 3rd inversion'));
-        
-        // Add slash chord notation (e.g., Cmaj7/B for C major 7 third inversion)
-        const bassNote = getBassNoteForInversion(rootNote, chordTypePart, inversionPart);
-        acceptableAnswers.add(normalizeAnswer(baseChord + '/' + bassNote));
-      } else {
-        // Root position - add root position variations
+      }
+    } else {
+      // Root position - only add root position variations if inversion labeling is required
+      if (requireInversionLabeling) {
         acceptableAnswers.add(normalizeAnswer(baseChord + ' root'));
         acceptableAnswers.add(normalizeAnswer(baseChord + ' root position'));
       }
@@ -292,6 +300,7 @@ export const validateAnswer = (answer, expectedAnswer) => {
     addInversionVariations(rootNote + 'm'); // "Cm"
     addInversionVariations(rootNote + 'min'); // "Cmin"
     addInversionVariations(rootNote + 'minor'); // "Cminor"
+    addInversionVariations(rootNote + '-'); // "C-"
   }
   
   // Diminished chord variations
@@ -299,6 +308,7 @@ export const validateAnswer = (answer, expectedAnswer) => {
     addInversionVariations(rootNote + 'dim'); // "Cdim"
     addInversionVariations(rootNote + 'diminished'); // "Cdiminished"
     addInversionVariations(rootNote + '°'); // "C°"
+    addInversionVariations(rootNote + 'º'); // "Cº"
   }
   
   // Augmented chord variations
@@ -390,6 +400,8 @@ export const validateAnswer = (answer, expectedAnswer) => {
 export const levelConfigs = {
   level1: {
     name: "Level 1: Basic Triads",
+    roots: ['C', 'D', 'E', 'F', 'G', 'A', 'B'], // Natural notes only
+    requireInversionLabeling: false, // Level 1 doesn't use inversions
     selectChordAndInversion: () => {
       // Level 1: Only root position - basic triads only
       const basicTriadKeys = ['major', 'minor', 'diminished', 'augmented'];
@@ -400,6 +412,8 @@ export const levelConfigs = {
   
   level2: {
     name: "Level 2: First Inversions",
+    roots: ['C', 'D', 'E', 'F', 'G', 'A', 'B'], // Natural notes only
+    requireInversionLabeling: true, // Level 2 uses first inversions
     selectChordAndInversion: () => {
       // Level 2: Root position and first inversion (no augmented inversions) - basic triads only
       if (Math.random() < 0.5) {
@@ -418,6 +432,8 @@ export const levelConfigs = {
   
   level3: {
     name: "Level 3: All Inversions",
+    roots: ['C', 'D', 'E', 'F', 'G', 'A', 'B'], // Natural notes only
+    requireInversionLabeling: true, // Level 3 uses all inversions
     selectChordAndInversion: () => {
       // Level 3: Root position, first inversion, and second inversion (no augmented inversions) - basic triads only
       const inversionChoice = Math.random();
@@ -442,6 +458,8 @@ export const levelConfigs = {
   
   level4: {
     name: "Level 4: Open Voicings",
+    roots: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], // All chromatic notes
+    requireInversionLabeling: false, // Level 4 uses open voicings (different system)
     selectChordAndInversion: () => {
       // Level 4: Basic triads for open voicings (handled by level4's own generator)
       // This is just a placeholder since Level 4 uses its own chord generation
@@ -474,13 +492,6 @@ export const levelConfigs = {
       const chordType = seventhChords[Math.floor(chordTypeRandom * seventhChords.length)];
       const inversion = inversions[Math.floor(inversionRandom * inversions.length)];
       
-      console.log('Level6 selection:', { 
-        chordTypeRandom, 
-        inversionRandom, 
-        chordType, 
-        inversion,
-        timestamp: Date.now()
-      });
       
       return { chordType, inversion };
     }

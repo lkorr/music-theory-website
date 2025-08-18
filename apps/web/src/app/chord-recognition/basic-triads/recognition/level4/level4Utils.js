@@ -5,7 +5,7 @@
  * (Open Voicing Chords with octave doubling and wide spacing)
  */
 
-import { noteNames, chordTypes, getMidiNoteName } from '../../shared/chordLogic.js';
+import { noteNames, chordTypes, getMidiNoteName, validateAnswer, levelConfigs } from '../../shared/chordLogic.js';
 
 /**
  * Generate open voicing chord with octave doubling and wide spacing for Level 4
@@ -140,90 +140,13 @@ export const generateLevel4Chord = (previousChord = null) => {
  * @param {string} expectedAnswer - Expected correct answer
  * @returns {boolean} True if answer is correct
  */
+/**
+ * Validate answer for Level 4 using shared validation functions
+ * @param {string} answer - User's answer
+ * @param {string} expectedAnswer - Expected correct answer
+ * @returns {boolean} True if answer is correct
+ */
 export const validateLevel4Answer = (answer, expectedAnswer) => {
-  const normalizeAnswer = (str) => str.toLowerCase().replace(/\s+/g, '');
-  
-  const normalized = normalizeAnswer(answer);
-  const expectedNormalized = normalizeAnswer(expectedAnswer);
-  
-  // Extract root note and chord type from expected answer
-  const rootNote = expectedAnswer.match(/^[A-G][#b]?/)?.[0] || '';
-  const chordTypePart = expectedAnswer.replace(rootNote, '').toLowerCase();
-  
-  // Generate all acceptable formats for this chord
-  const acceptableAnswers = new Set();
-  
-  // Add the exact expected answer
-  acceptableAnswers.add(expectedNormalized);
-  
-  // Major chord variations
-  if (chordTypePart === '' || chordTypePart === 'maj' || chordTypePart === 'major') {
-    acceptableAnswers.add(normalizeAnswer(rootNote)); // Just "C"
-    acceptableAnswers.add(normalizeAnswer(rootNote + 'maj')); // "Cmaj"
-    acceptableAnswers.add(normalizeAnswer(rootNote + 'major')); // "Cmajor"
-    acceptableAnswers.add(normalizeAnswer(rootNote + 'M')); // "CM"
-  }
-  
-  // Minor chord variations  
-  else if (chordTypePart === 'm' || chordTypePart === 'min' || chordTypePart === 'minor') {
-    acceptableAnswers.add(normalizeAnswer(rootNote + 'm')); // "Cm"
-    acceptableAnswers.add(normalizeAnswer(rootNote + 'min')); // "Cmin"
-    acceptableAnswers.add(normalizeAnswer(rootNote + 'minor')); // "Cminor"
-    acceptableAnswers.add(normalizeAnswer(rootNote + '-')); // "C-"
-  }
-  
-  // Diminished chord variations
-  else if (chordTypePart === 'dim' || chordTypePart === 'diminished') {
-    acceptableAnswers.add(normalizeAnswer(rootNote + 'dim')); // "Cdim"
-    acceptableAnswers.add(normalizeAnswer(rootNote + 'diminished')); // "Cdiminished"
-    acceptableAnswers.add(normalizeAnswer(rootNote + '°')); // "C°"
-    acceptableAnswers.add(normalizeAnswer(rootNote + 'º')); // "Cº"
-  }
-  
-  // Augmented chord variations
-  else if (chordTypePart === 'aug' || chordTypePart === 'augmented') {
-    acceptableAnswers.add(normalizeAnswer(rootNote + 'aug'));
-    acceptableAnswers.add(normalizeAnswer(rootNote + 'augmented'));
-    acceptableAnswers.add(normalizeAnswer(rootNote + '+'));
-  }
-  
-  // Handle sharp/flat enharmonic equivalents
-  const enharmonicEquivalents = {
-    'c#': 'db', 'db': 'c#',
-    'd#': 'eb', 'eb': 'd#', 
-    'f#': 'gb', 'gb': 'f#',
-    'g#': 'ab', 'ab': 'g#',
-    'a#': 'bb', 'bb': 'a#'
-  };
-  
-  // If the root note has an enharmonic equivalent, add those variations too
-  const rootLower = rootNote.toLowerCase();
-  if (enharmonicEquivalents[rootLower]) {
-    const enharmonicRoot = enharmonicEquivalents[rootLower];
-    const capitalizedEnharmonic = enharmonicRoot.charAt(0).toUpperCase() + enharmonicRoot.slice(1);
-    
-    // Add all the same variations for the enharmonic equivalent
-    if (chordTypePart === '' || chordTypePart === 'maj' || chordTypePart === 'major') {
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic));
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + 'maj'));
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + 'major'));
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + 'M'));
-    } else if (chordTypePart === 'm' || chordTypePart === 'min' || chordTypePart === 'minor') {
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + 'm'));
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + 'min'));
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + 'minor'));
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + '-'));
-    } else if (chordTypePart === 'dim' || chordTypePart === 'diminished') {
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + 'dim'));
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + 'diminished'));
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + '°'));
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + 'º'));
-    } else if (chordTypePart === 'aug' || chordTypePart === 'augmented') {
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + 'aug'));
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + 'augmented'));
-      acceptableAnswers.add(normalizeAnswer(capitalizedEnharmonic + '+'));
-    }
-  }
-  
-  return acceptableAnswers.has(normalized);
+  return validateAnswer(answer, expectedAnswer, levelConfigs.level4);
 };
+

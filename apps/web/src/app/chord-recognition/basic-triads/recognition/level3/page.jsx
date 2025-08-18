@@ -52,7 +52,7 @@ export default function Level3Page() {
   // Start screen (when level hasn't been started yet)
   if (!hasStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F3E8FF] to-[#DDD6FE]">
+      <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9]">
         <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -577,7 +577,7 @@ export default function Level3Page() {
   // Completion screen
   if (isCompleted && levelResult) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F3E8FF] to-[#DDD6FE] flex items-center justify-center p-6">
+      <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9] flex items-center justify-center p-6">
         <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8 max-w-md w-full text-center">
           <h2 className="text-3xl font-bold text-black mb-6">
             Level {levelResult.passed ? 'Completed!' : 'Failed'}
@@ -638,7 +638,7 @@ export default function Level3Page() {
 
   // Main game screen
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F3E8FF] to-[#DDD6FE]">
+    <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9]">
       <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -675,7 +675,7 @@ export default function Level3Page() {
         <div className="mt-6 text-center mb-8">
           <h2 className="text-2xl font-bold text-black mb-4">What chord is this?</h2>
           <p className="text-black/70 mb-6">
-            Include inversions (e.g., C/1 for first inversion, C/2 for second inversion, Dm for root position)
+            Include inversions (e.g., C/1, C/E for first inversion, C/2, C/G for second inversion)
           </p>
         </div>
 

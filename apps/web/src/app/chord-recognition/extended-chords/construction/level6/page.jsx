@@ -3,12 +3,41 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { Eye, EyeOff } from "lucide-react";
-import { noteNames, chordTypes, getMidiNoteName, isBlackKey } from "../../shared/chordLogic.js";
+import { noteNames, getMidiNoteName, isBlackKey } from "../../shared/chordLogic.js";
 
-// Generate random chord construction task
+// 7th chord types for construction
+const seventhChordTypes = {
+  major7: {
+    name: 'Major 7th',
+    symbol: 'maj7',
+    intervals: [0, 4, 7, 11] // Root, Major 3rd, Perfect 5th, Major 7th
+  },
+  minor7: {
+    name: 'Minor 7th', 
+    symbol: 'm7',
+    intervals: [0, 3, 7, 10] // Root, Minor 3rd, Perfect 5th, Minor 7th
+  },
+  dominant7: {
+    name: 'Dominant 7th',
+    symbol: '7',
+    intervals: [0, 4, 7, 10] // Root, Major 3rd, Perfect 5th, Minor 7th
+  },
+  diminished7: {
+    name: 'Diminished 7th',
+    symbol: 'dim7',
+    intervals: [0, 3, 6, 9] // Root, Minor 3rd, Diminished 5th, Diminished 7th
+  },
+  halfdiminished7: {
+    name: 'Half Diminished 7th',
+    symbol: 'm7♭5',
+    intervals: [0, 3, 6, 10] // Root, Minor 3rd, Diminished 5th, Minor 7th
+  }
+};
+
+// Generate random 7th chord construction task
 const generateConstructionTask = (previousTask = null) => {
   const roots = ['C', 'D', 'E', 'F', 'G', 'A', 'B']; // Natural notes only
-  const chordTypeKeys = ['major', 'minor', 'diminished', 'augmented'];
+  const chordTypeKeys = ['major7', 'minor7', 'dominant7', 'diminished7', 'halfdiminished7'];
   
   let root, chordTypeKey, attempt = 0;
   
@@ -25,7 +54,7 @@ const generateConstructionTask = (previousTask = null) => {
            previousTask.root === root && 
            previousTask.chordType === chordTypeKey);
   
-  const chordType = chordTypes[chordTypeKey];
+  const chordType = seventhChordTypes[chordTypeKey];
   
   // Choose octave (C3=48, C4=60, C5=72)
   const baseOctaves = [48, 60, 72]; // C3, C4, C5
@@ -50,7 +79,7 @@ const generateConstructionTask = (previousTask = null) => {
   };
 };
 
-// Interactive Piano Roll Component
+// Interactive Piano Roll Component for 7th chords
 function InteractivePianoRoll({ placedNotes, onNoteToggle, currentTask, showSolution, feedback, showLabels, setShowLabels }) {
   const pianoKeysRef = useRef(null);
   const pianoRollRef = useRef(null);
@@ -82,7 +111,7 @@ function InteractivePianoRoll({ placedNotes, onNoteToggle, currentTask, showSolu
     if (!currentTask) return false;
     const semitone = midiNote % 12;
     const rootSemitone = noteNames.indexOf(currentTask.root);
-    const expectedSemitones = chordTypes[currentTask.chordType].intervals.map(interval => 
+    const expectedSemitones = seventhChordTypes[currentTask.chordType].intervals.map(interval => 
       (rootSemitone + interval) % 12
     );
     return expectedSemitones.includes(semitone);
@@ -249,7 +278,7 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
         </div>
         <div>
           <div className={`text-2xl font-bold ${
-            avgTime > 0 && avgTime <= 8 ? 'text-green-600' : avgTime > 8 ? 'text-red-600' : 'text-black'
+            avgTime > 0 && avgTime <= 12 ? 'text-green-600' : avgTime > 12 ? 'text-red-600' : 'text-black'
           }`}>
             {avgTime > 0 ? avgTime.toFixed(1) : '0.0'}s
           </div>
@@ -282,7 +311,7 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
   );
 }
 
-export default function Level5Construction() {
+export default function Level6Construction() {
   const [currentTask, setCurrentTask] = useState(null);
   const [placedNotes, setPlacedNotes] = useState([]);
   const [feedback, setFeedback] = useState(null);
@@ -301,7 +330,7 @@ export default function Level5Construction() {
   
   const TOTAL_PROBLEMS = 20;
   const PASS_ACCURACY = 85; // 85%
-  const PASS_TIME = 10; // 10 seconds
+  const PASS_TIME = 12; // 12 seconds (slightly longer for 7th chords)
 
   const startLevel = () => {
     setHasStarted(true);
@@ -358,8 +387,8 @@ export default function Level5Construction() {
   const validateChord = () => {
     if (!currentTask || placedNotes.length === 0) return false;
     
-    // For Level 5: Only root position chords, so we need exactly 3 notes
-    if (placedNotes.length !== 3) return false;
+    // For Level 6: Only root position 7th chords, so we need exactly 4 notes
+    if (placedNotes.length !== 4) return false;
     
     const sortedPlacedNotes = [...placedNotes].sort((a, b) => a - b);
     
@@ -375,7 +404,7 @@ export default function Level5Construction() {
     }).sort((a, b) => a - b);
     
     // Get expected intervals for the current chord type
-    const expectedIntervals = [...chordTypes[currentTask.chordType].intervals].sort((a, b) => a - b);
+    const expectedIntervals = [...seventhChordTypes[currentTask.chordType].intervals].sort((a, b) => a - b);
     
     // Check if intervals match (allowing any octave)
     return intervals.length === expectedIntervals.length &&
@@ -452,11 +481,11 @@ export default function Level5Construction() {
         <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
+              <Link to="/chord-recognition/extended-chords" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
               <h1 className="text-xl font-bold text-black">
-                Level 5: Build Basic Triads
+                Level 6: Build 7th Chords
               </h1>
             </div>
             <Link to="/" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
@@ -468,10 +497,10 @@ export default function Level5Construction() {
         <main className="max-w-6xl mx-auto p-6">
           <div className="flex flex-col lg:flex-row gap-8 items-start justify-center min-h-[80vh]">
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-2xl p-8 lg:w-1/2">
-              <h2 className="text-3xl font-bold text-black mb-6">Ready to Start Level 5?</h2>
+              <h2 className="text-3xl font-bold text-black mb-6">Ready to Start Level 6?</h2>
               <div className="text-lg text-black/80 mb-8 space-y-2">
                 <p><strong>{TOTAL_PROBLEMS} problems</strong> to complete</p>
-                <p>Build <strong>basic triads</strong> by placing notes on the piano roll</p>
+                <p>Build <strong>7th chords</strong> by placing notes on the piano roll</p>
                 <p>Need <strong>{PASS_ACCURACY}% accuracy</strong> to pass</p>
                 <p>Average time must be under <strong>{PASS_TIME} seconds</strong></p>
               </div>
@@ -479,31 +508,32 @@ export default function Level5Construction() {
                 onClick={startLevel}
                 className="px-12 py-4 bg-emerald-500 text-white text-xl font-bold rounded-xl hover:bg-emerald-600 transition-colors shadow-lg"
               >
-                Start Level 5
+                Start Level 6
               </button>
             </div>
 
             <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 lg:w-1/2">
-              <h3 className="text-2xl font-bold text-black mb-6 text-center">How to Build Chords</h3>
+              <h3 className="text-2xl font-bold text-black mb-6 text-center">How to Build 7th Chords</h3>
               <div className="space-y-4 text-black/80">
                 <div className="bg-white/30 rounded-xl p-4">
                   <h4 className="font-bold mb-2">Instructions</h4>
-                  <p className="text-sm">You'll be asked to build specific chords. Click on the piano roll to place the correct notes.</p>
+                  <p className="text-sm">You'll be asked to build specific 7th chords. Click on the piano roll to place the correct 4 notes.</p>
                 </div>
                 
                 <div className="bg-white/30 rounded-xl p-4">
-                  <h4 className="font-bold mb-2">Chord Types</h4>
+                  <h4 className="font-bold mb-2">7th Chord Types</h4>
                   <ul className="text-sm space-y-1">
-                    <li>• <strong>Major:</strong> Root + Major 3rd + Perfect 5th</li>
-                    <li>• <strong>Minor:</strong> Root + Minor 3rd + Perfect 5th</li>
-                    <li>• <strong>Diminished:</strong> Root + Minor 3rd + Diminished 5th</li>
-                    <li>• <strong>Augmented:</strong> Root + Major 3rd + Augmented 5th</li>
+                    <li>• <strong>Major 7th:</strong> Root + Major 3rd + Perfect 5th + Major 7th</li>
+                    <li>• <strong>Minor 7th:</strong> Root + Minor 3rd + Perfect 5th + Minor 7th</li>
+                    <li>• <strong>Dominant 7th:</strong> Root + Major 3rd + Perfect 5th + Minor 7th</li>
+                    <li>• <strong>Diminished 7th:</strong> Root + Minor 3rd + Diminished 5th + Diminished 7th</li>
+                    <li>• <strong>Half Diminished 7th:</strong> Root + Minor 3rd + Diminished 5th + Minor 7th</li>
                   </ul>
                 </div>
                 
                 <div className="bg-white/30 rounded-xl p-4">
                   <h4 className="font-bold mb-2">Example</h4>
-                  <p className="text-sm">For "C Major": Place C, E, and G notes. Green notes = correct, Red notes = incorrect.</p>
+                  <p className="text-sm">For "Cmaj7": Place C, E, G, and B notes. Green notes = correct, Red notes = incorrect.</p>
                 </div>
               </div>
             </div>
@@ -520,11 +550,11 @@ export default function Level5Construction() {
         <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
+              <Link to="/chord-recognition/extended-chords" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
               <h1 className="text-xl font-bold text-black">
-                Level 5: Complete!
+                Level 6: Complete!
               </h1>
             </div>
             <Link to="/" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
@@ -582,14 +612,14 @@ export default function Level5Construction() {
                 Try Again
               </button>
               <Link
-                to="/chord-recognition/basic-triads"
+                to="/chord-recognition/extended-chords"
                 className="px-6 py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors"
               >
                 Back to Levels
               </Link>
               {levelResult.passed && (
                 <Link
-                  to="/chord-recognition/basic-triads/construction/level6"
+                  to="/chord-recognition/extended-chords/construction/level7"
                   className="px-6 py-3 bg-green-500 text-white font-semibold rounded-xl hover:bg-green-600 transition-colors"
                 >
                   Next Level
@@ -611,11 +641,11 @@ export default function Level5Construction() {
       <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
+            <Link to="/chord-recognition/extended-chords" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-black">
-              Level 5: Build Basic Triads
+              Level 6: Build 7th Chords
             </h1>
           </div>
           <Link to="/" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
@@ -698,7 +728,7 @@ export default function Level5Construction() {
                 
                 {feedback.isCorrect && (
                   <div className="text-green-700 mt-2">
-                    Excellent chord construction!
+                    Excellent 7th chord construction!
                   </div>
                 )}
               </div>

@@ -314,6 +314,39 @@ const midiToNoteName = (midiNote) => {
   return `${note}${octave}`;
 };
 
+// Helper function to check if a MIDI note is the tonic
+const isTonicNote = (midiNote, keySignature) => {
+  const noteNames = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
+  const noteName = noteNames[midiNote % 12];
+  
+  // Get the tonic note from the key
+  let tonicNote;
+  if (keySignature.key.endsWith('m')) {
+    // Minor key - remove 'm' suffix
+    tonicNote = keySignature.key.slice(0, -1);
+  } else {
+    // Major key
+    tonicNote = keySignature.key;
+  }
+  
+  // Handle enharmonic equivalents
+  const enharmonicMap = {
+    'Bb': ['Bb', 'A#'],
+    'A#': ['Bb', 'A#'],
+    'Db': ['Db', 'C#'],
+    'C#': ['Db', 'C#'],
+    'Eb': ['Eb', 'D#'],
+    'D#': ['Eb', 'D#'],
+    'Gb': ['Gb', 'F#'],
+    'F#': ['Gb', 'F#'],
+    'Ab': ['Ab', 'G#'],
+    'G#': ['Ab', 'G#']
+  };
+  
+  const equivalents = enharmonicMap[tonicNote] || [tonicNote];
+  return equivalents.includes(noteName);
+};
+
 // Generate a chord progression challenge with non-diatonic chords
 const generateNonDiatonicChordProgression = (previousChallenge = null) => {
   const keys = Object.keys(keySignatures);
@@ -457,18 +490,21 @@ function ChordProgressionDisplay({ chords, currentKey, keyData, progressionData,
               {Array.from({ length: totalNotes }, (_, i) => {
                 const midiNote = highestNote - i;
                 const noteName = getMidiNoteName(midiNote);
+                const isTonic = isTonicNote(midiNote, { key: currentKey });
                 return (
                   <div 
                     key={midiNote} 
                     className="border-b border-gray-200 flex items-center justify-end pr-3"
                     style={{ 
                       height: `${noteHeight}px`,
-                      backgroundColor: isBlackKey(midiNote) ? '#6b7280' : '#ffffff',
-                      color: isBlackKey(midiNote) ? '#ffffff' : '#000000'
+                      backgroundColor: isTonic 
+                        ? '#22c55e' // Green for tonic notes
+                        : isBlackKey(midiNote) ? '#6b7280' : '#ffffff',
+                      color: isTonic || isBlackKey(midiNote) ? '#ffffff' : '#000000'
                     }}
                   >
                     <span className={`${
-                      isBlackKey(midiNote) 
+                      isTonic || isBlackKey(midiNote) 
                         ? "text-xs text-white" 
                         : "text-xs text-black"
                     }`}>
@@ -641,9 +677,41 @@ export default function Level3Page() {
       normalizedUserAnswer = normalizedUserAnswer.replace(/64|6/g, '').replace(/\s+/g, ' ').trim();
     }
     
-    // Generate alternative notations for half-diminished chords
+    // Normalize diminished chord symbols in user input to match expected format
+    normalizedUserAnswer = normalizedUserAnswer.replace(/viid\b/g, 'vii°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/viidim\b/g, 'vii°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/iid\b/g, 'ii°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/iidim\b/g, 'ii°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/id\b/g, 'i°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/idim\b/g, 'i°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/iiid\b/g, 'iii°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/iiidim\b/g, 'iii°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/ivd\b/g, 'iv°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/ivdim\b/g, 'iv°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/vd\b/g, 'v°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/vdim\b/g, 'v°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/vid\b/g, 'vi°');
+    normalizedUserAnswer = normalizedUserAnswer.replace(/vidim\b/g, 'vi°');
+    
+    // Generate alternative notations for diminished and half-diminished chords
     const generateAlternativeNotations = (answer) => {
       const alternatives = [answer];
+      
+      // Handle diminished chord alternatives (vii°, ii°, etc.)
+      alternatives.push(answer.replace(/vii°/g, 'viid'));
+      alternatives.push(answer.replace(/vii°/g, 'viidim'));
+      alternatives.push(answer.replace(/ii°/g, 'iid'));
+      alternatives.push(answer.replace(/ii°/g, 'iidim'));
+      alternatives.push(answer.replace(/i°/g, 'id'));
+      alternatives.push(answer.replace(/i°/g, 'idim'));
+      alternatives.push(answer.replace(/iii°/g, 'iiid'));
+      alternatives.push(answer.replace(/iii°/g, 'iiidim'));
+      alternatives.push(answer.replace(/iv°/g, 'ivd'));
+      alternatives.push(answer.replace(/iv°/g, 'ivdim'));
+      alternatives.push(answer.replace(/v°/g, 'vd'));
+      alternatives.push(answer.replace(/v°/g, 'vdim'));
+      alternatives.push(answer.replace(/vi°/g, 'vid'));
+      alternatives.push(answer.replace(/vi°/g, 'vidim'));
       
       // Handle half-diminished chord alternatives
       alternatives.push(answer.replace(/ii\/♭5/g, 'iid'));
@@ -668,6 +736,12 @@ export default function Level3Page() {
         alternatives.push(answer.replace(/iv\/♭564/g, 'ivd64'));
         alternatives.push(answer.replace(/iv\/♭564/g, 'ivdim64'));
         alternatives.push(answer.replace(/iv\/♭564/g, 'iv°64'));
+        
+        // Handle diminished chord inversions
+        alternatives.push(answer.replace(/vii°6/g, 'viid6'));
+        alternatives.push(answer.replace(/vii°6/g, 'viidim6'));
+        alternatives.push(answer.replace(/vii°64/g, 'viid64'));
+        alternatives.push(answer.replace(/vii°64/g, 'viidim64'));
       }
       
       return [...new Set(alternatives)]; // Remove duplicates
@@ -813,7 +887,7 @@ export default function Level3Page() {
             chords={currentChallenge.chords}
             currentKey={currentChallenge.key}
             keyData={currentChallenge.keyData}
-            progressionData={currentChallenge.progressionData}
+            progressionData={currentChallenge.progression}
             showLabels={showLabels}
             setShowLabels={setShowLabels}
           />
@@ -827,7 +901,7 @@ export default function Level3Page() {
           <p className="text-sm text-black/70 mb-4 text-center">
             Enter four roman numerals including non-diatonic chords (e.g., "I bIII IV V" or "vi bII V I")<br/>
             <span className="text-xs text-black/60">Include symbols like bII, bIII, bVI, bVII for borrowed chords, I+ for augmented, etc.<br/>
-            Half-diminished chords can be written as ii/♭5, iid, iidim, or ii°. Inversion labeling not required.</span>
+            Diminished chords: vii°, viid, viidim are all accepted. Half-diminished: ii/♭5, iid, iidim, ii°. Inversion labeling not required.</span>
           </p>
           
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
