@@ -7,18 +7,21 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Validate required environment variables
+// Check if mock auth is enabled (development only)
+const useMockAuth = process.env.USE_MOCK_AUTH === 'true' && process.env.NODE_ENV === 'development';
+
+// Validate required environment variables (skip in mock mode)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseServiceKey) {
+if (!useMockAuth && (!supabaseUrl || !supabaseServiceKey)) {
   throw new Error(
     'Missing required Supabase environment variables. Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.'
   );
 }
 
-// Create admin client for server-side operations
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+// Create admin client for server-side operations (only if not using mock auth)
+export const supabaseAdmin = useMockAuth ? null : createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
@@ -28,8 +31,8 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   }
 });
 
-// Create client-side client (anon key)
-export const supabase = createClient(
+// Create client-side client (anon key) (only if not using mock auth)
+export const supabase = useMockAuth ? null : createClient(
   supabaseUrl, 
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   {
@@ -49,6 +52,24 @@ export const supabase = createClient(
 export async function getUserByEmail(email) {
   if (!email || typeof email !== 'string') {
     throw new Error('Invalid email parameter');
+  }
+
+  // Mock mode for development
+  if (useMockAuth) {
+    console.log(`Mock getUserByEmail: ${email}`);
+    // Return a mock user for any email in development
+    return {
+      id: 'mock-user-id',
+      email: email.toLowerCase().trim(),
+      name: 'Mock User',
+      role: 'FREE',
+      password: '$argon2id$v=19$m=19456,t=2,p=1$mockSaltMockSaltMockSaltMockSalt$mockHashMockHashMockHashMockHashMockHashMockHash',
+      created_at: new Date().toISOString(),
+      last_login_at: null,
+      login_attempts: 0,
+      locked_until: null,
+      deleted_at: null
+    };
   }
 
   const { data, error } = await supabaseAdmin
@@ -71,6 +92,18 @@ export async function createUser(userData) {
 
   if (!email || !password_hash) {
     throw new Error('Email and password hash are required');
+  }
+
+  // Mock mode for development
+  if (useMockAuth) {
+    console.log(`Mock createUser: ${email}`);
+    return {
+      id: 'mock-user-id-' + Date.now(),
+      email: email.toLowerCase().trim(),
+      name: name?.trim() || null,
+      role: 'FREE',
+      created_at: new Date().toISOString()
+    };
   }
 
   const { data, error } = await supabaseAdmin
@@ -100,6 +133,12 @@ export async function createUser(userData) {
 export async function updateLoginTracking(userId, ipAddress, success = true) {
   if (!userId) {
     throw new Error('User ID is required');
+  }
+
+  // Mock mode for development
+  if (useMockAuth) {
+    console.log(`Mock updateLoginTracking: ${userId}, success: ${success}`);
+    return; // No-op in mock mode
   }
 
   const updateData = {
@@ -158,6 +197,12 @@ export async function createAuditLog(logData) {
     throw new Error('Action is required for audit log');
   }
 
+  // Mock mode for development
+  if (useMockAuth) {
+    console.log(`Mock createAuditLog: ${action} for user ${user_id}`);
+    return; // No-op in mock mode
+  }
+
   const { error } = await supabaseAdmin
     .from('audit_logs')
     .insert({
@@ -183,6 +228,12 @@ export async function createAuditLog(logData) {
 export async function isAccountLocked(userId) {
   if (!userId) {
     return false;
+  }
+
+  // Mock mode for development
+  if (useMockAuth) {
+    console.log(`Mock isAccountLocked: ${userId}`);
+    return false; // Never locked in mock mode
   }
 
   const { data, error } = await supabaseAdmin

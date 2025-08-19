@@ -7,7 +7,7 @@
 
 import { validateLoginData } from '../../../../lib/validation.js';
 import { verifyPassword } from '../../../../lib/password.js';
-import { getUserByEmail, updateLoginTracking, createAuditLog } from '../../../../lib/supabase.js';
+import { getUserByEmail, updateLoginTracking, createAuditLog, isAccountLocked } from '../../../../lib/supabase.js';
 import { createRateLimitMiddleware } from '../../../../lib/rateLimit.js';
 import { SignJWT } from 'jose';
 
@@ -30,10 +30,13 @@ export async function POST(request) {
     clientIP = getClientIP(request);
     userAgent = request.headers.get('user-agent') || 'Unknown';
 
-    // Apply rate limiting (stricter for login)
-    const rateLimitResult = await applyRateLimit(request, 'login');
-    if (rateLimitResult) {
-      return rateLimitResult;
+    // Apply rate limiting (stricter for login) - skip in development with mock auth
+    const useMockAuth = process.env.USE_MOCK_AUTH === 'true' && process.env.NODE_ENV === 'development';
+    if (!useMockAuth) {
+      const rateLimitResult = await applyRateLimit(request, 'login');
+      if (rateLimitResult) {
+        return rateLimitResult;
+      }
     }
 
     // Parse request body
@@ -143,6 +146,38 @@ export async function POST(request) {
       );
     }
 
+    // Check if account is locked (skip in development with mock auth)
+    if (!useMockAuth) {
+      try {
+        const accountLocked = await isAccountLocked(user.id);
+        if (accountLocked) {
+          await createAuditLog({
+            user_id: user.id,
+            action: 'USER_LOGIN_FAILED',
+            metadata: {
+              reason: 'account_locked',
+              email,
+              ip_address: clientIP,
+              user_agent: userAgent
+            },
+            severity: 'WARN',
+            category: 'auth'
+          });
+
+          return new Response(
+            JSON.stringify({ error: 'Account temporarily locked due to too many failed login attempts. Please try again later.' }),
+            {
+              status: 423, // Locked status code
+              headers: { 'Content-Type': 'application/json' }
+            }
+          );
+        }
+      } catch (error) {
+        console.error('Account lock check error:', error);
+        // Continue with login if lock check fails
+      }
+    }
+
     // Verify password
     let passwordValid;
     try {
@@ -172,6 +207,15 @@ export async function POST(request) {
     }
 
     if (!passwordValid) {
+      // Update failed login tracking (skip in development with mock auth)
+      if (!useMockAuth) {
+        try {
+          await updateLoginTracking(user.id, clientIP, false);
+        } catch (error) {
+          console.error('Failed login tracking error:', error);
+        }
+      }
+
       await createAuditLog({
         user_id: user.id,
         action: 'USER_LOGIN_FAILED',

@@ -26,10 +26,13 @@ export async function POST(request) {
     clientIP = getClientIP(request);
     userAgent = request.headers.get('user-agent') || 'Unknown';
 
-    // Apply rate limiting
-    const rateLimitResult = await applyRateLimit(request, 'register');
-    if (rateLimitResult) {
-      return rateLimitResult; // Rate limit exceeded
+    // Apply rate limiting (skip in development with mock auth)
+    const useMockAuth = process.env.USE_MOCK_AUTH === 'true' && process.env.NODE_ENV === 'development';
+    if (!useMockAuth) {
+      const rateLimitResult = await applyRateLimit(request, 'register');
+      if (rateLimitResult) {
+        return rateLimitResult; // Rate limit exceeded
+      }
     }
 
     // Parse request body
