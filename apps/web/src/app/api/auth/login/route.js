@@ -31,13 +31,10 @@ export async function POST(request) {
     userAgent = request.headers.get('user-agent') || 'Unknown';
 
     // Apply rate limiting (stricter for login)
-    // TEMPORARILY DISABLED FOR TESTING - UNCOMMENT IN PRODUCTION
-    /*
     const rateLimitResult = await applyRateLimit(request, 'login');
     if (rateLimitResult) {
       return rateLimitResult;
     }
-    */
 
     // Parse request body
     let requestData;
