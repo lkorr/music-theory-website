@@ -124,6 +124,54 @@ async function registerRoutes() {
       console.log('✅ Registered GET /auth/expo-web-success');
     }
 
+    // Register auth register route
+    const authRegisterRoute = await import('../src/app/api/auth/register/route.js');
+    if (authRegisterRoute.POST) {
+      api.post('/auth/register', async (c) => {
+        return await authRegisterRoute.POST(c.req.raw);
+      });
+      console.log('✅ Registered POST /auth/register');
+    }
+    if (authRegisterRoute.GET) {
+      api.get('/auth/register', async (c) => {
+        return await authRegisterRoute.GET(c.req.raw);
+      });
+      console.log('✅ Registered GET /auth/register');
+    }
+
+    // Register auth login route
+    const authLoginRoute = await import('../src/app/api/auth/login/route.js');
+    if (authLoginRoute.POST) {
+      api.post('/auth/login', async (c) => {
+        return await authLoginRoute.POST(c.req.raw);
+      });
+      console.log('✅ Registered POST /auth/login');
+    }
+    if (authLoginRoute.GET) {
+      api.get('/auth/login', async (c) => {
+        return await authLoginRoute.GET(c.req.raw);
+      });
+      console.log('✅ Registered GET /auth/login');
+    }
+
+    // Register auth me route
+    const authMeRoute = await import('../src/app/api/auth/me/route.js');
+    if (authMeRoute.GET) {
+      api.get('/auth/me', async (c) => {
+        return await authMeRoute.GET(c.req.raw);
+      });
+      console.log('✅ Registered GET /auth/me');
+    }
+
+    // Register auth logout route
+    const authLogoutRoute = await import('../src/app/api/auth/logout/route.js');
+    if (authLogoutRoute.POST) {
+      api.post('/auth/logout', async (c) => {
+        return await authLogoutRoute.POST(c.req.raw);
+      });
+      console.log('✅ Registered POST /auth/logout');
+    }
+
     console.log('🎉 Route registration completed');
   } catch (error) {
     console.error('❌ Error registering routes:', error);

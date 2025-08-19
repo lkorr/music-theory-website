@@ -68,13 +68,19 @@ export default function PailiaqHomePage() {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0a0a]/50 to-[#0a0a0a]"></div>
         </div>
         
-        <div className="absolute top-6 right-6 z-20">
-          <a 
-            href="#store"
-            className="px-6 py-3 bg-white/20 backdrop-blur-md rounded-full text-white/90 font-medium hover:bg-white/30 transition-all duration-300 border border-white/30"
+        <div className="absolute top-6 right-6 z-20 flex items-center space-x-4">
+          <Link
+            to="/auth/login"
+            className="px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white/90 font-medium hover:bg-white/20 transition-all duration-300 border border-white/20"
           >
-            Store
-          </a>
+            Sign In
+          </Link>
+          <Link
+            to="/auth/register"
+            className="px-6 py-3 bg-blue-600/80 backdrop-blur-md rounded-full text-white font-medium hover:bg-blue-600 transition-all duration-300 border border-blue-500/50"
+          >
+            Get Started
+          </Link>
         </div>
         
         <div className="relative z-10 px-6 py-16">
