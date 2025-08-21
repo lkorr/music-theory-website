@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router";
+import { CompactAuthButton } from "../auth/AuthButton.jsx";
 
 export default function CounterpointHeader({
   currentExercise,
@@ -44,6 +45,7 @@ export default function CounterpointHeader({
               <ChevronRight size={20} className="text-black" />
             </button>
           </div>
+          <CompactAuthButton />
         </div>
       </div>
     </header>

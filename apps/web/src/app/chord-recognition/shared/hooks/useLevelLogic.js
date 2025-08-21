@@ -23,6 +23,7 @@ export const useLevelLogic = (state, config, dependencies) => {
   // Destructure state for easier access
   const {
     currentChord,
+    feedback,
     score,
     startTime,
     isAnswered,
@@ -101,9 +102,11 @@ export const useLevelLogic = (state, config, dependencies) => {
     const isCorrect = validateAnswer(userAnswer, currentChord.expectedAnswer || currentChord.name);
     
     // Set feedback for display
+    const correctAnswer = currentChord.expectedAnswer || currentChord.name;
     setFeedback({
+      show: true,
       isCorrect,
-      correctAnswer: currentChord.expectedAnswer || currentChord.name,
+      correctAnswer,
       userAnswer: userAnswer.trim(),
       timeTaken: timeTaken
     });
@@ -119,16 +122,15 @@ export const useLevelLogic = (state, config, dependencies) => {
     
     setIsAnswered(true);
     
-    // Auto-advance based on configuration
-    const delay = isCorrect 
-      ? config.autoAdvance.correctDelay 
-      : config.autoAdvance.incorrectDelay;
-      
-    setTimeout(() => {
-      if (score.total + 1 < config.totalProblems) {
-        nextChord();
-      }
-    }, delay);
+    // Auto-advance only for correct answers
+    if (isCorrect) {
+      setTimeout(() => {
+        if (score.total + 1 < config.totalProblems) {
+          nextChord();
+        }
+      }, config.autoAdvance.correctDelay);
+    }
+    // For incorrect answers, wait for manual continuation
   }, [
     currentChord, 
     userAnswer, 
@@ -146,9 +148,19 @@ export const useLevelLogic = (state, config, dependencies) => {
   ]);
   
   /**
-   * Handle keyboard input (Enter to submit, etc.)
+   * Handle keyboard input (Enter to submit or continue)
    */
-  const handleKeyPress = createHandleKeyPress(handleSubmit, isAnswered);
+  const handleKeyPress = useCallback((e) => {
+    if (e.key === 'Enter') {
+      if (!isAnswered) {
+        // Submit answer if not answered yet
+        handleSubmit();
+      } else if (feedback && feedback.show && !feedback.isCorrect && score.total < config.totalProblems) {
+        // Continue to next question if wrong answer
+        nextChord();
+      }
+    }
+  }, [isAnswered, handleSubmit, feedback, score.total, config.totalProblems, nextChord]);
   
   /**
    * Handle input change

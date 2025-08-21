@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router";
+import { CompactAuthButton } from "../../../../../components/auth/AuthButton.jsx";
 import { noteNames, chordTypes, getMidiNoteName, isBlackKey } from "../../shared/chordLogic.js";
 import ChordPianoDisplay from "../../shared/ChordPianoDisplay.jsx";
 
@@ -133,10 +134,10 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
   const progress = Math.round((total / totalProblems) * 100);
   
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-6">
+    <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 mb-6">
       {/* Progress bar */}
       <div className="mb-4">
-        <div className="flex justify-between text-sm text-black/70 mb-2">
+        <div className="flex justify-between text-sm text-white/70 mb-2">
           <span>Progress: {total}/{totalProblems}</span>
           <span>{progress}%</span>
         </div>
@@ -150,18 +151,18 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
       
       <div className="grid grid-cols-5 gap-4 text-center">
         <div>
-          <div className="text-2xl font-bold text-black">
+          <div className="text-2xl font-bold text-white">
             {currentTime.toFixed(1)}s
           </div>
-          <div className="text-sm text-black/70">Current Time</div>
+          <div className="text-sm text-white/70">Current Time</div>
         </div>
         <div>
           <div className={`text-2xl font-bold ${
-            avgTime > 0 && avgTime <= 8 ? 'text-green-600' : avgTime > 8 ? 'text-red-600' : 'text-black'
+            avgTime > 0 && avgTime <= 8 ? 'text-green-600' : avgTime > 8 ? 'text-red-600' : 'text-white'
           }`}>
             {avgTime > 0 ? avgTime.toFixed(1) : '0.0'}s
           </div>
-          <div className="text-sm text-black/70">Average Time</div>
+          <div className="text-sm text-white/70">Average Time</div>
         </div>
         <div>
           <div className={`text-2xl font-bold ${
@@ -169,21 +170,21 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
           }`}>
             {accuracy}%
           </div>
-          <div className="text-sm text-black/70">Accuracy</div>
+          <div className="text-sm text-white/70">Accuracy</div>
         </div>
         <div>
-          <div className="text-2xl font-bold text-black">
+          <div className="text-2xl font-bold text-white">
             {correct}
           </div>
-          <div className="text-sm text-black/70">Correct</div>
+          <div className="text-sm text-white/70">Correct</div>
         </div>
         <div>
           <div className={`text-2xl font-bold ${
-            streak >= 5 ? 'text-green-600' : streak >= 3 ? 'text-yellow-600' : 'text-black'
+            streak >= 5 ? 'text-green-600' : streak >= 3 ? 'text-yellow-600' : 'text-white'
           }`}>
             {streak}
           </div>
-          <div className="text-sm text-black/70">Streak</div>
+          <div className="text-sm text-white/70">Streak</div>
         </div>
       </div>
     </div>
@@ -410,29 +411,27 @@ export default function Level4OpenVoicings() {
   // Start screen
   if (!hasStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9]">
-        <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+        <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
+              <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
-              <h1 className="text-xl font-bold text-black">
+              <h1 className="text-xl font-bold text-white">
                 Level 4: Open Voicings
               </h1>
             </div>
-            <Link to="/" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
-              <span className="text-white text-sm font-bold">♪</span>
-            </Link>
+            <CompactAuthButton />
           </div>
         </header>
         
         <main className="max-w-6xl mx-auto p-6">
           <div className="flex flex-col lg:flex-row gap-8 items-start justify-center min-h-[80vh]">
             {/* Main content */}
-            <div className="text-center bg-white/20 backdrop-blur-sm rounded-2xl p-8 lg:w-1/2">
-              <h2 className="text-3xl font-bold text-black mb-6">Ready to Start Level 4?</h2>
-              <div className="text-lg text-black/80 mb-8 space-y-2">
+            <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-8 lg:w-1/2">
+              <h2 className="text-3xl font-bold text-white mb-6">Ready to Start Level 4?</h2>
+              <div className="text-lg text-white/80 mb-8 space-y-2">
                 <p><strong>{TOTAL_PROBLEMS} problems</strong> to complete</p>
                 <p>Identify triads in <strong>open voicings</strong> with octave doubling and wide spacing</p>
                 <p>Need <strong>{PASS_ACCURACY}% accuracy</strong> to pass</p>
@@ -447,15 +446,15 @@ export default function Level4OpenVoicings() {
             </div>
 
             {/* Open Voicing Examples */}
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 lg:w-1/2">
-              <h3 className="text-2xl font-bold text-black mb-6 text-center">Open Voicing Examples</h3>
-              <div className="space-y-4 text-black/80">
-                <div className="bg-white/30 rounded-xl p-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:w-1/2">
+              <h3 className="text-2xl font-bold text-white mb-6 text-center">Open Voicing Examples</h3>
+              <div className="space-y-4 text-white/80">
+                <div className="bg-white/10 rounded-xl p-4">
                   <h4 className="font-bold mb-2">What are Open Voicings?</h4>
                   <p className="text-sm">Open voicings spread chord tones across multiple octaves with gaps between notes, creating a fuller, more resonant sound than close voicings.</p>
                 </div>
                 
-                <div className="bg-white/30 rounded-xl p-4">
+                <div className="bg-white/10 rounded-xl p-4">
                   <h4 className="font-bold mb-2">Features You'll Encounter:</h4>
                   <ul className="text-sm space-y-1">
                     <li>• <strong>Wide spacing:</strong> Notes spread across 2-3 octaves</li>
@@ -465,7 +464,7 @@ export default function Level4OpenVoicings() {
                   </ul>
                 </div>
                 
-                <div className="bg-white/30 rounded-xl p-4">
+                <div className="bg-white/10 rounded-xl p-4">
                   <h4 className="font-bold mb-2">Tips for Success:</h4>
                   <ul className="text-sm space-y-1">
                     <li>• Focus on the <strong>lowest note</strong> (usually the root)</li>
@@ -475,7 +474,7 @@ export default function Level4OpenVoicings() {
                   </ul>
                 </div>
                 
-                <div className="bg-white/30 rounded-xl p-4">
+                <div className="bg-white/10 rounded-xl p-4">
                   <h4 className="font-bold mb-2">Example:</h4>
                   <p className="text-sm">C major open voicing might have: C3, E4, G4, C5 - same chord as close voicing C4-E4-G4, but with wider spacing and octave doubling.</p>
                 </div>
@@ -490,20 +489,18 @@ export default function Level4OpenVoicings() {
   // Completion screen
   if (isCompleted && levelResult) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9]">
-        <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+        <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
+              <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
-              <h1 className="text-xl font-bold text-black">
+              <h1 className="text-xl font-bold text-white">
                 Level 4: Complete!
               </h1>
             </div>
-            <Link to="/" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
-              <span className="text-white text-sm font-bold">♪</span>
-            </Link>
+            <CompactAuthButton />
           </div>
         </header>
         
@@ -526,7 +523,7 @@ export default function Level4OpenVoicings() {
                 }`}>
                   {levelResult.accuracy.toFixed(1)}%
                 </div>
-                <div className="text-black/70">Accuracy (need {PASS_ACCURACY}%)</div>
+                <div className="text-white/70">Accuracy (need {PASS_ACCURACY}%)</div>
               </div>
               <div className="text-center">
                 <div className={`text-3xl font-bold ${
@@ -534,7 +531,7 @@ export default function Level4OpenVoicings() {
                 }`}>
                   {levelResult.avgTime.toFixed(1)}s
                 </div>
-                <div className="text-black/70">Avg Time (need ≤{PASS_TIME}s)</div>
+                <div className="text-white/70">Avg Time (need ≤{PASS_TIME}s)</div>
               </div>
             </div>
             
@@ -562,7 +559,7 @@ export default function Level4OpenVoicings() {
               </Link>
               {levelResult.passed && (
                 <Link
-                  to="/chord-recognition/extended-chords"
+                  to="/chord-recognition/seventh-chords"
                   className="px-6 py-3 bg-green-500 text-white font-semibold rounded-xl hover:bg-green-600 transition-colors"
                 >
                   Continue to Extended Chords
@@ -580,105 +577,138 @@ export default function Level4OpenVoicings() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9]">
-      <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+      <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
+            <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
               <span className="text-white text-sm font-bold">←</span>
             </Link>
-            <h1 className="text-xl font-bold text-black">
-              Level 4: Open Voicings
+            <h1 className="text-xl font-bold text-white">
+              Level 4: Open Voicings - Problem {score.total + 1}/{TOTAL_PROBLEMS}
             </h1>
           </div>
-          <Link to="/" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
-            <span className="text-white text-sm font-bold">♪</span>
-          </Link>
+          <div className="flex items-center space-x-6">
+            <div className="text-white font-semibold">
+              Score: {score.correct}/{score.total}
+            </div>
+            <div className="text-white font-semibold">
+              Time: {currentTime.toFixed(1)}s
+            </div>
+          </div>
         </div>
       </header>
-
-      <main className="max-w-4xl mx-auto p-6">
-        <ScoreDisplay 
-          correct={score.correct}
-          total={score.total}
-          streak={score.streak}
-          currentTime={currentTime}
-          avgTime={avgTime}
-          isAnswered={isAnswered}
-          totalProblems={TOTAL_PROBLEMS}
-        />
-
-        <ChordPianoDisplay 
-          notes={currentChord.notes} 
-          showLabels={showLabels} 
-          setShowLabels={setShowLabels}
-          noteBlockColor="bg-orange-500"
-          noteBorderColor="border-orange-600"
-          title="Open Voicing Chord"
-          showLabelToggle={false}
-          lowestMidi={24}
-          highestMidi={96}
-        />
-
-        <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-black mb-2">What chord is this?</h2>
-            <p className="text-black/70">Listen to the open voicing and identify the chord type</p>
-          </div>
-
-          <div className="max-w-md mx-auto">
-            <input
-              ref={inputRef}
-              type="text"
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Enter chord name (e.g., C, Dm, F#dim, Aaug)"
-              className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:outline-none"
-              disabled={isAnswered}
+      
+      <main className="max-w-7xl mx-auto p-6">
+        {/* Progress bar */}
+        <div className="mb-8">
+          <div className="w-full bg-white/10 rounded-full h-3">
+            <div 
+              className="bg-orange-500 h-3 rounded-full transition-all duration-300"
+              style={{ width: `${(score.total / TOTAL_PROBLEMS) * 100}%` }}
             />
-            
-            <button
-              onClick={handleSubmit}
-              disabled={isAnswered || !userAnswer.trim()}
-              className="w-full mt-4 px-6 py-3 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              Submit Answer
-            </button>
           </div>
-
-          {feedback && (
-            <div className={`mt-6 p-4 rounded-xl ${
-              feedback.isCorrect 
-                ? 'bg-green-100 border border-green-300' 
-                : 'bg-red-100 border border-red-300'
-            }`}>
-              <div className="text-center">
-                <div className={`text-xl font-bold mb-2 ${
-                  feedback.isCorrect ? 'text-green-800' : 'text-red-800'
-                }`}>
-                  {feedback.isCorrect ? 'Correct!' : 'Incorrect'}
-                </div>
+        </div>
+        
+        <div className="flex flex-col xl:flex-row gap-8 items-start">
+          {/* Main content */}
+          <div className="flex-1">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">
+                Identify this open voicing chord
+              </h2>
+              
+              {/* Piano Display */}
+              <div className="mb-8">
+                <ChordPianoDisplay 
+                  notes={currentChord.notes} 
+                  showLabels={showLabels} 
+                  setShowLabels={setShowLabels}
+                  noteBlockColor="bg-orange-500"
+                  noteBorderColor="border-orange-600"
+                  title=""
+                  showLabelToggle={false}
+                  lowestMidi={24}
+                  highestMidi={96}
+                />
+              </div>
+              
+              {/* Input area */}
+              <div className="space-y-4">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Enter chord name (e.g., C, Dm, F#dim, Aaug)"
+                  className="w-full px-4 py-3 text-lg rounded-lg border-2 border-white/30 focus:border-orange-400 focus:outline-none bg-white/10 text-white placeholder-white/50"
+                  disabled={isAnswered}
+                />
                 
-                {!feedback.isCorrect && (
-                  <div className="text-red-700 mb-2">
-                    <div>Your answer: <strong>{feedback.userAnswer}</strong></div>
-                    <div>Correct answer: <strong>{feedback.correctAnswer}</strong></div>
-                  </div>
-                )}
+                <button
+                  onClick={handleSubmit}
+                  disabled={isAnswered || !userAnswer.trim()}
+                  className="w-full py-3 px-6 font-semibold rounded-lg transition-colors bg-orange-500 text-white hover:bg-orange-600 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                >
+                  Submit Answer
+                </button>
                 
-                <div className="text-gray-700">
-                  Time: <strong>{feedback.timeTaken.toFixed(1)}s</strong>
-                </div>
-                
-                {feedback.isCorrect && (
-                  <div className="text-green-700 mt-2">
-                    Great job identifying the open voicing!
+                {/* Feedback */}
+                {feedback && (
+                  <div className={`p-4 rounded-lg ${
+                    feedback.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
+                    <p className="font-semibold">
+                      {feedback.isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+                    </p>
+                    {!feedback.isCorrect && (
+                      <p>The correct answer was: {feedback.correctAnswer}</p>
+                    )}
+                    <p className="text-sm mt-1">Time: {feedback.timeTaken.toFixed(1)}s</p>
                   </div>
                 )}
               </div>
+              
             </div>
-          )}
+          </div>
+          
+          {/* Stats sidebar */}
+          <div className="xl:w-80">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4">Statistics</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-white/70">Accuracy:</span>
+                  <span className="font-semibold text-white">
+                    {score.total > 0 
+                      ? Math.round((score.correct / score.total) * 100) 
+                      : 0}%
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Avg Time:</span>
+                  <span className="font-semibold text-white">{avgTime.toFixed(2)}s</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Progress:</span>
+                  <span className="font-semibold text-white">
+                    {score.total}/{TOTAL_PROBLEMS}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-black/10">
+                <h4 className="font-semibold text-white mb-2">Open Voicings:</h4>
+                <div className="text-sm text-white/70 space-y-1">
+                  <p>• <strong>Wide spacing:</strong> Notes spread across octaves</p>
+                  <p>• <strong>Octave doubling:</strong> Same notes in different octaves</p>
+                  <p>• <strong>Non-consecutive:</strong> Notes not stacked in thirds</p>
+                </div>
+                
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>

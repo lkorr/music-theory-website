@@ -200,20 +200,20 @@ function ChordProgressionDisplay({ chords, currentKey, keyData, showLabels, setS
   }, [chords, highestNote, noteHeight, containerHeight, totalNotes]);
   
   return (
-    <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-8">
+    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-xl font-semibold text-black text-center flex-1">
+        <h3 className="text-xl font-semibold text-white text-center flex-1">
           Chord Progression in {currentKey}
         </h3>
         <button
           onClick={() => setShowLabels(!showLabels)}
-          className="w-10 h-10 rounded-lg bg-white/30 hover:bg-white/40 transition-colors flex items-center justify-center"
+          className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/40 transition-colors flex items-center justify-center"
           title={showLabels ? "Hide note labels" : "Show note labels"}
         >
-          {showLabels ? <EyeOff size={20} className="text-black" /> : <Eye size={20} className="text-black" />}
+          {showLabels ? <EyeOff size={20} className="text-white" /> : <Eye size={20} className="text-white" />}
         </button>
       </div>
-      <p className="text-sm text-black/70 mb-6 text-center">
+      <p className="text-sm text-white/70 mb-6 text-center">
         Listen to the four chords and identify the roman numeral progression
       </p>
       
@@ -242,7 +242,7 @@ function ChordProgressionDisplay({ chords, currentKey, keyData, showLabels, setS
                     <span className={`${
                       isTonic || isBlackKey(midiNote) 
                         ? "text-xs text-white font-semibold" 
-                        : "text-xs text-black"
+                        : "text-xs text-white"
                     }`}>
                       {showLabels ? noteName : ''}
                     </span>
@@ -320,7 +320,7 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-6">
       <div className="mb-4">
-        <div className="flex justify-between text-sm text-black/70 mb-2">
+        <div className="flex justify-between text-sm text-white/70 mb-2">
           <span>Progress: {total}/{totalProblems}</span>
           <span>{progress}%</span>
         </div>
@@ -334,18 +334,18 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
       
       <div className="grid grid-cols-5 gap-4 text-center">
         <div>
-          <div className="text-2xl font-bold text-black">
+          <div className="text-2xl font-bold text-white">
             {currentTime.toFixed(1)}s
           </div>
-          <div className="text-sm text-black/70">Current Time</div>
+          <div className="text-sm text-white/70">Current Time</div>
         </div>
         <div>
           <div className={`text-2xl font-bold ${
-            avgTime > 0 && avgTime <= 8 ? 'text-green-600' : avgTime > 8 ? 'text-red-600' : 'text-black'
+            avgTime > 0 && avgTime <= 8 ? 'text-green-600' : avgTime > 8 ? 'text-red-600' : 'text-white'
           }`}>
             {avgTime > 0 ? avgTime.toFixed(1) : '0.0'}s
           </div>
-          <div className="text-sm text-black/70">Average Time</div>
+          <div className="text-sm text-white/70">Average Time</div>
         </div>
         <div>
           <div className={`text-2xl font-bold ${
@@ -353,15 +353,15 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
           }`}>
             {accuracy}%
           </div>
-          <div className="text-sm text-black/70">Accuracy</div>
+          <div className="text-sm text-white/70">Accuracy</div>
         </div>
         <div>
-          <div className="text-2xl font-bold text-black">{correct}/{total}</div>
-          <div className="text-sm text-black/70">Correct</div>
+          <div className="text-2xl font-bold text-white">{correct}/{total}</div>
+          <div className="text-sm text-white/70">Correct</div>
         </div>
         <div>
-          <div className="text-2xl font-bold text-black">{streak}</div>
-          <div className="text-sm text-black/70">Streak</div>
+          <div className="text-2xl font-bold text-white">{streak}</div>
+          <div className="text-sm text-white/70">Streak</div>
         </div>
       </div>
     </div>
@@ -595,16 +595,16 @@ export default function ChordProgressionsLevel1() {
 
   if (score.total >= totalProblems) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] flex items-center justify-center">
         <div className="text-center max-w-2xl mx-auto p-8">
           <div className="w-24 h-24 rounded-full bg-green-500 flex items-center justify-center mx-auto mb-8">
             <span className="text-4xl text-white">🎉</span>
           </div>
-          <h1 className="text-4xl font-bold text-black mb-6">Level 1 Complete!</h1>
-          <p className="text-xl text-black/70 mb-4">
+          <h1 className="text-4xl font-bold text-white mb-6">Level 1 Complete!</h1>
+          <p className="text-xl text-white/70 mb-4">
             Final Score: {score.correct}/{score.total} ({Math.round((score.correct/score.total)*100)}%)
           </p>
-          <p className="text-lg text-black/70 mb-8">
+          <p className="text-lg text-white/70 mb-8">
             Average Time: {avgTime.toFixed(1)}s
           </p>
           <div className="flex gap-4 justify-center">
@@ -616,7 +616,7 @@ export default function ChordProgressionsLevel1() {
             </button>
             <Link
               to="/chord-recognition/chord-progressions"
-              className="px-6 py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors"
+              className="px-6 py-3 bg-white/20 text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors"
             >
               Back to Levels
             </Link>
@@ -627,13 +627,13 @@ export default function ChordProgressionsLevel1() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9] p-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] p-6">
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <div className="mb-6">
           <Link
             to="/chord-recognition/chord-progressions"
-            className="inline-flex items-center px-4 py-2 bg-black/20 text-black hover:bg-black/30 transition-colors rounded-lg font-medium"
+            className="inline-flex items-center px-4 py-2 bg-white/20/20 text-white hover:bg-white/20/30 transition-colors rounded-lg font-medium"
           >
             ← Back to Chord Progressions
           </Link>
@@ -641,8 +641,8 @@ export default function ChordProgressionsLevel1() {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-black mb-4">Level 1: Basic Progressions</h1>
-          <p className="text-lg text-black/70">
+          <h1 className="text-4xl font-bold text-white mb-4">Level 1: Basic Progressions</h1>
+          <p className="text-lg text-white/70">
             Identify the roman numeral progression for each 4-chord sequence
           </p>
         </div>
@@ -668,13 +668,13 @@ export default function ChordProgressionsLevel1() {
         />
 
         {/* Answer Input */}
-        <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-6">
-          <h3 className="text-xl font-semibold text-black mb-4 text-center">
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
+          <h3 className="text-xl font-semibold text-white mb-4 text-center">
             What is the roman numeral progression?
           </h3>
-          <p className="text-sm text-black/70 mb-4 text-center">
+          <p className="text-sm text-white/70 mb-4 text-center">
             Enter four roman numerals separated by spaces (e.g., "I V vi IV" or "i iv bVI bVII")<br/>
-            <span className="text-xs text-black/60">For diminished: use °, dim, d, or o. In minor keys, use flat notation (bIII, bVI, bVII)</span>
+            <span className="text-xs text-white/60">For diminished: use °, dim, d, or o. In minor keys, use flat notation (bIII, bVI, bVII)</span>
           </p>
           
           <div className="flex gap-4 max-w-2xl mx-auto">
@@ -707,15 +707,15 @@ export default function ChordProgressionsLevel1() {
           
           {feedback && (
             <div className="mt-4 text-center">
-              <p className="text-lg font-semibold text-black">{feedback}</p>
+              <p className="text-lg font-semibold text-white">{feedback}</p>
             </div>
           )}
         </div>
 
         {/* Instructions */}
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-          <h4 className="font-semibold text-black mb-2">Instructions:</h4>
-          <ul className="text-sm text-black/70 space-y-1">
+          <h4 className="font-semibold text-white mb-2">Instructions:</h4>
+          <ul className="text-sm text-white/70 space-y-1">
             <li>• Listen to the four chords played in sequence</li>
             <li>• Identify the roman numeral for each chord in the given key</li>
             <li>• Major keys use: I, ii, iii, IV, V, vi, vii°</li>

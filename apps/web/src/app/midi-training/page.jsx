@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { CompactAuthButton } from "../../components/auth/AuthButton.jsx";
 
 export default function MidiTrainingPage() {
   const apps = [
@@ -23,37 +24,40 @@ export default function MidiTrainingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9]">
-      <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 rounded-full bg-black flex items-center justify-center">
-              <span className="text-white text-2xl font-bold">♪</span>
-            </div>
-          </div>
-          <h1 className="text-4xl font-bold text-black mb-2">
-            MIDI Training App
-          </h1>
-          <p className="text-xl text-black/70 max-w-2xl mx-auto">
-            Welcome to the comprehensive music theory training platform
-          </p>
-          <div className="mt-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+      <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
             <Link 
               to="/" 
-              className="inline-flex items-center px-4 py-2 rounded-lg bg-black/20 text-black hover:bg-black/30 transition-colors"
+              className="inline-flex items-center px-4 py-2 rounded-lg bg-white/20 text-white hover:bg-white/30 transition-colors"
             >
               ← Back to Main Site
             </Link>
+            <CompactAuthButton />
+          </div>
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
+                <span className="text-white text-2xl font-bold">♪</span>
+              </div>
+            </div>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              MIDI Training App
+            </h1>
+            <p className="text-xl text-white/70 max-w-2xl mx-auto">
+              Welcome to the comprehensive music theory training platform
+            </p>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto p-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-black mb-4">
+          <h2 className="text-3xl font-bold text-white mb-4">
             Choose Your Training App
           </h2>
-          <p className="text-lg text-black/70 max-w-3xl mx-auto">
+          <p className="text-lg text-white/70 max-w-3xl mx-auto">
             Select from our specialized training applications to improve your music theory knowledge and skills.
           </p>
         </div>
@@ -65,39 +69,39 @@ export default function MidiTrainingPage() {
               to={app.path}
               className="block group"
             >
-              <div className="bg-white/30 backdrop-blur-sm border-2 border-white/20 rounded-2xl p-8 transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-xl">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 transition-all duration-300 transform group-hover:scale-105 group-hover:bg-white/20">
                 <div className="flex items-start justify-between mb-6">
                   <div className={`w-16 h-16 rounded-full ${app.color} flex items-center justify-center`}>
                     <span className="text-white text-2xl font-bold">{app.icon}</span>
                   </div>
                   <div className="text-right">
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-black/10 text-black">
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/20 text-white">
                       Interactive
                     </span>
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-bold text-black mb-3">
+                <h3 className="text-2xl font-bold text-white mb-3">
                   {app.title}
                 </h3>
                 
-                <p className="text-black/70 mb-6 leading-relaxed">
+                <p className="text-white/70 mb-6 leading-relaxed">
                   {app.description}
                 </p>
 
                 <div className="space-y-2 mb-6">
-                  <h4 className="text-sm font-semibold text-black/80 mb-2">Features:</h4>
+                  <h4 className="text-sm font-semibold text-white/80 mb-2">Features:</h4>
                   <div className="grid grid-cols-2 gap-2">
                     {app.features.map((feature, index) => (
-                      <div key={index} className="flex items-center text-sm text-black/70">
-                        <span className="w-1.5 h-1.5 bg-black/40 rounded-full mr-2"></span>
+                      <div key={index} className="flex items-center text-sm text-white/70">
+                        <span className="w-1.5 h-1.5 bg-white/40 rounded-full mr-2"></span>
                         {feature}
                       </div>
                     ))}
                   </div>
                 </div>
                 
-                <div className="flex items-center text-black font-semibold group-hover:text-black/80 transition-colors">
+                <div className="flex items-center text-white font-semibold group-hover:text-white/80 transition-colors">
                   Start Training
                   <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                 </div>
@@ -107,32 +111,32 @@ export default function MidiTrainingPage() {
         </div>
 
         <div className="text-center mt-16">
-          <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto">
-            <h3 className="text-2xl font-semibold text-black mb-4">About MIDI Training</h3>
-            <p className="text-black/70 leading-relaxed mb-6">
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 max-w-4xl mx-auto">
+            <h3 className="text-2xl font-semibold text-white mb-4">About MIDI Training</h3>
+            <p className="text-white/70 leading-relaxed mb-6">
               Our comprehensive music theory training platform combines interactive exercises with 
               real-time feedback to help you master essential musical concepts. Whether you're a 
               beginner or advanced musician, our adaptive training system will help you improve 
               your skills at your own pace.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-black/80">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-white/80">
               <div className="text-center">
-                <div className="w-12 h-12 bg-black/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-black font-bold">1</span>
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-white font-bold">1</span>
                 </div>
                 <p className="font-medium">Interactive Learning</p>
                 <p className="text-xs mt-1">Hands-on exercises with immediate feedback</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-black/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-black font-bold">2</span>
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-white font-bold">2</span>
                 </div>
                 <p className="font-medium">Progressive Difficulty</p>
                 <p className="text-xs mt-1">Structured learning path from basics to advanced</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-black/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-black font-bold">3</span>
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-white font-bold">3</span>
                 </div>
                 <p className="font-medium">Real-time Validation</p>
                 <p className="text-xs mt-1">Instant feedback on your musical choices</p>

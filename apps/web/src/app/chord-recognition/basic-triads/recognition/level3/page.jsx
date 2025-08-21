@@ -5,6 +5,7 @@
  */
 
 import { Link } from "react-router";
+import { CompactAuthButton } from "../../../../../components/auth/AuthButton.jsx";
 import { useLevelState } from "../../../shared/hooks/useLevelState.js";
 import { useLevelLogic } from "../../../shared/hooks/useLevelLogic.js";
 import { getLevelConfig } from "../../../shared/config/levelConfigs.js";
@@ -46,33 +47,32 @@ export default function Level3Page() {
     handleSubmit,
     handleKeyPress,
     handleInputChange,
-    canSubmit
+    canSubmit,
+    nextChord
   } = logic;
   
   // Start screen (when level hasn't been started yet)
   if (!hasStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9]">
-        <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+        <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
+              <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
-              <h1 className="text-xl font-bold text-black">{config.title}</h1>
+              <h1 className="text-xl font-bold text-white">{config.title}</h1>
             </div>
-            <Link to="/" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
-              <span className="text-white text-sm font-bold">♪</span>
-            </Link>
+            <CompactAuthButton />
           </div>
         </header>
         
         <main className="max-w-6xl mx-auto p-6">
           <div className="flex flex-col lg:flex-row gap-8 items-start justify-center min-h-[80vh]">
             {/* Main content */}
-            <div className="text-center bg-white/20 backdrop-blur-sm rounded-2xl p-8 lg:w-1/2">
-              <h2 className="text-3xl font-bold text-black mb-6">Ready to Start Level 3?</h2>
-              <div className="text-lg text-black/80 mb-8 space-y-2">
+            <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-8 lg:w-1/2">
+              <h2 className="text-3xl font-bold text-white mb-6">Ready to Start Level 3?</h2>
+              <div className="text-lg text-white/80 mb-8 space-y-2">
                 <p><strong>{config.totalProblems} problems</strong> to complete</p>
                 <p>{config.description}</p>
                 <p>Need <strong>{config.passAccuracy}% accuracy</strong> to pass</p>
@@ -87,12 +87,12 @@ export default function Level3Page() {
             </div>
 
             {/* Chord Legend with All Inversions */}
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 lg:w-1/2">
-              <h3 className="text-2xl font-bold text-black mb-6 text-center">All Inversions</h3>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:w-1/2">
+              <h3 className="text-2xl font-bold text-white mb-6 text-center">All Inversions</h3>
               <div className="space-y-3">
                 {/* Major Triad Row */}
-                <div className="bg-white/30 rounded-xl p-3">
-                  <h4 className="font-bold text-black mb-2 text-center text-sm">Major Triads</h4>
+                <div className="bg-white/10 rounded-xl p-3">
+                  <h4 className="font-bold text-white mb-2 text-center text-sm">Major Triads</h4>
                   <div className="flex justify-center gap-3">
                     {/* Root Position */}
                     <div className="text-center">
@@ -142,7 +142,7 @@ export default function Level3Page() {
                           );
                         })()}
                       </div>
-                      <p className="text-xs text-black/70">C</p>
+                      <p className="text-xs text-white/70">C</p>
                     </div>
 
                     {/* First Inversion */}
@@ -193,7 +193,7 @@ export default function Level3Page() {
                           );
                         })()}
                       </div>
-                      <p className="text-xs text-black/70">C/1</p>
+                      <p className="text-xs text-white/70">C/1</p>
                     </div>
 
                     {/* Second Inversion */}
@@ -244,14 +244,14 @@ export default function Level3Page() {
                           );
                         })()}
                       </div>
-                      <p className="text-xs text-black/70">C/2</p>
+                      <p className="text-xs text-white/70">C/2</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Minor Triad Row */}
-                <div className="bg-white/30 rounded-xl p-3">
-                  <h4 className="font-bold text-black mb-2 text-center text-sm">Minor Triads</h4>
+                <div className="bg-white/10 rounded-xl p-3">
+                  <h4 className="font-bold text-white mb-2 text-center text-sm">Minor Triads</h4>
                   <div className="flex justify-center gap-3">
                     {/* Root Position */}
                     <div className="text-center">
@@ -301,7 +301,7 @@ export default function Level3Page() {
                           );
                         })()}
                       </div>
-                      <p className="text-xs text-black/70">Dm</p>
+                      <p className="text-xs text-white/70">Dm</p>
                     </div>
 
                     {/* First Inversion */}
@@ -352,7 +352,7 @@ export default function Level3Page() {
                           );
                         })()}
                       </div>
-                      <p className="text-xs text-black/70">Dm/1</p>
+                      <p className="text-xs text-white/70">Dm/1</p>
                     </div>
 
                     {/* Second Inversion */}
@@ -403,14 +403,14 @@ export default function Level3Page() {
                           );
                         })()}
                       </div>
-                      <p className="text-xs text-black/70">Dm/2</p>
+                      <p className="text-xs text-white/70">Dm/2</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Diminished Triad Row */}
-                <div className="bg-white/30 rounded-xl p-3">
-                  <h4 className="font-bold text-black mb-2 text-center text-sm">Diminished Triads</h4>
+                <div className="bg-white/10 rounded-xl p-3">
+                  <h4 className="font-bold text-white mb-2 text-center text-sm">Diminished Triads</h4>
                   <div className="flex justify-center gap-3">
                     {/* Root Position */}
                     <div className="text-center">
@@ -460,7 +460,7 @@ export default function Level3Page() {
                           );
                         })()}
                       </div>
-                      <p className="text-xs text-black/70">Bdim</p>
+                      <p className="text-xs text-white/70">Bdim</p>
                     </div>
 
                     {/* First Inversion */}
@@ -511,7 +511,7 @@ export default function Level3Page() {
                           );
                         })()}
                       </div>
-                      <p className="text-xs text-black/70">Bdim/1</p>
+                      <p className="text-xs text-white/70">Bdim/1</p>
                     </div>
 
                     {/* Second Inversion */}
@@ -562,7 +562,7 @@ export default function Level3Page() {
                           );
                         })()}
                       </div>
-                      <p className="text-xs text-black/70">Bdim/2</p>
+                      <p className="text-xs text-white/70">Bdim/2</p>
                     </div>
                   </div>
                 </div>
@@ -577,28 +577,28 @@ export default function Level3Page() {
   // Completion screen
   if (isCompleted && levelResult) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9] flex items-center justify-center p-6">
-        <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8 max-w-md w-full text-center">
-          <h2 className="text-3xl font-bold text-black mb-6">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] flex items-center justify-center p-6">
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-md w-full text-center">
+          <h2 className="text-3xl font-bold text-white mb-6">
             Level {levelResult.passed ? 'Completed!' : 'Failed'}
           </h2>
           
           <div className="space-y-4 mb-8">
             <div className="flex justify-between">
-              <span className="text-black/70">Accuracy:</span>
+              <span className="text-white/70">Accuracy:</span>
               <span className={`font-bold ${levelResult.accuracy >= config.passAccuracy ? 'text-green-600' : 'text-red-600'}`}>
                 {levelResult.accuracy.toFixed(1)}%
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-black/70">Average Time:</span>
+              <span className="text-white/70">Average Time:</span>
               <span className={`font-bold ${levelResult.avgTime <= config.passTime ? 'text-green-600' : 'text-red-600'}`}>
                 {levelResult.avgTime.toFixed(1)}s
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-black/70">Score:</span>
-              <span className="font-bold text-black">
+              <span className="text-white/70">Score:</span>
+              <span className="font-bold text-white">
                 {levelResult.score.correct}/{levelResult.score.total}
               </span>
             </div>
@@ -638,93 +638,143 @@ export default function Level3Page() {
 
   // Main game screen
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9]">
-      <header className="bg-white/10 backdrop-blur-md border-b border-white/20 px-6 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+      <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
+            <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
               <span className="text-white text-sm font-bold">←</span>
             </Link>
-            <h1 className="text-xl font-bold text-black">{config.title}</h1>
+            <h1 className="text-xl font-bold text-white">
+              {config.title} - Problem {score.total}/{config.totalProblems}
+            </h1>
           </div>
-          <Link to="/" className="w-8 h-8 rounded-full bg-black flex items-center justify-center hover:bg-gray-800 transition-colors">
-            <span className="text-white text-sm font-bold">♪</span>
-          </Link>
+          <div className="flex items-center space-x-6">
+            <div className="text-white font-semibold">
+              Score: {score.correct}/{score.total}
+            </div>
+            <div className="text-white font-semibold">
+              Time: {currentTime}s
+            </div>
+          </div>
         </div>
       </header>
-
-      <main className="max-w-4xl mx-auto p-6">
-        <ScoreDisplay 
-          {...score} 
-          currentTime={currentTime} 
-          avgTime={avgTime} 
-          isAnswered={state.isAnswered} 
-          totalProblems={config.totalProblems} 
-          progressColor={config.progressColor} 
-        />
-        
-        <ChordPianoDisplay 
-          notes={currentChord?.notes || []} 
-          showLabels={showLabels} 
-          setShowLabels={state.setShowLabels} 
-          noteBlockColor="bg-purple-500"
-          noteBorderColor="border-purple-600"
-        />
-
-        {/* Question section */}
-        <div className="mt-6 text-center mb-8">
-          <h2 className="text-2xl font-bold text-black mb-4">What chord is this?</h2>
-          <p className="text-black/70 mb-6">
-            Include inversions (e.g., C/1, C/E for first inversion, C/2, C/G for second inversion)
-          </p>
-        </div>
-
-        {/* Input section */}
-        <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8 mb-6">
-          <div className="max-w-md mx-auto">
-            <input
-              ref={inputRef}
-              type="text"
-              value={userAnswer}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              placeholder="Enter chord name..."
-              disabled={state.isAnswered}
-              className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none text-center bg-white disabled:bg-gray-100"
+      
+      <main className="max-w-7xl mx-auto p-6">
+        {/* Progress bar */}
+        <div className="mb-8">
+          <div className="w-full bg-white/10 rounded-full h-3">
+            <div 
+              className={`${config.progressColor} h-3 rounded-full transition-all duration-300`}
+              style={{ width: `${(score.total / config.totalProblems) * 100}%` }}
             />
-            
-            <button
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className={`w-full mt-4 px-6 py-3 text-lg font-semibold rounded-xl transition-colors ${
-                canSubmit
-                  ? `${config.buttonColor} hover:${config.buttonHoverColor} text-white`
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              Submit Answer
-            </button>
           </div>
         </div>
-
-        {/* Feedback section */}
-        {feedback && (
-          <div className={`bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center ${
-            feedback.isCorrect ? 'border-2 border-green-500' : 'border-2 border-red-500'
-          }`}>
-            <div className={`text-2xl font-bold mb-2 ${
-              feedback.isCorrect ? 'text-green-600' : 'text-red-600'
-            }`}>
-              {feedback.isCorrect ? '✓ Correct!' : '✗ Incorrect'}
-            </div>
-            
-            <div className="text-black/80 space-y-1">
-              <p>Your answer: <span className="font-semibold">{feedback.userAnswer}</span></p>
-              <p>Correct answer: <span className="font-semibold">{feedback.correctAnswer}</span></p>
-              <p>Time: <span className="font-semibold">{feedback.timeTaken.toFixed(1)}s</span></p>
+        
+        <div className="flex flex-col xl:flex-row gap-8 items-start">
+          {/* Main content */}
+          <div className="flex-1">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">
+                Identify this triad and its inversion
+              </h2>
+              
+              {/* Piano Display */}
+              {currentChord && (
+                <div className="mb-8">
+                  <ChordPianoDisplay 
+                    notes={currentChord.notes} 
+                    showLabels={showLabels}
+                    setShowLabels={(value) => state.setShowLabels(value)}
+                    noteBlockColor="bg-purple-500"
+                    noteBorderColor="border-purple-600"
+                  />
+                </div>
+              )}
+              
+              {/* Input area */}
+              <div className="space-y-4">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={userAnswer}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Enter chord with inversion (e.g., C/1, Dm/F, F second inversion)"
+                  className="w-full px-4 py-3 text-lg rounded-lg border-2 border-white/30 focus:border-purple-400 focus:outline-none bg-white/10 text-white placeholder-white/50"
+                  readOnly={feedback && feedback.show}
+                />
+                
+                <button
+                  onClick={feedback && feedback.show && !feedback.isCorrect ? nextChord : handleSubmit}
+                  disabled={!canSubmit && !(feedback && feedback.show && !feedback.isCorrect)}
+                  className={`w-full py-3 px-6 font-semibold rounded-lg transition-colors ${
+                    (canSubmit || (feedback && feedback.show && !feedback.isCorrect))
+                      ? `${config.buttonColor} text-white hover:${config.buttonHoverColor}`
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {feedback && feedback.show && !feedback.isCorrect 
+                    ? 'Press Enter to Continue' 
+                    : 'Submit Answer'}
+                </button>
+                
+                {/* Feedback */}
+                {feedback && feedback.show && (
+                  <div className={`p-4 rounded-lg ${
+                    feedback.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
+                    <p className="font-semibold">
+                      {feedback.isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+                    </p>
+                    {!feedback.isCorrect && (
+                      <p>The correct answer was: {feedback.correctAnswer}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+              
             </div>
           </div>
-        )}
+          
+          {/* Stats sidebar */}
+          <div className="xl:w-80">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4">Statistics</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-white/70">Accuracy:</span>
+                  <span className="font-semibold text-white">
+                    {score.total > 0 
+                      ? Math.round((score.correct / score.total) * 100) 
+                      : 0}%
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Avg Time:</span>
+                  <span className="font-semibold text-white">{parseFloat(avgTime).toFixed(2)}s</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Progress:</span>
+                  <span className="font-semibold text-white">
+                    {score.total}/{config.totalProblems}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-black/10">
+                <h4 className="font-semibold text-white mb-2">All Inversions:</h4>
+                <div className="text-sm text-white/70 space-y-1">
+                  <p>• <strong>Root:</strong> C, Dm, F (no inversion)</p>
+                  <p>• <strong>1st Inversion:</strong> C/1, C/E</p>
+                  <p>• <strong>2nd Inversion:</strong> C/2, C/G</p>
+                  <p>• <strong>Descriptive:</strong> C first inversion</p>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

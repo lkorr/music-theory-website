@@ -1,6 +1,7 @@
 "use client";
 
 import { Link } from "react-router";
+import { CompactAuthButton } from "../../../components/auth/AuthButton.jsx";
 
 export default function ChordProgressionsPage() {
   const levels = [
@@ -37,16 +38,17 @@ export default function ChordProgressionsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9] p-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] p-6">
       <div className="max-w-6xl mx-auto">
-        {/* Back Button */}
-        <div className="mb-6">
+        {/* Header with Back Button and Auth */}
+        <div className="flex items-center justify-between mb-6">
           <Link
             to="/chord-recognition"
-            className="inline-flex items-center px-4 py-2 bg-black/20 text-black hover:bg-black/30 transition-colors rounded-lg font-medium"
+            className="inline-flex items-center px-4 py-2 bg-white/20 text-white hover:bg-white/30 transition-colors rounded-lg font-medium"
           >
             ← Back to Chord Recognition
           </Link>
+          <CompactAuthButton />
         </div>
 
         {/* Header */}
@@ -55,8 +57,8 @@ export default function ChordProgressionsPage() {
             <span className="text-4xl text-white">🎼</span>
           </div>
           
-          <h1 className="text-5xl font-bold text-black mb-4">Chord Progressions</h1>
-          <p className="text-xl text-black/70 max-w-3xl mx-auto">
+          <h1 className="text-5xl font-bold text-white mb-4">Chord Progressions</h1>
+          <p className="text-xl text-white/70 max-w-3xl mx-auto">
             Master the art of identifying chord progressions using roman numeral analysis. 
             Learn to recognize common harmonic patterns in different keys.
           </p>
@@ -70,7 +72,7 @@ export default function ChordProgressionsPage() {
               to={level.path}
               className="block group"
             >
-              <div className="bg-white/30 backdrop-blur-sm border-2 border-white/20 rounded-2xl p-8 transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-xl">
+              <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-2xl p-8 transition-all duration-300 transform group-hover:scale-105 group-hover:bg-white/20">
                 <div className="flex items-start justify-between mb-6">
                   <div className={`w-16 h-16 rounded-full ${level.color} flex items-center justify-center`}>
                     <span className="text-white text-2xl font-bold">{level.icon}</span>
@@ -82,27 +84,27 @@ export default function ChordProgressionsPage() {
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-bold text-black mb-3">
+                <h3 className="text-2xl font-bold text-white mb-3">
                   Level {level.id}: {level.title}
                 </h3>
                 
-                <p className="text-black/70 mb-6 leading-relaxed">
+                <p className="text-white/70 mb-6 leading-relaxed">
                   {level.description}
                 </p>
 
                 <div className="space-y-2 mb-6">
-                  <h4 className="text-sm font-semibold text-black/80 mb-2">Features:</h4>
+                  <h4 className="text-sm font-semibold text-white/80 mb-2">Features:</h4>
                   <div className="grid grid-cols-2 gap-2">
                     {level.features.map((feature, index) => (
-                      <div key={index} className="flex items-center text-sm text-black/70">
-                        <span className="w-1.5 h-1.5 bg-black/40 rounded-full mr-2"></span>
+                      <div key={index} className="flex items-center text-sm text-white/70">
+                        <span className="w-1.5 h-1.5 bg-white/40 rounded-full mr-2"></span>
                         {feature}
                       </div>
                     ))}
                   </div>
                 </div>
                 
-                <div className="flex items-center text-black font-semibold group-hover:text-black/80 transition-colors">
+                <div className="flex items-center text-white font-semibold group-hover:text-white/80 transition-colors">
                   Start Level {level.id}
                   <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                 </div>
@@ -121,22 +123,22 @@ export default function ChordProgressionsPage() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-black/80">
               <div className="text-center">
-                <div className="w-12 h-12 bg-black/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-black font-bold">4</span>
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-white font-bold">4</span>
                 </div>
                 <p className="font-medium">Secondary Dominants</p>
                 <p className="text-xs mt-1">V/V, V/vi progressions</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-black/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-black font-bold">5</span>
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-white font-bold">5</span>
                 </div>
                 <p className="font-medium">Jazz Progressions</p>
                 <p className="text-xs mt-1">ii-V-I, circle of fifths</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-black/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-black font-bold">6</span>
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-white font-bold">6</span>
                 </div>
                 <p className="font-medium">Modulations</p>
                 <p className="text-xs mt-1">Key changes and pivots</p>

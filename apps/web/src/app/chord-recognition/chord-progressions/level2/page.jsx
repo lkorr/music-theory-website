@@ -740,7 +740,7 @@ export default function ChordProgressionsLevel2() {
 
   if (score.total >= totalProblems) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] flex items-center justify-center">
         <div className="text-center max-w-2xl mx-auto p-8">
           <div className="w-24 h-24 rounded-full bg-green-500 flex items-center justify-center mx-auto mb-8">
             <span className="text-4xl text-white">🎉</span>
@@ -772,7 +772,7 @@ export default function ChordProgressionsLevel2() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9] p-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] p-6">
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <div className="mb-6">

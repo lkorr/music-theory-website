@@ -38,18 +38,18 @@ function DashboardContent() {
 
   const trainingAreas = [
     {
-      title: 'Basic Triads',
+      title: 'Chord Recognition',
       description: 'Learn major, minor, diminished, and augmented triads',
       icon: '🎵',
-      link: '/chord-recognition/basic-triads',
+      link: '/chord-recognition',
       levels: 7
     },
     {
-      title: 'Extended Chords',
-      description: '7th chords, 9ths, 11ths, and complex harmonies',
-      icon: '🎶',
-      link: '/chord-recognition/extended-chords',
-      levels: 8
+      title: 'Chord Construction',
+      description: 'Learn to build chords by placing notes on the piano roll',
+      icon: '🎹',
+      link: '/chord-construction',
+      levels: 10
     },
     {
       title: 'Chord Progressions',
@@ -61,7 +61,7 @@ function DashboardContent() {
     {
       title: 'Counterpoint',
       description: 'Species counterpoint and voice leading',
-      icon: '🎹',
+      icon: '🎶',
       link: '/counterpoint',
       levels: 5
     }

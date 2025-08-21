@@ -14,7 +14,6 @@ export default function ChordPianoDisplay({
   lowestMidi = 24, // Lowest MIDI note (C1)
   highestMidi = 84 // Highest MIDI note (C6)
 }) {
-  const pianoKeysRef = useRef(null);
   const pianoRollRef = useRef(null);
   const noteHeight = 18;
   // Use parameterized MIDI range
@@ -25,7 +24,7 @@ export default function ChordPianoDisplay({
   
   // Auto-scroll to center the chord when notes change (with random offset)
   useEffect(() => {
-    if (notes.length > 0 && pianoKeysRef.current && pianoRollRef.current) {
+    if (notes.length > 0 && pianoRollRef.current) {
       // Find the middle note of the chord
       const sortedNotes = [...notes].sort((a, b) => b - a); // Sort high to low
       const middleNote = sortedNotes[Math.floor(sortedNotes.length / 2)];
@@ -44,32 +43,36 @@ export default function ChordPianoDisplay({
       const maxScroll = (totalNotes * noteHeight) - containerHeight;
       const clampedScroll = Math.max(0, Math.min(scrollPosition, maxScroll));
       
-      // Scroll both containers
-      pianoKeysRef.current.scrollTop = clampedScroll;
+      // Scroll the unified container
       pianoRollRef.current.scrollTop = clampedScroll;
     }
   }, [notes, highestNote, noteHeight, containerHeight, totalNotes]);
   
   return (
-    <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-8">
+    <div className="bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] rounded-2xl p-6 mb-8">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-black text-center flex-1">{title}</h3>
+        <h3 className="text-xl font-semibold text-white text-center flex-1">{title}</h3>
         {showLabelToggle && (
           <button
             onClick={() => setShowLabels(!showLabels)}
-            className="w-10 h-10 rounded-lg bg-white/30 hover:bg-white/40 transition-colors flex items-center justify-center"
+            className="w-10 h-10 rounded-lg bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center"
             title={showLabels ? "Hide note labels" : "Show note labels"}
           >
-            {showLabels ? <EyeOff size={20} className="text-black" /> : <Eye size={20} className="text-black" />}
+            {showLabels ? <EyeOff size={20} className="text-white" /> : <Eye size={20} className="text-white" />}
           </button>
         )}
       </div>
       
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden mx-auto" style={{ width: '550px', height: `${containerHeight}px` }}>
-        <div className="flex">
-          {/* Piano keys on the left */}
-          <div ref={pianoKeysRef} className="w-24 flex-shrink-0 border-r-2 border-gray-300 bg-white overflow-y-hidden" style={{ height: `${containerHeight}px` }}>
-            <div style={{ height: `${totalNotes * noteHeight}px` }}>
+      <div className="bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] rounded-xl shadow-lg overflow-hidden mx-auto" style={{ width: '550px', height: `${containerHeight}px` }}>
+        {/* Single unified scrollable container */}
+        <div 
+          ref={pianoRollRef}
+          className="w-full overflow-y-auto bg-gradient-to-r from-gray-50 to-gray-100" 
+          style={{ height: `${containerHeight}px` }}
+        >
+          <div className="flex" style={{ height: `${totalNotes * noteHeight}px` }}>
+            {/* Piano keys section - fixed width, part of the scrollable content */}
+            <div className="w-24 flex-shrink-0 border-r-2 border-gray-600 bg-gray-800">
               {Array.from({ length: totalNotes }, (_, i) => {
                 // Display notes from highest to lowest
                 const midiNote = highestNote - i;
@@ -85,24 +88,17 @@ export default function ChordPianoDisplay({
                     }}
                   >
                     <span className={`text-xs ${
-                      isBlackKey(midiNote) ? "text-white" : "text-black"
-                    }`}>
-                      {showLabels ? noteName : ''}
+                      isBlackKey(midiNote) ? "text-white" : "text-gray-900"
+                    } ${showLabels ? 'opacity-100' : 'opacity-0'}`}>
+                      {noteName}
                     </span>
                   </div>
                 );
               })}
             </div>
-          </div>
-          
-          {/* Note visualization area */}
-          <div ref={pianoRollRef} className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 overflow-y-auto" style={{ height: `${containerHeight}px` }} onScroll={(e) => { 
-                // Sync scroll with piano keys
-                if (pianoKeysRef.current) {
-                  pianoKeysRef.current.scrollTop = e.target.scrollTop;
-                }
-              }}>
-            <div className="relative h-full">
+            
+            {/* Note visualization area - flex-1, part of the same scrollable content */}
+            <div className="flex-1 relative">
               {/* Grid lines */}
               {Array.from({ length: totalNotes }, (_, i) => {
                 const midiNote = highestNote - i;

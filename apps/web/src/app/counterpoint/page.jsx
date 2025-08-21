@@ -43,14 +43,14 @@ export default function CounterpointApp() {
 
   if (!currentExercise) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9] flex items-center justify-center">
-        <p className="text-black font-medium">No exercise found for this species.</p>
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] flex items-center justify-center">
+        <p className="text-white font-medium">No exercise found for this species.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9D6E8] to-[#D8D6F9]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
       <CounterpointHeader
         currentExercise={currentExercise}
         exercises={exercises}

@@ -806,7 +806,7 @@ export default function Level3Page() {
   if (isCompleted) {
     const percentage = Math.round((score.correct / score.total) * 100);
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-orange-200 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] p-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <Link 
@@ -854,7 +854,7 @@ export default function Level3Page() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-orange-200 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] p-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <Link 
