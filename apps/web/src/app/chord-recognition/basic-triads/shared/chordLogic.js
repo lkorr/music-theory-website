@@ -1,61 +1,39 @@
-// Music theory utilities
-export const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+// Import shared music theory utilities
+import { 
+  noteNames, 
+  getMidiNoteName as getMidiNoteNameBase,
+  isBlackKey,
+  getMidiNoteNameWithEnharmonics 
+} from '../../shared/theory/core/notes.js';
 
-// Global configuration for inversion requirements
-// Set to false to disable inversion labeling requirements across all levels
-export const REQUIRE_INVERSION_LABELING = false;
+import {
+  REQUIRE_INVERSION_LABELING,
+  inversionTypes,
+  chordTypes,
+  seventhChordTypes,
+  extendedChordTypes as extendedChordTypesImport,
+  allChordTypes
+} from '../../shared/theory/core/constants.js';
 
-// Basic triad chord types (for basic-triads levels)
-export const chordTypes = {
-  major: { name: '', intervals: [0, 4, 7], symbol: '' },
-  minor: { name: 'Minor', intervals: [0, 3, 7], symbol: 'm' },
-  diminished: { name: 'Diminished', intervals: [0, 3, 6], symbol: 'dim' },
-  augmented: { name: 'Augmented', intervals: [0, 4, 8], symbol: 'aug' }
+// Re-export for backward compatibility
+export { 
+  noteNames, 
+  REQUIRE_INVERSION_LABELING, 
+  inversionTypes, 
+  chordTypes, 
+  isBlackKey 
 };
 
-// Extended chord types (includes 7th chords for extended-chords levels)
-export const extendedChordTypes = {
-  major: { name: '', intervals: [0, 4, 7], symbol: '' },
-  minor: { name: 'Minor', intervals: [0, 3, 7], symbol: 'm' },
-  diminished: { name: 'Diminished', intervals: [0, 3, 6], symbol: 'dim' },
-  augmented: { name: 'Augmented', intervals: [0, 4, 8], symbol: 'aug' },
-  // 7th chords
-  major7: { name: 'Major 7th', intervals: [0, 4, 7, 11], symbol: 'maj7' },
-  minor7: { name: 'Minor 7th', intervals: [0, 3, 7, 10], symbol: 'm7' },
-  dominant7: { name: 'Dominant 7th', intervals: [0, 4, 7, 10], symbol: '7' },
-  diminished7: { name: 'Diminished 7th', intervals: [0, 3, 6, 9], symbol: 'dim7' },
-  halfDiminished7: { name: 'Half Diminished 7th', intervals: [0, 3, 6, 10], symbol: 'm7b5' },
-  minor7b5: { name: 'Minor 7th b5', intervals: [0, 3, 6, 10], symbol: 'm7b5' }, // Alias for halfDiminished7
-  // 9th chords
-  maj9: { name: 'Major 9th', intervals: [0, 4, 7, 11, 14], symbol: 'maj9' },
-  min9: { name: 'Minor 9th', intervals: [0, 3, 7, 10, 14], symbol: 'm9' },
-  dom9: { name: 'Dominant 9th', intervals: [0, 4, 7, 10, 14], symbol: '9' },
-  // 11th chords
-  maj11: { name: 'Major 11th', intervals: [0, 4, 7, 11, 14, 17], symbol: 'maj11' },
-  min11: { name: 'Minor 11th', intervals: [0, 3, 7, 10, 14, 17], symbol: 'm11' },
-  // 13th chords
-  maj13: { name: 'Major 13th', intervals: [0, 4, 7, 11, 14, 21], symbol: 'maj13' },
-  min13: { name: 'Minor 13th', intervals: [0, 3, 7, 10, 14, 21], symbol: 'm13' }
-};
-
-export const inversionTypes = {
-  root: { name: 'Root Position', intervalOrder: [0, 1, 2, 3] },
-  first: { name: '1st Inversion', intervalOrder: [1, 2, 3, 0] },
-  second: { name: '2nd Inversion', intervalOrder: [2, 3, 0, 1] },
-  third: { name: '3rd Inversion', intervalOrder: [3, 0, 1, 2] }
-};
-
-// Helper functions for MIDI note handling
+// Wrapper for getMidiNoteName to maintain compatibility with existing code
 export const getMidiNoteName = (midiNote) => {
-    const noteNames = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
-    const octave = Math.floor(midiNote / 12) - 1;
-    const note = noteNames[midiNote % 12];
-    return `${note}${octave}`;
+  return getMidiNoteNameWithEnharmonics(midiNote);
 };
 
-export const isBlackKey = (midiNote) => {
-    const noteInOctave = midiNote % 12;
-    return [1, 3, 6, 8, 10].includes(noteInOctave);
+// Merge all extended chord types for backward compatibility
+export const extendedChordTypes = {
+  ...chordTypes,
+  ...seventhChordTypes,
+  ...extendedChordTypesImport
 };
 
 // Helper function to get the appropriate chord types object

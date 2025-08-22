@@ -4,8 +4,17 @@
  * Contains 7th chord definitions and utilities for extended chord recognition
  */
 
-// Re-export basic utilities from triads
-export { noteNames, getMidiNoteName, isBlackKey } from '../../basic-triads/shared/chordLogic.js';
+// Import from shared theory modules
+import { noteNames, getMidiNoteNameWithEnharmonics, isBlackKey } from '../../shared/theory/core/notes.js';
+import { seventhChordTypes as importedSeventhChordTypes, inversionTypes } from '../../shared/theory/core/constants.js';
+
+// Re-export for backward compatibility
+export { noteNames, isBlackKey };
+
+// Wrapper for getMidiNoteName to maintain compatibility
+export const getMidiNoteName = (midiNote) => {
+  return getMidiNoteNameWithEnharmonics(midiNote);
+};
 
 // 7th chord types with intervals (semitones from root)
 export const seventhChordTypes = {
