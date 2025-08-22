@@ -55,7 +55,7 @@ function DashboardContent() {
       title: 'Chord Progressions',
       description: 'Roman numeral analysis and harmonic progressions',
       icon: '🎼',
-      link: '/chord-recognition/chord-progressions',
+      link: '/chord-progressions',
       levels: 3
     },
     {
@@ -68,12 +68,17 @@ function DashboardContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] relative">
+      {/* Logo in absolute top-left corner */}
+      <Link to="/" className="absolute top-2 left-2 z-50">
+        <img src="/pailiaq-logo-small.png" alt="Logo" className="w-12 h-12" />
+      </Link>
+      
       {/* Header */}
       <header className="bg-black/20 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 ml-16">
               <Link to="/" className="text-2xl font-bold text-white">
                 🎹 MIDI Training
               </Link>

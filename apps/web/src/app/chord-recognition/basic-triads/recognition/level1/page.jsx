@@ -55,11 +55,15 @@ export default function Level1Page() {
   // Start screen (when level hasn't been started yet)
   if (!hasStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] relative">
+      {/* Logo in absolute top-left corner */}
+      <Link to="/" className="absolute top-2 left-2 z-50">
+        <img src="/pailiaq-logo-small.png" alt="Logo" className="w-12 h-12" />
+      </Link>
         <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <div className="flex items-center space-x-4 ml-16">
+              <Link to="/chord-recognition" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
               <h1 className="text-xl font-bold text-white">{config.title}</h1>
@@ -349,7 +353,7 @@ export default function Level1Page() {
             </button>
             
             <Link 
-              to="/chord-recognition/basic-triads"
+              to="/chord-recognition"
               className="block px-6 py-3 bg-gray-500 text-white font-semibold rounded-xl hover:bg-gray-600 transition-colors"
             >
               Back to Levels
@@ -362,11 +366,15 @@ export default function Level1Page() {
 
   // Main game screen
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] relative">
+      {/* Logo in absolute top-left corner */}
+      <Link to="/" className="absolute top-2 left-2 z-50">
+        <img src="/pailiaq-logo-small.png" alt="Logo" className="w-12 h-12" />
+      </Link>
       <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link to="/chord-recognition/basic-triads" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+          <div className="flex items-center space-x-4 ml-16">
+            <Link to="/chord-recognition" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-white">

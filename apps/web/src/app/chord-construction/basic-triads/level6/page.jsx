@@ -1,9 +1,17 @@
 "use client";
 
+// UNIVERSAL CONTROLLER IMPLEMENTATION - Level 6 First Inversions
+import { UniversalChordConstructor } from "../../shared/UniversalChordConstructor.jsx";
+import { LEVEL_CONFIGS } from "../../data/levelConfigs.js";
+
+// Original implementation kept for fallback
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { Eye, EyeOff } from "lucide-react";
 import { noteNames, chordTypes, inversionTypes, getMidiNoteName, isBlackKey } from "../../../chord-recognition/basic-triads/shared/chordLogic.js";
+
+// Feature flag for Universal Controller (set to true to enable)
+const USE_UNIVERSAL_CONTROLLER = true; // Change to false to use original implementation
 
 // Generate random chord construction task with inversions
 const generateConstructionTask = (previousTask = null) => {
@@ -333,7 +341,8 @@ function ScoreDisplay({ correct, total, streak, currentTime, avgTime, isAnswered
   );
 }
 
-export default function Level6Construction() {
+// Original implementation renamed for fallback
+function OriginalLevel6Construction() {
   const [currentTask, setCurrentTask] = useState(null);
   const [placedNotes, setPlacedNotes] = useState([]);
   const [feedback, setFeedback] = useState(null);
@@ -525,10 +534,14 @@ export default function Level6Construction() {
   // Start screen
   if (!hasStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] relative">
+      {/* Logo in absolute top-left corner */}
+      <Link to="/" className="absolute top-2 left-2 z-50">
+        <img src="/pailiaq-logo-small.png" alt="Logo" className="w-12 h-12" />
+      </Link>
         <header className="bg-white/20/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 ml-16">
               <Link to="/chord-construction" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
@@ -601,10 +614,14 @@ export default function Level6Construction() {
   // Completion screen
   if (isCompleted && levelResult) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] relative">
+      {/* Logo in absolute top-left corner */}
+      <Link to="/" className="absolute top-2 left-2 z-50">
+        <img src="/pailiaq-logo-small.png" alt="Logo" className="w-12 h-12" />
+      </Link>
         <header className="bg-white/20/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 ml-16">
               <Link to="/chord-construction" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
@@ -692,10 +709,14 @@ export default function Level6Construction() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] relative">
+      {/* Logo in absolute top-left corner */}
+      <Link to="/" className="absolute top-2 left-2 z-50">
+        <img src="/pailiaq-logo-small.png" alt="Logo" className="w-12 h-12" />
+      </Link>
       <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 ml-16">
             <Link to="/chord-construction" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
               <span className="text-white text-sm font-bold">←</span>
             </Link>
@@ -846,4 +867,19 @@ export default function Level6Construction() {
       </main>
     </div>
   );
+}
+
+// ===== MAIN COMPONENT - USES FEATURE FLAG =====
+export default function Level6Construction() {
+  if (USE_UNIVERSAL_CONTROLLER) {
+    // Use the new Universal Controller - SINGLE SOURCE OF TRUTH FOR UI
+    return (
+      <UniversalChordConstructor 
+        levelConfig={LEVEL_CONFIGS["basic-triads-level6"]} 
+      />
+    );
+  } else {
+    // Fallback to original implementation
+    return <OriginalLevel6Construction />;
+  }
 }

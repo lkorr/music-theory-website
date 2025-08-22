@@ -15,19 +15,19 @@ export default function ChordConstructionPage() {
       levels: [
         {
           id: 'level5',
-          title: 'Level 5: Build Basic Triads',
+          title: 'Level 1: Build Basic Triads',
           description: 'Root position triads',
           path: '/chord-construction/basic-triads/level5'
         },
         {
           id: 'level6',
-          title: 'Level 6: Build First Inversions',
+          title: 'Level 2: Build First Inversions',
           description: 'Triads with first inversion',
           path: '/chord-construction/basic-triads/level6'
         },
         {
           id: 'level7',
-          title: 'Level 7: Build All Inversions',
+          title: 'Level 3: Build All Inversions',
           description: 'Root, first, and second inversions',
           path: '/chord-construction/basic-triads/level7'
         }
@@ -42,22 +42,22 @@ export default function ChordConstructionPage() {
       available: true,
       levels: [
         {
-          id: 'level6',
-          title: 'Level 6: Build 7th Chords',
+          id: 'level1',
+          title: 'Level 1: Build 7th Chords',
           description: 'Root position 7th chords',
-          path: '/chord-construction/seventh-chords/level6'
+          path: '/chord-construction/seventh-chords/level1'
         },
         {
-          id: 'level7',
-          title: 'Level 7: Build First Inversions',
+          id: 'level2',
+          title: 'Level 2: Build First Inversions',
           description: '7th chords with first inversion',
-          path: '/chord-construction/seventh-chords/level7'
+          path: '/chord-construction/seventh-chords/level2'
         },
         {
-          id: 'level8',
-          title: 'Level 8: Build All Inversions',
+          id: 'level3',
+          title: 'Level 3: Build All Inversions',
           description: 'All 7th chord inversions',
-          path: '/chord-construction/seventh-chords/level8'
+          path: '/chord-construction/seventh-chords/level3'
         }
       ]
     },
@@ -73,46 +73,41 @@ export default function ChordConstructionPage() {
           id: 'level1',
           title: 'Level 1: Build 9th Chords',
           description: 'Major 9th, minor 9th, dominant 9th',
-          path: '/chord-construction/jazz-chords/level1'
+          path: '/chord-construction/extended-chords/level1'
         },
         {
           id: 'level2',
           title: 'Level 2: Build 11th Chords',
           description: 'Major 11th, minor 11th variations',
-          path: '/chord-construction/jazz-chords/level2',
-          available: false
+          path: '/chord-construction/extended-chords/level2'
         },
         {
           id: 'level3',
           title: 'Level 3: Build 13th Chords',
           description: 'Major 13th, minor 13th variations',
-          path: '/chord-construction/jazz-chords/level3',
-          available: false
-        },
-        {
-          id: 'level4',
-          title: 'Level 4: All Extended + Inversions',
-          description: 'All extended chords with inversions',
-          path: '/chord-construction/jazz-chords/level4',
-          available: false
+          path: '/chord-construction/extended-chords/level3'
         }
       ]
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] relative">
+      {/* Logo in absolute top-left corner */}
+      <Link to="/" className="absolute top-2 left-2 z-50">
+        <img src="/pailiaq-logo-small.png" alt="Logo" className="w-12 h-12" />
+      </Link>
+      
       <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link to="/midi-training" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+          <div className="flex items-center space-x-4 ml-16">
+            <Link to="/dashboard" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-white">
               Chord Construction Training
             </h1>
           </div>
-          <CompactAuthButton />
         </div>
       </header>
 

@@ -25,7 +25,17 @@ export const extendedChordTypes = {
   dominant7: { name: 'Dominant 7th', intervals: [0, 4, 7, 10], symbol: '7' },
   diminished7: { name: 'Diminished 7th', intervals: [0, 3, 6, 9], symbol: 'dim7' },
   halfDiminished7: { name: 'Half Diminished 7th', intervals: [0, 3, 6, 10], symbol: 'm7b5' },
-  minor7b5: { name: 'Minor 7th b5', intervals: [0, 3, 6, 10], symbol: 'm7b5' } // Alias for halfDiminished7
+  minor7b5: { name: 'Minor 7th b5', intervals: [0, 3, 6, 10], symbol: 'm7b5' }, // Alias for halfDiminished7
+  // 9th chords
+  maj9: { name: 'Major 9th', intervals: [0, 4, 7, 11, 14], symbol: 'maj9' },
+  min9: { name: 'Minor 9th', intervals: [0, 3, 7, 10, 14], symbol: 'm9' },
+  dom9: { name: 'Dominant 9th', intervals: [0, 4, 7, 10, 14], symbol: '9' },
+  // 11th chords
+  maj11: { name: 'Major 11th', intervals: [0, 4, 7, 11, 14, 17], symbol: 'maj11' },
+  min11: { name: 'Minor 11th', intervals: [0, 3, 7, 10, 14, 17], symbol: 'm11' },
+  // 13th chords
+  maj13: { name: 'Major 13th', intervals: [0, 4, 7, 11, 14, 21], symbol: 'maj13' },
+  min13: { name: 'Minor 13th', intervals: [0, 3, 7, 10, 14, 21], symbol: 'm13' }
 };
 
 export const inversionTypes = {

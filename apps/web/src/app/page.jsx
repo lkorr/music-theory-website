@@ -77,7 +77,7 @@ export default function PailiaqHomePage() {
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex items-center justify-center mb-8">
               <img 
-                src="/pailiaq logo smoller.png" 
+                src="/pailiaq-logo-small.png" 
                 alt="pailiaq logo"
                 className="w-32 h-32 rounded-full shadow-2xl border-4 border-white/20"
               />
