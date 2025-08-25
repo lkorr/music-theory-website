@@ -5,7 +5,7 @@ import type { GetInfo, GetAnnotations } from "react-router/internal";
 type Module = typeof import("../page.js")
 
 type Info = GetInfo<{
-  file: "./chord-progressions/level1/page.jsx",
+  file: "./chord-progressions/level1/page.tsx",
   module: Module
 }>
 

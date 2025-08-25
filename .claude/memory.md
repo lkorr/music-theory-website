@@ -431,3 +431,5 @@ AUDIT_LOGGING=true
 
 **Last Updated**: Complete architecture documentation added
 **Remember**: Update this file whenever the structure changes!
+
+Run the server only ever on localhost:4000. do not create a secondary server at localhost:4001, only try to access the existing one. IF you need to create a new server, restart it on localhost:4000

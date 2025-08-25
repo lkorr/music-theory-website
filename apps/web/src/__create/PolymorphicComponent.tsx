@@ -8,7 +8,6 @@ import {
   type SyntheticEvent,
   useCallback,
   useRef,
-  type RefObject,
 } from 'react';
 
 const JSX_RENDER_ID_ATTRIBUTE_NAME = 'data-render-id';
@@ -56,10 +55,10 @@ type PolymorphicProps<As extends ElementType> = PropsOf<As> &
  * Returns a fallback ref if no ref or a callback ref is passed.
  * Otherwise, it returns the original ref.
  */
-function useOptionalRef<T>(ref?: Ref<T> | null): RefObject<T> {
+function useOptionalRef<T>(ref?: Ref<T> | null): React.RefObject<T> {
   const fallbackRef = useRef<T>(null);
   if (ref && 'instance' in ref) return fallbackRef;
-  return (ref as RefObject<T> | null) ?? fallbackRef;
+  return (ref as React.RefObject<T> | null) ?? fallbackRef;
 }
 
 const CreatePolymorphicComponent = forwardRef(

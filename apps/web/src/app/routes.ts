@@ -1,4 +1,4 @@
-import { readdirSync, statSync } from 'node:fs';
+import { readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -52,7 +52,7 @@ function buildRouteTree(dir: string, basePath = ''): Tree {
 			const childPath = basePath ? `${basePath}/${file}` : file;
 			const childNode = buildRouteTree(filePath, childPath);
 			node.children.push(childNode);
-		} else if (file === 'page.jsx') {
+		} else if (file === 'page.jsx' || file === 'page.tsx') {
 			node.hasPage = true;
     }
 	}
@@ -64,8 +64,14 @@ function generateRoutes(node: Tree): RouteConfigEntry[] {
 	const routes: RouteConfigEntry[] = [];
 
 	if (node.hasPage) {
-		const componentPath =
-			node.path === '' ? `./${node.path}page.jsx` : `./${node.path}/page.jsx`;
+		// Determine file extension by checking which file exists
+		const basePath = node.path === '' ? `./${node.path}page` : `./${node.path}/page`;
+		const jsxPath = `${basePath}.jsx`;
+		const tsxPath = `${basePath}.tsx`;
+		
+		// Check if tsx file exists first, fallback to jsx
+		const fullTsxPath = join(__dirname, node.path === '' ? 'page.tsx' : `${node.path}/page.tsx`);
+		const componentPath = existsSync(fullTsxPath) ? tsxPath : jsxPath;
 
 		if (node.path === '') {
 			routes.push(index(componentPath));
@@ -105,7 +111,7 @@ function generateRoutes(node: Tree): RouteConfigEntry[] {
 	return routes;
 }
 if (import.meta.env.DEV) {
-	import.meta.glob('./**/page.jsx', {});
+	import.meta.glob('./**/page.{jsx,tsx}', {});
 	if (import.meta.hot) {
 		import.meta.hot.accept((newSelf) => {
 			import.meta.hot?.invalidate();
