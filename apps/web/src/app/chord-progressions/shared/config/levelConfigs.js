@@ -293,6 +293,46 @@ export const LEVEL_CONFIGS = {
       correctDelay: 500,   // 0.5 seconds
       incorrectDelay: 4000 // 4 seconds
     }
+  },
+
+  progressionLevel4: {
+    // Metadata
+    id: 'progressionLevel4',
+    title: 'Chord Progressions Level 4: Non-Diatonic Chords with Inversions',
+    description: 'Identify progressions with borrowed chords, Neapolitan, augmented, and other non-diatonic chords including inversions',
+    
+    // Scoring criteria
+    totalProblems: 25,
+    passAccuracy: 75, // 75%
+    passTime: 18, // 18 seconds average
+    
+    // Visual theme
+    progressColor: 'bg-indigo-500',
+    buttonColor: 'bg-indigo-600',
+    buttonHoverColor: 'bg-indigo-700',
+    
+    // Chord generation settings
+    chordGeneration: {
+      type: 'non-diatonic-progressions-inversions',
+      supportedKeys: ['C', 'G', 'D', 'F', 'Bb', 'Eb', 'Am', 'Em', 'Bm', 'Dm', 'Gm', 'Cm'],
+      inversionSupport: true,
+      maxInversion: 2,
+      nonDiatonicChords: true,
+      requireInversions: true
+    },
+    
+    // Validation settings
+    validation: {
+      supportsInversions: true,
+      requireInversionLabeling: true, // Level 4 requires inversions
+      acceptableFormats: ['roman', 'figured-bass', 'alternative'] // e.g., 'I6 - bVI64 - IV - V', 'N6'
+    },
+    
+    // Auto-advance timing
+    autoAdvance: {
+      correctDelay: 500,   // 0.5 seconds
+      incorrectDelay: 4000 // 4 seconds
+    }
   }
 };
 

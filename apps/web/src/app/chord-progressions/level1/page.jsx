@@ -143,7 +143,7 @@ export default function ChordProgressionsLevel1() {
         <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4 ml-16">
-              <Link to="/chord-recognition" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+              <Link to="/chord-progressions" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
               <h1 className="text-xl font-bold text-white">{config.title}</h1>
@@ -235,7 +235,7 @@ export default function ChordProgressionsLevel1() {
           <div className="space-y-4">
             {levelResult.passed && (
               <Link 
-                to="/chord-recognition/chord-progressions/level2"
+                to="/chord-progressions/level2"
                 className={`block px-6 py-3 ${config.buttonColor} text-white font-semibold rounded-xl hover:${config.buttonHoverColor} transition-colors`}
               >
                 Next Level
@@ -253,7 +253,7 @@ export default function ChordProgressionsLevel1() {
             </button>
             
             <Link 
-              to="/chord-recognition/chord-progressions"
+              to="/chord-progressions"
               className="block px-6 py-3 bg-gray-500 text-white font-semibold rounded-xl hover:bg-gray-600 transition-colors"
             >
               Back to Levels
@@ -274,7 +274,7 @@ export default function ChordProgressionsLevel1() {
       <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4 ml-16">
-            <Link to="/chord-recognition/chord-progressions" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+            <Link to="/chord-progressions" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-white">

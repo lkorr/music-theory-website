@@ -150,17 +150,9 @@ function validateSpecies1(cfSorted, cpSorted) {
       });
     }
 
-    // Check for large leaps
+    // Check for excessive leaps (>12 semitones = octave) - these are always bad
     const melodicInterval = Math.abs(prev.note - curr.note);
-    if (melodicInterval > 7 && melodicInterval <= 12) {
-      violations.push({
-        rule: 3,
-        message: `Large leap (${getIntervalName(melodicInterval % 12)}) should be followed by contrary motion`,
-        beat: curr.beat,
-        noteId: curr.id,
-        severity: "warning"
-      });
-    } else if (melodicInterval > 12) {
+    if (melodicInterval > 12) {
       violations.push({
         rule: 3,
         message: `Excessive leap (${melodicInterval} semitones) at beat ${curr.beat}`,
@@ -253,18 +245,23 @@ function validateSpecies1(cfSorted, cpSorted) {
     const prev = cpSorted[i - 1];
     const curr = cpSorted[i];
     
+    const leapInterval = Math.abs(prev.note - prev2.note);
+    
     if (isLeap(prev2.note, prev.note)) {
       // Check if leap is followed by contrary motion
       const leapDirection = prev.note - prev2.note;
       const recoveryDirection = curr.note - prev.note;
       
       if ((leapDirection > 0 && recoveryDirection > 0) || (leapDirection < 0 && recoveryDirection < 0)) {
+        const severityLevel = leapInterval > 7 ? "warning" : "suggestion";
+        const leapSize = leapInterval > 7 ? "Large leap" : "Leap";
+        
         violations.push({
           rule: 6,
-          message: "After a leap, prefer contrary motion for melodic recovery",
+          message: `${leapSize} (${getIntervalName(leapInterval % 12)}) should be followed by contrary motion`,
           beat: curr.beat,
           noteId: curr.id,
-          severity: "suggestion"
+          severity: severityLevel
         });
       }
     }

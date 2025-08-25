@@ -52,6 +52,15 @@ type Pages = {
   "/chord-construction/seventh-chords/level3": {
     params: {};
   };
+  "/chord-construction2": {
+    params: {};
+  };
+  "/chord-construction2/:category/:level": {
+    params: {
+      "category": string;
+      "level": string;
+    };
+  };
   "/chord-progressions": {
     params: {};
   };
@@ -59,6 +68,24 @@ type Pages = {
     params: {};
   };
   "/chord-progressions/level2": {
+    params: {};
+  };
+  "/chord-progressions/level3": {
+    params: {};
+  };
+  "/chord-progressions/level4": {
+    params: {};
+  };
+  "/chord-progressions-backup": {
+    params: {};
+  };
+  "/chord-progressions-backup/level1": {
+    params: {};
+  };
+  "/chord-progressions-backup/level2": {
+    params: {};
+  };
+  "/chord-progressions-backup/level3": {
     params: {};
   };
   "/chord-recognition": {
@@ -77,18 +104,6 @@ type Pages = {
     params: {};
   };
   "/chord-recognition/basic-triads/recognition/level4": {
-    params: {};
-  };
-  "/chord-recognition/chord-progressions": {
-    params: {};
-  };
-  "/chord-recognition/chord-progressions/level1": {
-    params: {};
-  };
-  "/chord-recognition/chord-progressions/level2": {
-    params: {};
-  };
-  "/chord-recognition/chord-progressions/level3": {
     params: {};
   };
   "/chord-recognition/jazz-chords": {
@@ -130,14 +145,49 @@ type Pages = {
   "/chord-recognition/seventh-chords/recognition/level5": {
     params: {};
   };
+  "/chord-recognition2": {
+    params: {};
+  };
+  "/chord-recognition2/:category/:level": {
+    params: {
+      "category": string;
+      "level": string;
+    };
+  };
   "/counterpoint": {
     params: {};
+  };
+  "/counterpoint/exercise": {
+    params: {};
+  };
+  "/counterpoint/:species/:voices/:level": {
+    params: {
+      "species": string;
+      "voices": string;
+      "level": string;
+    };
+  };
+  "/counterpoint/:species/:voices/:level/practice": {
+    params: {
+      "species": string;
+      "voices": string;
+      "level": string;
+    };
   };
   "/dashboard": {
     params: {};
   };
   "/midi-training": {
     params: {};
+  };
+  "/transcription": {
+    params: {};
+  };
+  "/transcription/:category/:level": {
+    params: {
+      "category": string;
+      "level": string;
+    };
   };
   "/unauthorized": {
     params: {};
@@ -152,7 +202,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/register" | "/chord-construction" | "/chord-construction/basic-triads/level5" | "/chord-construction/basic-triads/level6" | "/chord-construction/basic-triads/level7" | "/chord-construction/extended-chords/level1" | "/chord-construction/extended-chords/level2" | "/chord-construction/extended-chords/level3" | "/chord-construction/jazz-chords/level1" | "/chord-construction/seventh-chords/level1" | "/chord-construction/seventh-chords/level2" | "/chord-construction/seventh-chords/level3" | "/chord-progressions" | "/chord-progressions/level1" | "/chord-progressions/level2" | "/chord-recognition" | "/chord-recognition/basic-triads" | "/chord-recognition/basic-triads/recognition/level1" | "/chord-recognition/basic-triads/recognition/level2" | "/chord-recognition/basic-triads/recognition/level3" | "/chord-recognition/basic-triads/recognition/level4" | "/chord-recognition/chord-progressions" | "/chord-recognition/chord-progressions/level1" | "/chord-recognition/chord-progressions/level2" | "/chord-recognition/chord-progressions/level3" | "/chord-recognition/jazz-chords" | "/chord-recognition/jazz-chords/recognition/level1" | "/chord-recognition/jazz-chords/recognition/level2" | "/chord-recognition/jazz-chords/recognition/level3" | "/chord-recognition/jazz-chords/recognition/level4" | "/chord-recognition/jazz-chords/recognition/level5" | "/chord-recognition/jazz-chords/recognition/level6" | "/chord-recognition/seventh-chords" | "/chord-recognition/seventh-chords/recognition/level1" | "/chord-recognition/seventh-chords/recognition/level2" | "/chord-recognition/seventh-chords/recognition/level3" | "/chord-recognition/seventh-chords/recognition/level4" | "/chord-recognition/seventh-chords/recognition/level5" | "/counterpoint" | "/dashboard" | "/midi-training" | "/unauthorized" | "/*";
+    page: "/" | "/auth/login" | "/auth/register" | "/chord-construction" | "/chord-construction/basic-triads/level5" | "/chord-construction/basic-triads/level6" | "/chord-construction/basic-triads/level7" | "/chord-construction/extended-chords/level1" | "/chord-construction/extended-chords/level2" | "/chord-construction/extended-chords/level3" | "/chord-construction/jazz-chords/level1" | "/chord-construction/seventh-chords/level1" | "/chord-construction/seventh-chords/level2" | "/chord-construction/seventh-chords/level3" | "/chord-construction2" | "/chord-construction2/:category/:level" | "/chord-progressions" | "/chord-progressions/level1" | "/chord-progressions/level2" | "/chord-progressions/level3" | "/chord-progressions/level4" | "/chord-progressions-backup" | "/chord-progressions-backup/level1" | "/chord-progressions-backup/level2" | "/chord-progressions-backup/level3" | "/chord-recognition" | "/chord-recognition/basic-triads" | "/chord-recognition/basic-triads/recognition/level1" | "/chord-recognition/basic-triads/recognition/level2" | "/chord-recognition/basic-triads/recognition/level3" | "/chord-recognition/basic-triads/recognition/level4" | "/chord-recognition/jazz-chords" | "/chord-recognition/jazz-chords/recognition/level1" | "/chord-recognition/jazz-chords/recognition/level2" | "/chord-recognition/jazz-chords/recognition/level3" | "/chord-recognition/jazz-chords/recognition/level4" | "/chord-recognition/jazz-chords/recognition/level5" | "/chord-recognition/jazz-chords/recognition/level6" | "/chord-recognition/seventh-chords" | "/chord-recognition/seventh-chords/recognition/level1" | "/chord-recognition/seventh-chords/recognition/level2" | "/chord-recognition/seventh-chords/recognition/level3" | "/chord-recognition/seventh-chords/recognition/level4" | "/chord-recognition/seventh-chords/recognition/level5" | "/chord-recognition2" | "/chord-recognition2/:category/:level" | "/counterpoint" | "/counterpoint/exercise" | "/counterpoint/:species/:voices/:level" | "/counterpoint/:species/:voices/:level/practice" | "/dashboard" | "/midi-training" | "/transcription" | "/transcription/:category/:level" | "/unauthorized" | "/*";
   };
   "./page.jsx": {
     id: "page";
@@ -210,6 +260,14 @@ type RouteFiles = {
     id: "chord-construction/seventh-chords/level3/page";
     page: "/chord-construction/seventh-chords/level3";
   };
+  "./chord-construction2/page.jsx": {
+    id: "chord-construction2/page";
+    page: "/chord-construction2";
+  };
+  "./chord-construction2/[category]/[level]/page.jsx": {
+    id: "chord-construction2/[category]/[level]/page";
+    page: "/chord-construction2/:category/:level";
+  };
   "./chord-progressions/page.jsx": {
     id: "chord-progressions/page";
     page: "/chord-progressions";
@@ -221,6 +279,30 @@ type RouteFiles = {
   "./chord-progressions/level2/page.jsx": {
     id: "chord-progressions/level2/page";
     page: "/chord-progressions/level2";
+  };
+  "./chord-progressions/level3/page.jsx": {
+    id: "chord-progressions/level3/page";
+    page: "/chord-progressions/level3";
+  };
+  "./chord-progressions/level4/page.jsx": {
+    id: "chord-progressions/level4/page";
+    page: "/chord-progressions/level4";
+  };
+  "./chord-progressions-backup/page.jsx": {
+    id: "chord-progressions-backup/page";
+    page: "/chord-progressions-backup";
+  };
+  "./chord-progressions-backup/level1/page.jsx": {
+    id: "chord-progressions-backup/level1/page";
+    page: "/chord-progressions-backup/level1";
+  };
+  "./chord-progressions-backup/level2/page.jsx": {
+    id: "chord-progressions-backup/level2/page";
+    page: "/chord-progressions-backup/level2";
+  };
+  "./chord-progressions-backup/level3/page.jsx": {
+    id: "chord-progressions-backup/level3/page";
+    page: "/chord-progressions-backup/level3";
   };
   "./chord-recognition/page.jsx": {
     id: "chord-recognition/page";
@@ -245,22 +327,6 @@ type RouteFiles = {
   "./chord-recognition/basic-triads/recognition/level4/page.jsx": {
     id: "chord-recognition/basic-triads/recognition/level4/page";
     page: "/chord-recognition/basic-triads/recognition/level4";
-  };
-  "./chord-recognition/chord-progressions/page.jsx": {
-    id: "chord-recognition/chord-progressions/page";
-    page: "/chord-recognition/chord-progressions";
-  };
-  "./chord-recognition/chord-progressions/level1/page.jsx": {
-    id: "chord-recognition/chord-progressions/level1/page";
-    page: "/chord-recognition/chord-progressions/level1";
-  };
-  "./chord-recognition/chord-progressions/level2/page.jsx": {
-    id: "chord-recognition/chord-progressions/level2/page";
-    page: "/chord-recognition/chord-progressions/level2";
-  };
-  "./chord-recognition/chord-progressions/level3/page.jsx": {
-    id: "chord-recognition/chord-progressions/level3/page";
-    page: "/chord-recognition/chord-progressions/level3";
   };
   "./chord-recognition/jazz-chords/page.jsx": {
     id: "chord-recognition/jazz-chords/page";
@@ -314,9 +380,29 @@ type RouteFiles = {
     id: "chord-recognition/seventh-chords/recognition/level5/page";
     page: "/chord-recognition/seventh-chords/recognition/level5";
   };
+  "./chord-recognition2/page.jsx": {
+    id: "chord-recognition2/page";
+    page: "/chord-recognition2";
+  };
+  "./chord-recognition2/[category]/[level]/page.jsx": {
+    id: "chord-recognition2/[category]/[level]/page";
+    page: "/chord-recognition2/:category/:level";
+  };
   "./counterpoint/page.jsx": {
     id: "counterpoint/page";
     page: "/counterpoint";
+  };
+  "./counterpoint/exercise/page.jsx": {
+    id: "counterpoint/exercise/page";
+    page: "/counterpoint/exercise";
+  };
+  "./counterpoint/[species]/[voices]/[level]/page.jsx": {
+    id: "counterpoint/[species]/[voices]/[level]/page";
+    page: "/counterpoint/:species/:voices/:level";
+  };
+  "./counterpoint/[species]/[voices]/[level]/practice/page.jsx": {
+    id: "counterpoint/[species]/[voices]/[level]/practice/page";
+    page: "/counterpoint/:species/:voices/:level/practice";
   };
   "./dashboard/page.jsx": {
     id: "dashboard/page";
@@ -325,6 +411,14 @@ type RouteFiles = {
   "./midi-training/page.jsx": {
     id: "midi-training/page";
     page: "/midi-training";
+  };
+  "./transcription/page.jsx": {
+    id: "transcription/page";
+    page: "/transcription";
+  };
+  "./transcription/[category]/[level]/page.jsx": {
+    id: "transcription/[category]/[level]/page";
+    page: "/transcription/:category/:level";
   };
   "./unauthorized/page.jsx": {
     id: "unauthorized/page";

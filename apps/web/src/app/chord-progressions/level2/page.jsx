@@ -143,7 +143,7 @@ export default function ChordProgressionsLevel2() {
         <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4 ml-16">
-              <Link to="/chord-recognition" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+              <Link to="/chord-progressions" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
               <h1 className="text-xl font-bold text-white">{config.title}</h1>
@@ -171,27 +171,27 @@ export default function ChordProgressionsLevel2() {
               </button>
             </div>
 
-            {/* Inversion Examples - Musical blurb */}
+            {/* Progression Examples - Musical blurb */}
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:w-1/2">
-              <h3 className="text-2xl font-bold text-white mb-6 text-center">Chord Inversions</h3>
+              <h3 className="text-2xl font-bold text-white mb-6 text-center">Chord Progressions</h3>
               <div className="space-y-4 text-white/80">
                 <div className="bg-white/10 rounded-xl p-4">
-                  <h4 className="font-bold text-white mb-2">Root Position</h4>
-                  <p className="text-sm">I, V, vi, IV - Standard triads with root in bass</p>
+                  <h4 className="font-bold text-white mb-2">Common Progressions</h4>
+                  <p className="text-sm">I - V - vi - IV: The most popular progression in Western music</p>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4">
-                  <h4 className="font-bold text-white mb-2">First Inversion</h4>
-                  <p className="text-sm">I6, V6, vi6, IV6 - Third in bass. Smoother voice leading.</p>
+                  <h4 className="font-bold text-white mb-2">Voice Leading</h4>
+                  <p className="text-sm">Chords may use different bass notes to create smoother connections</p>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4">
-                  <h4 className="font-bold text-white mb-2">Second Inversion</h4>
-                  <p className="text-sm">I64, V64, vi64, IV64 - Fifth in bass. Often passing or cadential.</p>
+                  <h4 className="font-bold text-white mb-2">Roman Numerals</h4>
+                  <p className="text-sm">Major keys: I, ii, iii, IV, V, vi, vii°<br/>Minor keys: i, ii°, bIII, iv, v, bVI, bVII</p>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4">
-                  <h4 className="font-bold text-white mb-2">Figured Bass</h4>
+                  <h4 className="font-bold text-white mb-2">Format</h4>
                   <p className="text-sm">
-                    <strong>6:</strong> First inversion (third in bass)<br/>
-                    <strong>64:</strong> Second inversion (fifth in bass)
+                    Use dashes between chords<br/>
+                    Example: I - V - vi - IV
                   </p>
                 </div>
               </div>
@@ -274,7 +274,7 @@ export default function ChordProgressionsLevel2() {
       <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4 ml-16">
-            <Link to="/chord-recognition/chord-progressions" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+            <Link to="/chord-progressions" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-white">
@@ -309,7 +309,7 @@ export default function ChordProgressionsLevel2() {
           <div className="flex-1">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
               <h2 className="text-2xl font-bold text-white mb-6 text-center">
-                Identify this chord progression with inversions
+                Identify this chord progression
               </h2>
               
               {/* Piano Roll Display */}
@@ -347,7 +347,7 @@ export default function ChordProgressionsLevel2() {
                   value={userAnswer}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
-                  placeholder="Enter roman numerals (e.g., I - V6 - vi - IV)"
+                  placeholder="Enter roman numerals (e.g., I - V - vi - IV)"
                   className="w-full px-4 py-3 text-lg rounded-lg border-2 border-white/30 focus:border-blue-400 focus:outline-none bg-white/10 text-white placeholder-white/50"
                   readOnly={feedback && feedback.show}
                 />
@@ -409,16 +409,14 @@ export default function ChordProgressionsLevel2() {
               </div>
               
               <div className="mt-6 pt-6 border-t border-white/10">
-                <h4 className="font-semibold text-white mb-2">Inversion Notation:</h4>
+                <h4 className="font-semibold text-white mb-2">Roman Numerals:</h4>
                 <div className="text-sm text-white/70 space-y-1">
-                  <p><strong>Root position:</strong></p>
-                  <p>I, V, vi, IV</p>
-                  <p><strong>First inversion:</strong></p>
-                  <p>I6, V6, vi6, IV6</p>
-                  <p><strong>Second inversion:</strong></p>
-                  <p>I64, V64, vi64, IV64</p>
+                  <p><strong>Major keys:</strong></p>
+                  <p>I, ii, iii, IV, V, vi, vii°</p>
+                  <p><strong>Minor keys:</strong></p>
+                  <p>i, ii°, bIII, iv, v, bVI, bVII</p>
                   <p><strong>Format:</strong> Use dashes</p>
-                  <p>Example: I - V6 - vi - IV</p>
+                  <p>Example: I - V - vi - IV</p>
                 </div>
               </div>
             </div>

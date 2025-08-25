@@ -1,7 +1,16 @@
 // Mock SQL implementation for development without database
+import { getAllFuxExercisesForApi } from './fuxExerciseConverter.js';
+
+// Get all Fux exercises converted to API format
+const fuxExercisesForApi = getAllFuxExercisesForApi();
+
+// Combine with existing mock exercises (keeping some for variety)
 const mockExercises = [
+  // Add all Fux exercises first
+  ...fuxExercisesForApi,
+  // Then add the original mock exercises with adjusted IDs (starting from 100)
   {
-    id: 1,
+    id: 100,
     species_type: 1,
     difficulty_level: 'beginner',
     title: 'First Species - Basic',
@@ -15,7 +24,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 2,
+    id: 101,
     species_type: 1,
     difficulty_level: 'intermediate',
     title: 'First Species - Extended',
@@ -29,7 +38,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 3,
+    id: 102,
     species_type: 1,
     difficulty_level: 'beginner',
     title: 'First Species - Rising Scale',
@@ -43,7 +52,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 4,
+    id: 103,
     species_type: 1,
     difficulty_level: 'beginner',
     title: 'First Species - Falling Scale',
@@ -57,7 +66,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 5,
+    id: 104,
     species_type: 1,
     difficulty_level: 'intermediate',
     title: 'First Species - Skip and Step',
@@ -71,7 +80,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 6,
+    id: 105,
     species_type: 1,
     difficulty_level: 'intermediate',
     title: 'First Species - Arch Form',
@@ -85,7 +94,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 7,
+    id: 106,
     species_type: 1,
     difficulty_level: 'beginner',
     title: 'First Species - Simple Dorian',
@@ -99,7 +108,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 8,
+    id: 107,
     species_type: 1,
     difficulty_level: 'advanced',
     title: 'First Species - Wide Range',
@@ -113,7 +122,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 9,
+    id: 108,
     species_type: 1,
     difficulty_level: 'intermediate',
     title: 'First Species - Chromatic Touch',
@@ -127,7 +136,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 10,
+    id: 109,
     species_type: 1,
     difficulty_level: 'advanced',
     title: 'First Species - Longer Exercise',
@@ -144,7 +153,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 11,
+    id: 110,
     species_type: 1,
     difficulty_level: 'beginner',
     title: 'First Species - Triad Outline',
@@ -158,7 +167,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 12,
+    id: 111,
     species_type: 1,
     difficulty_level: 'intermediate',
     title: 'First Species - Lower Register',
@@ -173,7 +182,7 @@ const mockExercises = [
   },
   // Species 2 exercises
   {
-    id: 13,
+    id: 112,
     species_type: 2,
     difficulty_level: 'beginner',
     title: 'Second Species - Basic',
@@ -186,7 +195,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 14,
+    id: 113,
     species_type: 2,
     difficulty_level: 'intermediate',
     title: 'Second Species - Passing Tones',
@@ -200,7 +209,7 @@ const mockExercises = [
   },
   // Species 3 exercises
   {
-    id: 15,
+    id: 114,
     species_type: 3,
     difficulty_level: 'beginner',
     title: 'Third Species - Four Against One',
@@ -213,7 +222,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 16,
+    id: 115,
     species_type: 3,
     difficulty_level: 'advanced',
     title: 'Third Species - Nota Cambiata',
@@ -227,7 +236,7 @@ const mockExercises = [
   },
   // Species 4 exercises
   {
-    id: 17,
+    id: 116,
     species_type: 4,
     difficulty_level: 'intermediate',
     title: 'Fourth Species - Suspensions',
@@ -240,7 +249,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 18,
+    id: 117,
     species_type: 4,
     difficulty_level: 'advanced',
     title: 'Fourth Species - Chain Suspensions',
@@ -255,7 +264,7 @@ const mockExercises = [
   },
   // Species 5 exercises
   {
-    id: 19,
+    id: 118,
     species_type: 5,
     difficulty_level: 'advanced',
     title: 'Fifth Species - Florid Counterpoint',
@@ -269,7 +278,7 @@ const mockExercises = [
     ])
   },
   {
-    id: 20,
+    id: 119,
     species_type: 5,
     difficulty_level: 'expert',
     title: 'Fifth Species - Complex Florid',

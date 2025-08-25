@@ -41,7 +41,8 @@ export const keySignatures = {
   'Fm': { type: 'minor', notes: ['F', 'G', 'G# / Ab', 'A# / Bb', 'C', 'C# / Db', 'D# / Eb'] },
   'Bbm': { type: 'minor', notes: ['A# / Bb', 'C', 'C# / Db', 'D# / Eb', 'F', 'F# / Gb', 'G# / Ab'] },
   'Ebm': { type: 'minor', notes: ['D# / Eb', 'F', 'F# / Gb', 'G# / Ab', 'A# / Bb', 'B / Cb', 'C# / Db'] },
-  'Abm': { type: 'minor', notes: ['G# / Ab', 'A# / Bb', 'B / Cb', 'C# / Db', 'D# / Eb', 'E / Fb', 'F# / Gb'] }
+  'Abm': { type: 'minor', notes: ['G# / Ab', 'A# / Bb', 'B / Cb', 'C# / Db', 'D# / Eb', 'E / Fb', 'F# / Gb'] },
+  'Gbm': { type: 'minor', notes: ['F# / Gb', 'G# / Ab', 'A', 'B', 'C# / Db', 'D', 'E'] }
 };
 
 // Roman numeral patterns for major and minor keys
@@ -162,10 +163,10 @@ export const generateChordFromScaleDegree = (keySignature, scaleDegree, octave =
   
   // Keep chords in a reasonable range
   if (rootMidi > 72) { // If too high, move down an octave
-    return [rootMidi - 12, thirdMidi - 12, fifthMidi - 12];
+    return [Math.round(rootMidi - 12), Math.round(thirdMidi - 12), Math.round(fifthMidi - 12)];
   }
   
-  return [rootMidi, thirdMidi, fifthMidi];
+  return [Math.round(rootMidi), Math.round(thirdMidi), Math.round(fifthMidi)];
 };
 
 /**
@@ -257,11 +258,14 @@ export const validateProgressionAnswer = (userAnswer, expectedAnswer) => {
   // Normalize the answers for comparison
   const normalize = (str) => str
     .toLowerCase()
-    .replace(/\s+/g, '')
-    .replace(/[–—]/g, '-') // Handle different dash types
-    .replace(/°/g, 'o')    // Handle diminished symbol variations
-    .replace(/♭/g, 'b')    // Handle flat symbol variations
-    .replace(/♯/g, '#');   // Handle sharp symbol variations
+    .replace(/\s+/g, '')           // Remove all spaces
+    .replace(/[–—]/g, '-')         // Handle different dash types  
+    .replace(/°/g, 'o')            // Handle diminished symbol variations
+    .replace(/dim/g, 'o')          // Handle "dim" as diminished
+    .replace(/([iv]+)d\b/g, '$1o') // Handle "d" suffix as diminished (e.g., "iid" -> "iio")
+    .replace(/♭/g, 'b')            // Handle flat symbol variations
+    .replace(/♯/g, '#')            // Handle sharp symbol variations
+    .replace(/-/g, '');            // Remove dashes for comparison
   
   return normalize(userAnswer) === normalize(expectedAnswer);
 };

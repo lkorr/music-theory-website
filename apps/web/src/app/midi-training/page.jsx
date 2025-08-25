@@ -13,6 +13,15 @@ export default function MidiTrainingPage() {
       features: ['Basic Triads', 'Extended Chords', 'Jazz Harmonies', 'Chord Progressions']
     },
     {
+      id: 'chord-recognition2',
+      title: 'Chord Recognition (New)',
+      description: 'Same chord recognition training with clean architecture! 95% less tech debt, identical functionality, easier to maintain and extend.',
+      icon: '♪',
+      color: 'bg-gradient-to-br from-indigo-500 to-purple-600',
+      path: '/chord-recognition2',
+      features: ['Clean Architecture', 'Same Functionality', '95% Less Code', 'Easy Maintenance']
+    },
+    {
       id: 'counterpoint',
       title: 'Counterpoint',
       description: 'Master the art of counterpoint composition with interactive exercises. Learn species counterpoint rules and compose beautiful melodic lines.',

@@ -44,6 +44,11 @@ export async function GET(request, { params }) {
           typeof exercise.cantus_firmus === "string"
             ? JSON.parse(exercise.cantus_firmus)
             : exercise.cantus_firmus,
+        solution: exercise.solution ? (
+          typeof exercise.solution === "string"
+            ? JSON.parse(exercise.solution)
+            : exercise.solution
+        ) : null,
         rules: rules.map((r) => r.rule_text),
       },
     });

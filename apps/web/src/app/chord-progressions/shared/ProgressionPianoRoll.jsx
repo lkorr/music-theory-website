@@ -25,9 +25,10 @@ export default function ProgressionPianoRoll({ chords, currentKey, showLabels, o
     
     // Calculate tonic notes (all instances of the key's tonic across octaves)
     const tonics = new Set();
+    let tonicName = '';
+    
     if (currentKey) {
       // Get the tonic note name from the key
-      let tonicName;
       if (currentKey.endsWith('m')) {
         // Minor key - remove 'm' suffix  
         tonicName = currentKey.slice(0, -1);
@@ -38,7 +39,10 @@ export default function ProgressionPianoRoll({ chords, currentKey, showLabels, o
       
       // Find all instances of this note across the MIDI range
       for (let midi = lowestMidi; midi <= highestMidi; midi++) {
-        const noteName = getMidiNoteNameWithEnharmonics(midi);
+        const noteNameWithOctave = getMidiNoteNameWithEnharmonics(midi);
+        // Remove octave number to get just the note name
+        const noteName = noteNameWithOctave.replace(/\d+$/, '');
+        
         // Handle enharmonic equivalents
         if (noteName.includes(' / ')) {
           const [sharp, flat] = noteName.split(' / ');
@@ -50,6 +54,7 @@ export default function ProgressionPianoRoll({ chords, currentKey, showLabels, o
         }
       }
     }
+    
     
     return {
       lowestNote: lowestMidi,
@@ -108,7 +113,7 @@ export default function ProgressionPianoRoll({ chords, currentKey, showLabels, o
                     style={{ 
                       height: `${noteHeight}px`,
                       backgroundColor: isRootNote 
-                        ? '#22c55e' // Green for the main root note only
+                        ? 'rgba(34, 197, 94, 0.5)' // Green for the main root note with 50% opacity
                         : isBlackKey(midiNote) ? '#6b7280' : '#ffffff',
                       color: isRootNote || isBlackKey(midiNote) ? '#ffffff' : '#000000'
                     }}
@@ -169,18 +174,21 @@ export default function ProgressionPianoRoll({ chords, currentKey, showLabels, o
               {/* Chord blocks for each beat */}
               {chords.map((chord, chordIndex) => (
                 chord.map((midiNote, noteIndex) => {
-                  const yPos = (highestNote - midiNote) * noteHeight;
+                  // Ensure MIDI note is an integer and calculate exact pixel position
+                  const roundedMidiNote = Math.round(midiNote);
+                  const gridIndex = highestNote - roundedMidiNote;
+                  const yPos = gridIndex * noteHeight;
                   const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-red-500'];
                   
                   return (
                     <div
-                      key={`chord-${chordIndex}-note-${noteIndex}`}
+                      key={`chord-${chordIndex}-note-${noteIndex}-${roundedMidiNote}`}
                       className={`absolute ${colors[chordIndex]} border-2 border-opacity-80 rounded-lg shadow-lg`}
                       style={{
                         left: `${chordIndex * beatWidth + 10}px`,
-                        top: `${yPos + 2}px`,
+                        top: `${yPos}px`,
                         width: `${beatWidth - 20}px`,
-                        height: `${noteHeight - 4}px`
+                        height: `${noteHeight}px`
                       }}
                     />
                   );

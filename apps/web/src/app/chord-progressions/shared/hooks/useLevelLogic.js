@@ -77,44 +77,85 @@ export const useLevelLogic = (state, config, dependencies) => {
    * Start the level - initialize first chord and timer
    */
   const startLevel = useCallback(() => {
-    setHasStarted(true);
-    const firstChord = generateChord(currentChord);
-    setCurrentChord(firstChord);
-    
-    // Start timer for first problem
-    const now = Date.now();
-    setStartTime(now);
-    setCurrentTime(0);
-    
-    // Focus the input after a brief delay
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
+    try {
+      setHasStarted(true);
+      const firstChord = generateChord(currentChord);
+      
+      // Ensure the chord was generated successfully
+      if (!firstChord || !firstChord.chords || firstChord.chords.length === 0) {
+        console.error('Failed to generate initial chord progression:', firstChord);
+        // Try generating again
+        const retryChord = generateChord(null);
+        if (retryChord && retryChord.chords && retryChord.chords.length > 0) {
+          setCurrentChord(retryChord);
+        } else {
+          console.error('Failed to generate chord progression after retry');
+          // Generate a fallback error message for the user
+          alert('Failed to generate chord progression. Please refresh the page.');
+          return;
+        }
+      } else {
+        setCurrentChord(firstChord);
       }
-    }, 100);
+      
+      // Start timer for first problem
+      const now = Date.now();
+      setStartTime(now);
+      setCurrentTime(0);
+      
+      // Focus the input after a brief delay
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Error starting level:', error);
+      alert('An error occurred while starting the level. Please refresh the page.');
+    }
   }, [currentChord, generateChord, setHasStarted, setCurrentChord, setStartTime, setCurrentTime, inputRef]);
   
   /**
    * Move to next chord - reset state for new question
    */
   const nextChord = useCallback(() => {
-    const newChord = generateChord(currentChord);
-    setCurrentChord(newChord);
-    
-    // Reset question-specific state
-    helpers.resetForNextQuestion();
-    
-    // Start timer for new problem
-    const now = Date.now();
-    setStartTime(now);
-    setCurrentTime(0);
-    
-    // Focus the input after a brief delay to ensure DOM is updated
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
+    try {
+      const newChord = generateChord(currentChord);
+      
+      // Ensure the chord was generated successfully
+      if (!newChord || !newChord.chords || newChord.chords.length === 0) {
+        console.error('Failed to generate next chord progression:', newChord);
+        // Try generating again
+        const retryChord = generateChord(null);
+        if (retryChord && retryChord.chords && retryChord.chords.length > 0) {
+          setCurrentChord(retryChord);
+        } else {
+          console.error('Failed to generate chord progression after retry');
+          alert('Failed to generate next chord progression. Please refresh the page.');
+          return;
+        }
+      } else {
+        setCurrentChord(newChord);
       }
-    }, 50);
+      
+      // Reset question-specific state
+      helpers.resetForNextQuestion();
+      
+      // Start timer for new problem
+      const now = Date.now();
+      setStartTime(now);
+      setCurrentTime(0);
+      
+      // Focus the input after a brief delay to ensure DOM is updated
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 50);
+    } catch (error) {
+      console.error('Error generating next chord:', error);
+      alert('An error occurred while generating the next chord. Please refresh the page.');
+    }
   }, [currentChord, generateChord, setCurrentChord, helpers, setStartTime, setCurrentTime, inputRef]);
   
   /**

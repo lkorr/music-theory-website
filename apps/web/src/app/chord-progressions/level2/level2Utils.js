@@ -24,21 +24,22 @@ const inversionSymbols = {
 
 // Common progressions with inversions for Level 2
 // Scale degrees: 0=I, 1=ii, 2=iii, 3=IV, 4=V, 5=vi, 6=vii°
+// Each progression has at least 2 inversions
 const level2Progressions = [
   [
-    { degree: 0, inversion: 'root' },    // I
+    { degree: 0, inversion: 'first' },   // I6
     { degree: 4, inversion: 'first' },   // V6
     { degree: 5, inversion: 'root' },    // vi
-    { degree: 0, inversion: 'root' }     // I
+    { degree: 3, inversion: 'root' }     // IV
   ],
   [
     { degree: 0, inversion: 'root' },    // I
     { degree: 3, inversion: 'first' },   // IV6  
-    { degree: 4, inversion: 'root' },    // V
+    { degree: 4, inversion: 'second' },  // V64
     { degree: 0, inversion: 'root' }     // I
   ],
   [
-    { degree: 5, inversion: 'root' },    // vi
+    { degree: 5, inversion: 'first' },   // vi6
     { degree: 3, inversion: 'root' },    // IV
     { degree: 0, inversion: 'second' },  // I64
     { degree: 4, inversion: 'root' }     // V
@@ -46,28 +47,45 @@ const level2Progressions = [
   [
     { degree: 0, inversion: 'root' },    // I
     { degree: 1, inversion: 'first' },   // ii6
-    { degree: 4, inversion: 'root' },    // V
+    { degree: 4, inversion: 'first' },   // V6
     { degree: 0, inversion: 'root' }     // I
   ],
   [
     { degree: 0, inversion: 'first' },   // I6
     { degree: 4, inversion: 'root' },    // V
-    { degree: 5, inversion: 'root' },    // vi
+    { degree: 5, inversion: 'first' },   // vi6
     { degree: 3, inversion: 'root' }     // IV
   ],
   [
-    { degree: 3, inversion: 'root' },    // IV
+    { degree: 3, inversion: 'first' },   // IV6
     { degree: 0, inversion: 'second' },  // I64
     { degree: 4, inversion: 'root' },    // V
     { degree: 0, inversion: 'root' }     // I
+  ],
+  [
+    { degree: 1, inversion: 'first' },   // ii6
+    { degree: 4, inversion: 'second' },  // V64
+    { degree: 0, inversion: 'root' },    // I
+    { degree: 5, inversion: 'root' }     // vi
+  ],
+  [
+    { degree: 0, inversion: 'root' },    // I
+    { degree: 5, inversion: 'first' },   // vi6
+    { degree: 1, inversion: 'first' },   // ii6
+    { degree: 4, inversion: 'root' }     // V
   ]
 ];
 
 /**
- * Convert note name to MIDI number (handles flats and sharps)
+ * Convert note name to MIDI number (handles flats, sharps, and enharmonic equivalents)
  */
 const noteToMidi = (noteName, octave = 4) => {
   const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  
+  // Handle enharmonic equivalents (e.g., "F# / Gb")
+  if (noteName.includes(' / ')) {
+    noteName = noteName.split(' / ')[0]; // Use the first note name (sharp version)
+  }
   
   // Handle flat and sharp notes
   let noteIndex;
@@ -88,43 +106,92 @@ const noteToMidi = (noteName, octave = 4) => {
 
 /**
  * Generate chord from scale degree with inversion in a given key
+ * Uses proper chord qualities and interval calculations
  */
 const generateChordFromScaleDegreeWithInversion = (keySignature, chordInfo, octave = 4) => {
-  const notes = keySignature.notes;
   const { degree, inversion } = chordInfo;
+  const keyType = keySignature.type;
   
-  // Build triad using scale degrees (root, third, fifth)
-  const root = notes[degree];
-  const third = notes[(degree + 2) % 7];
-  const fifth = notes[(degree + 4) % 7];
+  // Get the root note from the scale
+  const rootNote = keySignature.notes[degree];
   
-  // Convert to MIDI numbers
-  let rootMidi = noteToMidi(root, octave);
-  let thirdMidi = noteToMidi(third, octave);
-  let fifthMidi = noteToMidi(fifth, octave);
+  // Handle enharmonic equivalents (e.g., "F# / Gb")
+  let cleanRootNote = rootNote;
+  if (rootNote.includes(' / ')) {
+    cleanRootNote = rootNote.split(' / ')[0]; // Use the first note name (sharp version)
+  }
   
-  // Ensure notes are in ascending order within the octave
-  while (thirdMidi <= rootMidi) thirdMidi += 12;
-  while (fifthMidi <= thirdMidi) fifthMidi += 12;
+  // Convert root to MIDI
+  const rootMidi = noteToMidi(cleanRootNote, octave);
+  
+  // Define chord qualities for each scale degree
+  const chordQualities = {
+    major: [
+      'major',     // I
+      'minor',     // ii
+      'minor',     // iii
+      'major',     // IV
+      'major',     // V
+      'minor',     // vi
+      'diminished' // vii°
+    ],
+    minor: [
+      'minor',     // i
+      'diminished',// ii°
+      'major',     // bIII
+      'minor',     // iv
+      'minor',     // v
+      'major',     // bVI
+      'major'      // bVII
+    ]
+  };
+  
+  const quality = chordQualities[keyType][degree];
+  
+  // Build chord based on quality using proper intervals
+  let thirdMidi, fifthMidi;
+  
+  switch (quality) {
+    case 'major':
+      thirdMidi = rootMidi + 4; // Major third
+      fifthMidi = rootMidi + 7; // Perfect fifth
+      break;
+    case 'minor':
+      thirdMidi = rootMidi + 3; // Minor third
+      fifthMidi = rootMidi + 7; // Perfect fifth
+      break;
+    case 'diminished':
+      thirdMidi = rootMidi + 3; // Minor third
+      fifthMidi = rootMidi + 6; // Diminished fifth
+      break;
+    default:
+      thirdMidi = rootMidi + 4; // Default to major
+      fifthMidi = rootMidi + 7;
+  }
   
   // Apply inversion
   let chordNotes = [rootMidi, thirdMidi, fifthMidi];
   
   if (inversion === 'first') {
-    // First inversion: move root up an octave
+    // First inversion: third in bass
     chordNotes = [thirdMidi, fifthMidi, rootMidi + 12];
   } else if (inversion === 'second') {
-    // Second inversion: move root and third up an octave
+    // Second inversion: fifth in bass
     chordNotes = [fifthMidi, rootMidi + 12, thirdMidi + 12];
   }
   
-  // Keep chords in a reasonable range
+  // Keep chords in a reasonable range (C4-C6)
   const minNote = Math.min(...chordNotes);
+  const maxNote = Math.max(...chordNotes);
+  
   if (minNote > 72) { // If too high, move down an octave
-    chordNotes = chordNotes.map(note => note - 12);
+    chordNotes = chordNotes.map(note => Math.round(note - 12));
+  } else if (maxNote < 60) { // If too low, move up an octave
+    chordNotes = chordNotes.map(note => Math.round(note + 12));
   }
   
-  return chordNotes;
+  // Ensure all notes are integers
+  return chordNotes.map(note => Math.round(note));
 };
 
 /**
@@ -162,16 +229,26 @@ export const generateLevel2Progression = () => {
     generateChordFromScaleDegreeWithInversion(keySignature, chordInfo)
   );
   
-  // Generate the answer (Roman numerals with inversions)
+  // Generate the answer (Roman numerals with or without inversions based on config)
   const romanNumeralProgression = progression.map(chordInfo => 
     getRomanNumeralWithInversion(randomKey, chordInfo)
   );
+  
+  // If inversion labeling is not required, strip inversions from the displayed answer
+  let displayAnswer = romanNumeralProgression.join(' - ');
+  if (!REQUIRE_INVERSION_LABELING) {
+    displayAnswer = displayAnswer
+      .replace(/6/g, '')       // Remove figured bass 6
+      .replace(/64/g, '')      // Remove figured bass 64
+      .replace(/°6/g, '°')     // Handle diminished chords with inversions
+      .replace(/°64/g, '°');
+  }
   
   return {
     key: randomKey,
     chords,
     progression,
-    answer: romanNumeralProgression.join(' - '),
+    answer: displayAnswer,
     romanNumerals: romanNumeralProgression
   };
 };

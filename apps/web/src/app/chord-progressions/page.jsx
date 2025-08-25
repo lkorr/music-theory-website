@@ -37,18 +37,34 @@ export default function ChordProgressionsPage() {
       ]
     },
     {
-      id: 'advanced-progressions',
-      title: 'Non-Diatonic & Modal Chords',
-      description: 'Borrowed chords, augmented chords, and non-diatonic harmonies',
+      id: 'non-diatonic-progressions',
+      title: 'Non-Diatonic Chords',
+      description: 'Borrowed chords, augmented chords, and modal interchange',
       difficulty: 'Advanced',
-      color: 'bg-red-500',
+      color: 'bg-purple-500',
       available: true,
       levels: [
         {
           id: 'level3',
-          title: 'Level 3: Non-Diatonic & Modal Chords',
-          description: 'Identify progressions with borrowed chords, augmented chords, and non-diatonic harmonies',
+          title: 'Level 3: Non-Diatonic Chords',
+          description: 'Identify progressions with borrowed chords, Neapolitan, and augmented chords',
           path: '/chord-progressions/level3'
+        }
+      ]
+    },
+    {
+      id: 'non-diatonic-inversions',
+      title: 'Non-Diatonic with Inversions',
+      description: 'Advanced borrowed chords with inversion labeling',
+      difficulty: 'Expert',
+      color: 'bg-indigo-500',
+      available: true,
+      levels: [
+        {
+          id: 'level4',
+          title: 'Level 4: Non-Diatonic Chords with Inversions',
+          description: 'Master progressions with borrowed chords and precise inversion identification',
+          path: '/chord-progressions/level4'
         }
       ]
     }
@@ -91,8 +107,8 @@ export default function ChordProgressionsPage() {
           </p>
         </div>
 
-        {/* Categories Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-16">
+        {/* Categories Grid - Now 4 categories */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8 mb-16">
           {progressionCategories.map((category) => (
             <Link
               key={category.id}
@@ -109,6 +125,7 @@ export default function ChordProgressionsPage() {
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       category.difficulty === 'Beginner' ? 'bg-green-500/20 text-green-300' :
                       category.difficulty === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-300' :
+                      category.difficulty === 'Advanced' ? 'bg-purple-500/20 text-purple-300' :
                       'bg-red-500/20 text-red-300'
                     }`}>
                       {category.difficulty}
@@ -121,11 +138,11 @@ export default function ChordProgressionsPage() {
                   </div>
                 </div>
 
-                <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-white/90 transition-colors">
+                <h3 className="text-xl font-bold text-white mb-4 group-hover:text-white/90 transition-colors">
                   {category.title}
                 </h3>
                 
-                <p className="text-white/70 mb-6 leading-relaxed">
+                <p className="text-white/70 mb-6 leading-relaxed text-sm">
                   {category.description}
                 </p>
 

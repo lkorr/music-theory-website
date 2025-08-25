@@ -88,10 +88,15 @@ const level3Progressions = [
 ];
 
 /**
- * Convert note name to MIDI number
+ * Convert note name to MIDI number (handles enharmonic equivalents)
  */
 const noteToMidi = (noteName, octave = 4) => {
   const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  
+  // Handle enharmonic equivalents (e.g., "F# / Gb")
+  if (noteName.includes(' / ')) {
+    noteName = noteName.split(' / ')[0]; // Use the first note name (sharp version)
+  }
   
   let noteIndex;
   if (noteName.includes('b')) {
@@ -106,7 +111,7 @@ const noteToMidi = (noteName, octave = 4) => {
     noteIndex = noteNames.indexOf(noteName);
   }
   
-  return noteIndex + (octave + 1) * 12;
+  return Math.round(noteIndex + (octave + 1) * 12);
 };
 
 /**
@@ -120,8 +125,11 @@ const generateNonDiatonicChord = (key, chordInfo, octave = 4) => {
     throw new Error(`Non-diatonic chord ${chordInfo.symbol} not found for ${keyType} keys`);
   }
   
-  // Get tonic note
-  const tonicNote = key.endsWith('m') ? key.slice(0, -1) : key;
+  // Get tonic note and handle enharmonic equivalents
+  let tonicNote = key.endsWith('m') ? key.slice(0, -1) : key;
+  if (tonicNote.includes(' / ')) {
+    tonicNote = tonicNote.split(' / ')[0]; // Use the first note name (sharp version)
+  }
   const tonicMidi = noteToMidi(tonicNote, octave);
   
   // Calculate root note based on offset
@@ -158,45 +166,105 @@ const generateNonDiatonicChord = (key, chordInfo, octave = 4) => {
   
   // Ensure reasonable range
   const minNote = Math.min(...chordNotes);
+  const maxNote = Math.max(...chordNotes);
+  
   if (minNote > 72) {
-    chordNotes = chordNotes.map(note => note - 12);
+    chordNotes = chordNotes.map(note => Math.round(note - 12));
+  } else if (maxNote < 60) {
+    chordNotes = chordNotes.map(note => Math.round(note + 12));
   }
   
-  return chordNotes;
+  // Ensure all notes are integers
+  return chordNotes.map(note => Math.round(note));
 };
 
 /**
- * Generate diatonic chord from scale degree
+ * Generate diatonic chord from scale degree using proper music theory intervals
  */
 const generateChordFromScaleDegree = (keySignature, chordInfo, octave = 4) => {
-  const notes = keySignature.notes;
   const { degree, inversion } = chordInfo;
+  const keyType = keySignature.type;
   
-  const root = notes[degree];
-  const third = notes[(degree + 2) % 7];
-  const fifth = notes[(degree + 4) % 7];
+  // Get the root note from the scale
+  const rootNote = keySignature.notes[degree];
   
-  let rootMidi = noteToMidi(root, octave);
-  let thirdMidi = noteToMidi(third, octave);
-  let fifthMidi = noteToMidi(fifth, octave);
+  // Handle enharmonic equivalents (e.g., "F# / Gb")
+  let cleanRootNote = rootNote;
+  if (rootNote.includes(' / ')) {
+    cleanRootNote = rootNote.split(' / ')[0]; // Use the first note name (sharp version)
+  }
   
-  while (thirdMidi <= rootMidi) thirdMidi += 12;
-  while (fifthMidi <= thirdMidi) fifthMidi += 12;
+  // Convert root to MIDI
+  const rootMidi = noteToMidi(cleanRootNote, octave);
   
+  // Define chord qualities for each scale degree
+  const chordQualities = {
+    major: [
+      'major',     // I
+      'minor',     // ii
+      'minor',     // iii
+      'major',     // IV
+      'major',     // V
+      'minor',     // vi
+      'diminished' // vii°
+    ],
+    minor: [
+      'minor',     // i
+      'diminished',// ii°
+      'major',     // bIII
+      'minor',     // iv
+      'minor',     // v
+      'major',     // bVI
+      'major'      // bVII
+    ]
+  };
+  
+  const quality = chordQualities[keyType][degree];
+  
+  // Build chord based on quality using proper intervals
+  let thirdMidi, fifthMidi;
+  
+  switch (quality) {
+    case 'major':
+      thirdMidi = rootMidi + 4; // Major third
+      fifthMidi = rootMidi + 7; // Perfect fifth
+      break;
+    case 'minor':
+      thirdMidi = rootMidi + 3; // Minor third
+      fifthMidi = rootMidi + 7; // Perfect fifth
+      break;
+    case 'diminished':
+      thirdMidi = rootMidi + 3; // Minor third
+      fifthMidi = rootMidi + 6; // Diminished fifth
+      break;
+    default:
+      thirdMidi = rootMidi + 4; // Default to major
+      fifthMidi = rootMidi + 7;
+  }
+  
+  // Apply inversion
   let chordNotes = [rootMidi, thirdMidi, fifthMidi];
   
   if (inversion === 'first') {
+    // First inversion: third in bass
     chordNotes = [thirdMidi, fifthMidi, rootMidi + 12];
   } else if (inversion === 'second') {
+    // Second inversion: fifth in bass
     chordNotes = [fifthMidi, rootMidi + 12, thirdMidi + 12];
   }
   
+  // Keep chords in a reasonable range (C4-C6)
   const minNote = Math.min(...chordNotes);
-  if (minNote > 72) {
-    chordNotes = chordNotes.map(note => note - 12);
+  const maxNote = Math.max(...chordNotes);
+  
+  if (minNote > 72) { // If too high, move down an octave
+    chordNotes = chordNotes.map(note => Math.round(note - 12));
+  } else if (maxNote < 60) { // If too low, move up an octave
+    chordNotes = chordNotes.map(note => Math.round(note + 12));
   }
   
-  return chordNotes;
+  // Ensure all notes are integers
+  return chordNotes.map(note => Math.round(note));
 };
 
 /**
@@ -263,29 +331,41 @@ export const validateLevel3Answer = (userAnswer, expectedAnswer) => {
   let normalizedExpected = expectedAnswer;
   let normalizedUser = userAnswer;
   
-  // Common alternatives
+  // Common alternatives - normalize both to the same format
   const alternatives = [
-    { from: 'bII6', to: 'N6' },
-    { from: 'bII', to: 'N' },
-    { from: 'I+', to: 'Iaug' },
-    { from: 'V+', to: 'Vaug' },
-    { from: 'i+', to: 'iaug' },
-    { from: '#iv°', to: '#ivdim' },
-    { from: '#ii°', to: '#iidim' },
-    { from: 'ii/♭5', to: 'ii°' },
-    { from: 'iv/♭5', to: 'iv°' }
+    { from: /bII6/g, to: 'N6' },
+    { from: /N6/g, to: 'N6' },
+    { from: /bII/g, to: 'N' },
+    { from: /N/g, to: 'N' },
+    { from: /I\+/g, to: 'Iaug' },
+    { from: /Iaug/g, to: 'Iaug' },
+    { from: /V\+/g, to: 'Vaug' },
+    { from: /Vaug/g, to: 'Vaug' },
+    { from: /i\+/g, to: 'iaug' },
+    { from: /iaug/g, to: 'iaug' },
+    { from: /#iv°/g, to: '#ivdim' },
+    { from: /#ivdim/g, to: '#ivdim' },
+    { from: /#ii°/g, to: '#iidim' },
+    { from: /#iidim/g, to: '#iidim' },
+    { from: /ii\/♭5/g, to: 'ii°' },
+    { from: /iv\/♭5/g, to: 'iv°' }
   ];
   
-  // Apply alternatives to both user and expected answers
+  // Apply alternatives to normalize both answers to the same format
   alternatives.forEach(alt => {
-    normalizedExpected = normalizedExpected.replace(new RegExp(alt.from, 'g'), alt.to);
-    normalizedUser = normalizedUser.replace(new RegExp(alt.from, 'g'), alt.to);
-    normalizedUser = normalizedUser.replace(new RegExp(alt.to, 'g'), alt.from); // Bidirectional
+    normalizedExpected = normalizedExpected.replace(alt.from, alt.to);
+    normalizedUser = normalizedUser.replace(alt.from, alt.to);
   });
   
   if (!REQUIRE_INVERSION_LABELING) {
     // Strip inversion markings
     normalizedExpected = normalizedExpected
+      .replace(/6/g, '')
+      .replace(/64/g, '')
+      .replace(/°6/g, '°')
+      .replace(/°64/g, '°');
+    
+    normalizedUser = normalizedUser
       .replace(/6/g, '')
       .replace(/64/g, '')
       .replace(/°6/g, '°')
