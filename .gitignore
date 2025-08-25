@@ -99,4 +99,4 @@ web_modules/
 .turbo
 
 # Embedded git repository (original project structure)
-createxyz-project/
+createxyz-project/.claude/
