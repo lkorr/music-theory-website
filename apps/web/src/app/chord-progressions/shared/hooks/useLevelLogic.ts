@@ -51,6 +51,7 @@ export function useLevelLogic(
     setIsPlaying: (value: boolean) => void;
     setVolume: (value: number) => void;
     setPlayCount: (value: number) => void;
+    setSessionStartTime: (value: string | null) => void;
   },
   config: LevelConfig
 ): LevelLogic {
@@ -85,7 +86,32 @@ export function useLevelLogic(
     
     state.setLevelResult(result);
     state.setIsCompleted(true);
-  }, [state.score, state.avgTime, config.passAccuracy, config.passTime]);
+    
+    // Save statistics to server when level is completed
+    if (state.sessionStartTime) {
+      const sessionData = {
+        moduleType: 'chord-progressions',
+        category: config.category || 'progressions',
+        level: config.level.toString(),
+        accuracy: accuracy,
+        avgTime: state.avgTime,
+        totalTime: Math.round(state.avgTime * state.score.total),
+        problemsSolved: config.totalProblems,
+        correctAnswers: state.score.correct,
+        bestStreak: state.score.correct, // For progressions, we don't track streaks, so use correct answers
+        completed: true,
+        passed,
+        startTime: state.sessionStartTime,
+        endTime: new Date().toISOString(),
+        sessionToken: state.sessionToken
+      };
+      
+      // Save session asynchronously (don't block UI)
+      state.statistics.saveSession(sessionData).catch(error => {
+        console.error('Failed to save session statistics:', error);
+      });
+    }
+  }, [state.score, state.avgTime, state.sessionStartTime, state.sessionToken, state.statistics, config]);
   
   /**
    * Generate a new chord progression
@@ -144,6 +170,7 @@ export function useLevelLogic(
   const startLevel = useCallback(() => {
     state.setHasStarted(true);
     state.setStartTime(Date.now());
+    state.setSessionStartTime(new Date().toISOString());
     generateNewProgression();
   }, [generateNewProgression]);
   
@@ -210,7 +237,7 @@ export function useLevelLogic(
     if (!state.currentProgression || state.isPlaying) return;
     
     state.setIsPlaying(true);
-    state.setPlayCount(prev => prev + 1);
+    state.setPlayCount(state.playCount + 1);
     
     try {
       await playChordProgression(

@@ -185,7 +185,7 @@ export default function ChordConstructionLevelPage(): JSX.Element {
   }
   
   // Successfully loaded valid configuration - render the game
-  return <UniversalChordConstructor levelConfig={levelConfig} />;
+  return <UniversalChordConstructor levelConfig={levelConfig as any} category={category} level={level} />;
 }
 
 /**

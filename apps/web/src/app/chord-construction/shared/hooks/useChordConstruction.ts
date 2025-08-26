@@ -17,10 +17,11 @@
  * - State reset functionality
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { noteNames } from "../../../chord-recognition/shared/theory/core/notes.js";
 import { chordTypes, extendedChordTypes, inversionTypes } from "../../../chord-recognition/shared/theory/core/constants.js";
-import type { ChordData, LevelConfig } from "../../../chord-recognition/shared/theory/core/constants.js";
+import type { ChordData } from "../../../chord-recognition/shared/theory/core/constants.js";
+import type { LevelConfig } from "../../data/levelConfigs.js";
 
 interface ConstructionTask {
   root: string;
@@ -50,6 +51,25 @@ interface LevelResult {
   avgTime: number;
 }
 
+interface StatisticsCallback {
+  (data: {
+    moduleType: string;
+    category: string;
+    level: string;
+    accuracy: number;
+    avgTime: number;
+    totalTime: number;
+    problemsSolved: number;
+    correctAnswers: number;
+    bestStreak: number;
+    completed: boolean;
+    passed: boolean;
+    startTime: string;
+    endTime: string;
+    sessionToken: string;
+  }): Promise<void>;
+}
+
 interface ChordConstructionState {
   hasStarted: boolean;
   isCompleted: boolean;
@@ -60,16 +80,25 @@ interface ChordConstructionState {
   showSolution: boolean;
   score: ScoreData;
   levelResult: LevelResult | null;
+  sessionToken: string;
+  sessionStartTime: string | null;
+  bestStreak: number;
   startLevel: () => void;
   nextTask: () => void;
   handleNoteToggle: (midiNote: number) => void;
-  submitAnswer: (onTimerStop?: () => number) => { isCorrect: boolean; newScore: ScoreData } | undefined;
+  submitAnswer: (onTimerStop?: () => number, getAvgTime?: () => number, getTotalTime?: () => number, onStatisticsSave?: StatisticsCallback) => { isCorrect: boolean; newScore: ScoreData } | undefined;
   clearAllNotes: () => void;
   resetLevel: () => void;
   setShowSolution: (show: boolean) => void;
+  generateNewSessionToken: () => void;
+  setStatisticsCallback: (callback: StatisticsCallback, category: string, level: string) => void;
 }
 
 export default function useChordConstruction(levelConfig: LevelConfig): ChordConstructionState {
+  // Statistics callback
+  const statisticsCallbackRef = useRef<StatisticsCallback | null>(null);
+  const categoryRef = useRef<string>('');
+  const levelRef = useRef<string>('');
   // Game state
   const [hasStarted, setHasStarted] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -82,6 +111,35 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
   
   // Score tracking
   const [score, setScore] = useState<ScoreData>({ correct: 0, total: 0, streak: 0 });
+  
+  // Session tracking for statistics
+  const [sessionToken, setSessionToken] = useState<string>('');
+  const startTimeRef = useRef<Date | null>(null);
+  const bestStreakRef = useRef<number>(0);
+  
+  /**
+   * Generate a unique session token for anti-cheat protection
+   */
+  const generateSessionToken = (): string => {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  };
+  
+  /**
+   * Generate a new session token
+   */
+  const generateNewSessionToken = (): void => {
+    const newToken = generateSessionToken();
+    setSessionToken(newToken);
+  };
+  
+  /**
+   * Set statistics callback for saving
+   */
+  const setStatisticsCallback = (callback: StatisticsCallback, category: string, level: string): void => {
+    statisticsCallbackRef.current = callback;
+    categoryRef.current = category;
+    levelRef.current = level;
+  };
 
   /**
    * Generate a new chord construction task based on level configuration
@@ -111,7 +169,7 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
         } else {
           // First inversion (exclude augmented)
           if (chordTypeKey === 'augmented') {
-            const nonAugmentedChords = availableChordTypes.filter(type => type !== 'augmented');
+            const nonAugmentedChords = availableChordTypes.filter((type: string) => type !== 'augmented');
             chordTypeKey = nonAugmentedChords[Math.floor(Math.random() * nonAugmentedChords.length)];
           }
           inversion = 'first';
@@ -124,14 +182,14 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
         } else if (inversionChoice < 0.67) {
           // First inversion (exclude augmented)
           if (chordTypeKey === 'augmented') {
-            const nonAugmentedChords = availableChordTypes.filter(type => type !== 'augmented');
+            const nonAugmentedChords = availableChordTypes.filter((type: string) => type !== 'augmented');
             chordTypeKey = nonAugmentedChords[Math.floor(Math.random() * nonAugmentedChords.length)];
           }
           inversion = 'first';
         } else {
           // Second inversion (exclude augmented)
           if (chordTypeKey === 'augmented') {
-            const nonAugmentedChords = availableChordTypes.filter(type => type !== 'augmented');
+            const nonAugmentedChords = availableChordTypes.filter((type: string) => type !== 'augmented');
             chordTypeKey = nonAugmentedChords[Math.floor(Math.random() * nonAugmentedChords.length)];
           }
           inversion = 'second';
@@ -162,7 +220,7 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
     const intervals = chordType.intervals;
     
     let expectedNotes: number[];
-    let inversionDescription: string;
+    let inversionDescription: string = '';
     let chordName = root + chordType.symbol;
     
     if (inversion === 'root') {
@@ -301,6 +359,11 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
     setPlacedNotes([]);
     setFeedback(null);
     setIsAnswered(false);
+    
+    // Initialize session tracking
+    generateNewSessionToken();
+    startTimeRef.current = new Date();
+    bestStreakRef.current = 0;
   };
 
   /**
@@ -334,7 +397,12 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
   /**
    * Submit the current answer
    */
-  const submitAnswer = (onTimerStop?: () => number): { isCorrect: boolean; newScore: ScoreData } | undefined => {
+  const submitAnswer = (
+    onTimerStop?: () => number,
+    getAvgTime?: () => number,
+    getTotalTime?: () => number,
+    onStatisticsSave?: StatisticsCallback
+  ): { isCorrect: boolean; newScore: ScoreData } | undefined => {
     if (!currentTask || placedNotes.length === 0 || isAnswered) return;
 
     const isCorrect = validateChord(currentTask, placedNotes);
@@ -345,6 +413,11 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
       total: score.total + 1,
       streak: isCorrect ? score.streak + 1 : 0
     };
+    
+    // Update best streak tracking
+    if (newScore.streak > bestStreakRef.current) {
+      bestStreakRef.current = newScore.streak;
+    }
     
     setScore(newScore);
     setIsAnswered(true);
@@ -360,13 +433,41 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
     
     // Check for level completion
     if (newScore.total >= levelConfig.totalProblems) {
-      // Level completed
+      const avgTime = getAvgTime ? getAvgTime() : problemTime;
+      const totalTime = getTotalTime ? getTotalTime() : (avgTime * newScore.total);
+      const passed = newScore.correct >= Math.ceil(levelConfig.totalProblems * levelConfig.passAccuracy / 100);
+      const accuracy = Math.round((newScore.correct / newScore.total) * 100);
+      
+      // Save statistics immediately
+      const saveStats = onStatisticsSave || statisticsCallbackRef.current;
+      if (saveStats && categoryRef.current && levelRef.current) {
+        saveStats({
+          moduleType: 'chord-construction',
+          category: categoryRef.current,
+          level: levelRef.current,
+          accuracy,
+          avgTime,
+          totalTime: Math.round(totalTime),
+          problemsSolved: newScore.total,
+          correctAnswers: newScore.correct,
+          bestStreak: bestStreakRef.current,
+          completed: true,
+          passed,
+          startTime: startTimeRef.current ? startTimeRef.current.toISOString() : new Date().toISOString(),
+          endTime: new Date().toISOString(),
+          sessionToken
+        }).catch(error => {
+          console.error('Failed to save statistics:', error);
+        });
+      }
+      
+      // Level completed - delay UI update but not statistics saving
       setTimeout(() => {
         setIsCompleted(true);
         setLevelResult({
-          passed: newScore.correct >= Math.ceil(levelConfig.totalProblems * levelConfig.passAccuracy / 100),
-          accuracy: Math.round((newScore.correct / newScore.total) * 100),
-          avgTime: problemTime // This should be calculated from timer hook
+          passed,
+          accuracy,
+          avgTime
         });
       }, 2000);
     }
@@ -395,6 +496,11 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
     setShowSolution(false);
     setScore({ correct: 0, total: 0, streak: 0 });
     setLevelResult(null);
+    
+    // Reset session tracking
+    setSessionToken('');
+    startTimeRef.current = null;
+    bestStreakRef.current = 0;
   };
 
   return {
@@ -408,6 +514,9 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
     showSolution,
     score,
     levelResult,
+    sessionToken,
+    sessionStartTime: startTimeRef.current ? startTimeRef.current.toISOString() : null,
+    bestStreak: bestStreakRef.current,
     
     // Actions
     startLevel,
@@ -416,6 +525,8 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
     submitAnswer,
     clearAllNotes,
     resetLevel,
-    setShowSolution
+    setShowSolution,
+    generateNewSessionToken,
+    setStatisticsCallback
   };
 }

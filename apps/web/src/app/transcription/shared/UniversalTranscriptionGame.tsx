@@ -7,6 +7,9 @@ import { noteNames, getMidiNoteName, isBlackKey } from "../../chord-recognition/
 import { chordTypes, extendedChordTypes } from "../../chord-recognition/shared/theory/core/constants";
 import { audioManager } from "./audioManager.js";
 import { CompactAuthButton } from "../../../components/auth/AuthButton";
+import { useAuth } from "../../../components/auth/ProtectedRoute";
+import { useStatistics } from "./hooks/useStatistics";
+import LeaderboardComponent from "./components/LeaderboardComponent";
 
 // Type definitions for transcription game system
 interface Theme {
@@ -510,6 +513,15 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
   // Get theme configuration
   const theme = THEMES[levelConfig.theme] || THEMES.emerald;
   
+  // Auth state
+  const authState = useAuth();
+  const user = authState.user;
+  
+  // Statistics integration
+  const statistics = useStatistics();
+  const [sessionStartTime, setSessionStartTime] = useState<string | null>(null);
+  const [sessionToken] = useState<string>(() => statistics.generateSessionToken());
+  
   // Game state
   const [hasStarted, setHasStarted] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
@@ -657,6 +669,7 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
     try {
       await audioManager.initialize();
       setHasStarted(true);
+      setSessionStartTime(new Date().toISOString());
       generateNewTask();
     } catch (error) {
       console.error('Failed to start level:', error);
@@ -787,6 +800,31 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
               required: levelConfig.passRequirements
             });
             setIsCompleted(true);
+            
+            // Save statistics to server when level is completed
+            if (sessionStartTime) {
+              const sessionData = {
+                moduleType: 'transcription',
+                category: category,
+                level: level,
+                accuracy: finalAccuracy,
+                avgTime: newAvgTime,
+                totalTime: Math.round(newAvgTime * newTotal),
+                problemsSolved: levelConfig.totalProblems,
+                correctAnswers: newCorrect,
+                bestStreak: newStreak,
+                completed: true,
+                passed,
+                startTime: sessionStartTime,
+                endTime: new Date().toISOString(),
+                sessionToken: sessionToken
+              };
+              
+              // Save session asynchronously (don't block UI)
+              statistics.saveSession(sessionData).catch(error => {
+                console.error('Failed to save session statistics:', error);
+              });
+            }
           }, 2000);
         } else {
           // Generate new task after a short delay for correct answers
@@ -812,6 +850,16 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
 
   const canSubmit = placedNotes.length > 0 && !isAnswered;
 
+  // Parse category and level from levelId (e.g., "basic-triads-1" -> category: "basic-triads", level: "1")
+  const parseLevelId = (levelId: string) => {
+    const parts = levelId.split('-');
+    const level = parts[parts.length - 1]; // Last part is the level
+    const category = parts.slice(0, -1).join('-'); // Everything else is the category
+    return { category, level };
+  };
+
+  const { category, level } = parseLevelId(levelConfig.levelId);
+
   // Start screen
   if (!hasStarted) {
     return (
@@ -832,8 +880,10 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
           </div>
         </header>
         
-        <main className="max-w-4xl mx-auto p-6 flex items-center justify-center min-h-[80vh]">
-          <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+        <main className="max-w-7xl mx-auto p-6">
+          <div className="flex flex-col xl:flex-row gap-6 items-start justify-center min-h-[80vh]">
+            {/* Main content */}
+            <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-8 xl:w-2/3 w-full">
             <h2 className="text-3xl font-bold text-white mb-6">Ready to Start {levelConfig.title}?</h2>
             <div className="text-lg text-white/70 mb-8 space-y-2">
               <p><strong>{levelConfig.totalProblems} problems</strong> to complete</p>
@@ -848,6 +898,21 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
             >
               Start {levelConfig.title}
             </button>
+            </div>
+
+            {/* Leaderboard */}
+            {user && (
+              <div className="xl:w-1/3 w-full">
+                <LeaderboardComponent
+                  moduleType="transcription"
+                  category={category}
+                  level={level}
+                  limit={5}
+                  showUserStats={true}
+                  compact={true}
+                />
+              </div>
+            )}
           </div>
         </main>
       </div>

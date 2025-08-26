@@ -6,9 +6,11 @@
  * - Score tracking and timing
  * - Game flow and completion state
  * - Feedback and validation results
+ * - Statistics tracking integration
  */
 
 import { useState, useRef } from 'react';
+import { useStatistics } from './useStatistics';
 import type { ChordProgression } from '../utils/progressionLogic';
 import type { LevelConfig } from '../../data/levelConfigs';
 
@@ -63,6 +65,11 @@ export interface LevelState {
   
   // UI refs
   inputRef: React.RefObject<HTMLInputElement>;
+  
+  // Statistics tracking
+  sessionStartTime: string | null;
+  sessionToken: string;
+  statistics: ReturnType<typeof useStatistics>;
 }
 
 export function useLevelState(config?: LevelConfig): LevelState {
@@ -99,6 +106,11 @@ export function useLevelState(config?: LevelConfig): LevelState {
   // UI refs
   const inputRef = useRef<HTMLInputElement>(null);
   
+  // Statistics integration
+  const statistics = useStatistics();
+  const [sessionStartTime, setSessionStartTime] = useState<string | null>(null);
+  const [sessionToken] = useState<string>(() => statistics.generateSessionToken());
+  
   return {
     // Game state
     hasStarted,
@@ -133,6 +145,11 @@ export function useLevelState(config?: LevelConfig): LevelState {
     // UI refs
     inputRef,
     
+    // Statistics tracking
+    sessionStartTime,
+    sessionToken,
+    statistics,
+    
     // State setters (exposed for the logic hook)
     setHasStarted,
     setIsCompleted,
@@ -149,7 +166,8 @@ export function useLevelState(config?: LevelConfig): LevelState {
     setLevelResult,
     setIsPlaying,
     setVolume,
-    setPlayCount
+    setPlayCount,
+    setSessionStartTime
   } as LevelState & {
     setHasStarted: (value: boolean) => void;
     setIsCompleted: (value: boolean) => void;
@@ -167,5 +185,6 @@ export function useLevelState(config?: LevelConfig): LevelState {
     setIsPlaying: (value: boolean) => void;
     setVolume: (value: number) => void;
     setPlayCount: (value: number) => void;
+    setSessionStartTime: (value: string | null) => void;
   };
 }

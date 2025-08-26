@@ -22,14 +22,17 @@
  */
 
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { Link } from 'react-router';
+import { useAuth } from '../../../components/auth/ProtectedRoute';
 import PianoRoll from './components/PianoRoll.jsx';
 import ScoreDisplay from './components/ScoreDisplay.jsx';
 import TaskDisplay from './components/TaskDisplay.jsx';
+import LeaderboardComponent from './components/LeaderboardComponent';
 import useChordConstruction from './hooks/useChordConstruction.js';
 import useTimer from './hooks/useTimer.js';
-import { getThemeFromLevelConfig } from './utils/themes.js';
+import { useStatistics } from './hooks/useStatistics';
+import { getThemeFromLevelConfig, type ThemeColors } from './utils/themes.js';
 import { getMidiNoteName } from "../../chord-recognition/shared/theory/core/notes.js";
 
 interface ChordGeneration {
@@ -56,6 +59,12 @@ interface Theme {
   progressBar: string;
   buttons: ButtonTheme;
   feedback: FeedbackTheme;
+  pianoRoll?: {
+    whiteKey: string;
+    blackKey: string;
+    correctNote: string;
+    incorrectNote: string;
+  };
 }
 
 interface LevelResult {
@@ -78,11 +87,35 @@ interface LevelConfig {
 
 interface UniversalChordConstructorProps {
   levelConfig: LevelConfig;
+  category?: string;
+  level?: string;
 }
 
-export default function UniversalChordConstructor({ levelConfig }: UniversalChordConstructorProps): ReactNode {
+export default function UniversalChordConstructor({ levelConfig, category, level }: UniversalChordConstructorProps): ReactNode {
   // Get theme for this level
-  const theme = getThemeFromLevelConfig(levelConfig) as Theme;
+  const themeColors = getThemeFromLevelConfig({ theme: levelConfig.theme });
+  
+  // Convert ThemeColors to Theme interface
+  const theme: Theme = {
+    background: themeColors.background,
+    primary: themeColors.primary,
+    text: themeColors.text,
+    progressBar: themeColors.progressBar,
+    buttons: {
+      primary: themeColors.buttons.primary,
+      secondary: themeColors.buttons.secondary,
+      success: themeColors.buttons.success
+    },
+    feedback: {
+      correct: themeColors.feedback.correct,
+      incorrect: themeColors.feedback.incorrect
+    }
+  };
+  
+  // Authentication and statistics
+  const authState = useAuth();
+  const user = authState.user;
+  const statistics = useStatistics();
   
   // Game logic hook
   const {
@@ -95,14 +128,24 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
     showSolution,
     score,
     levelResult,
+    sessionToken,
+    sessionStartTime,
+    bestStreak,
     startLevel,
     nextTask,
     handleNoteToggle,
     submitAnswer,
     clearAllNotes,
     resetLevel,
-    setShowSolution
-  } = useChordConstruction(levelConfig);
+    setShowSolution,
+    setStatisticsCallback
+  } = useChordConstruction({ 
+    ...levelConfig,
+    autoAdvance: {
+      correctDelay: 1500,
+      incorrectDelay: 3000
+    }
+  } as any);
   
   // Timer hook
   const {
@@ -118,6 +161,15 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
    * Handle level start
    */
   const handleStartLevel = () => {
+    // Set up statistics callback
+    if (category && level) {
+      setStatisticsCallback(async (data) => {
+        console.log('🎯 Saving chord-construction statistics:', data);
+        const result = await statistics.saveSession(data);
+        console.log('📊 Statistics save result:', result);
+      }, category, level);
+    }
+    
     startLevel();
     startTimer();
   };
@@ -134,7 +186,7 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
    * Handle answer submission
    */
   const handleSubmit = () => {
-    const result = submitAnswer(stopTimer);
+    const result = submitAnswer(stopTimer, () => avgTime, () => avgTime * (score.total + 1));
     
     // Auto-advance to next task after delay
     if (result && score.total < levelConfig.totalProblems) {
@@ -152,6 +204,8 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
     resetAllTimers();
   };
 
+  // Statistics are now saved immediately in the hook, no need for separate saveStatistics function
+  
   /**
    * Auto-start timer when task changes
    */
@@ -161,6 +215,8 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
       startTimer();
     }
   }, [currentTask]);
+  
+  // Statistics are now saved immediately when level completes in the hook
 
   // ============================================================================
   // RENDER FUNCTIONS
@@ -203,7 +259,9 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
 
         {/* Start Screen Content */}
         <main className="flex items-center justify-center min-h-[calc(100vh-80px)]">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center max-w-2xl">
+          <div className="flex gap-8 items-start max-w-7xl w-full px-6">
+            {/* Main content */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center max-w-2xl flex-1">
             <div className="text-6xl mb-6">🎹</div>
             <h2 className="text-3xl font-bold text-white mb-4">Ready to Build Chords?</h2>
             <p className="text-lg text-white/80 mb-6 leading-relaxed">
@@ -217,7 +275,7 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
                 {levelConfig.chordGeneration.chordTypes.map((chordType, index) => (
                   <span 
                     key={index}
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${theme.primary} text-white`}
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${themeColors.primary} text-white`}
                   >
                     {chordType === 'major' ? 'Major' :
                      chordType === 'minor' ? 'Minor' :
@@ -272,6 +330,21 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
               Start Building
             </button>
           </div>
+          
+          {/* Leaderboard sidebar */}
+          {user && category && level && (
+            <div className="w-80">
+              <LeaderboardComponent
+                moduleType="chord-construction"
+                category={category}
+                level={level}
+                limit={5}
+                showUserStats={true}
+                compact={true}
+              />
+            </div>
+          )}
+          </div>
         </main>
       </div>
     );
@@ -303,6 +376,21 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
               }
             </p>
             
+            {/* Personal best notification */}
+            {statistics.lastResult?.isPersonalBest && passed && (
+              <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg">
+                <div className="text-center">
+                  <div className="text-3xl mb-2">🥇</div>
+                  <h3 className="text-lg font-bold text-yellow-300 mb-1">Congratulations on your new personal best!</h3>
+                  {statistics.lastResult.previousBest && (
+                    <div className="text-sm text-yellow-200">
+                      Previous best: {statistics.lastResult.previousBest.accuracy.toFixed(1)}% • {statistics.lastResult.previousBest.time.toFixed(1)}s
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
             {/* Results */}
             {levelResult && (
               <div className="grid grid-cols-2 gap-4 mb-8">
@@ -321,6 +409,18 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
                     {avgTime.toFixed(1)}s
                   </div>
                   <div className="text-white/70">Avg Time (need ≤{levelConfig.passTime}s)</div>
+                </div>
+                <div className="bg-white/10 rounded-xl p-4">
+                  <div className="text-2xl font-bold text-blue-400">
+                    {score.correct}
+                  </div>
+                  <div className="text-white/70">Correct ({score.total} total)</div>
+                </div>
+                <div className="bg-white/10 rounded-xl p-4">
+                  <div className="text-2xl font-bold text-purple-400">
+                    {score.streak}
+                  </div>
+                  <div className="text-white/70">Best Streak</div>
                 </div>
               </div>
             )}
@@ -412,7 +512,7 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
                 currentTask={currentTask}
                 showSolution={showSolution}
                 feedback={feedback}
-                theme={theme}
+                theme={themeColors}
               />
               
               {/* Target chord information */}
@@ -509,7 +609,7 @@ export default function UniversalChordConstructor({ levelConfig }: UniversalChor
               avgTime={avgTime}
               isAnswered={isAnswered}
               totalProblems={levelConfig.totalProblems}
-              theme={theme}
+              theme={{ progressBar: theme.progressBar }}
             />
             
             {/* Instructions panel */}

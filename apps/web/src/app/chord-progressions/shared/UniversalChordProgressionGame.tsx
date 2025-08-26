@@ -18,7 +18,9 @@ import { Link } from "react-router";
 import { useLevelState } from "./hooks/useLevelState";
 import { useLevelLogic } from "./hooks/useLevelLogic";
 import ProgressionDisplay from "./components/ProgressionDisplay";
+import LeaderboardComponent from "./components/LeaderboardComponent";
 import { CompactAuthButton } from "../../../components/auth/AuthButton";
+import { useAuth } from "../../../components/auth/ProtectedRoute";
 import type { LevelConfig } from "../data/levelConfigs";
 
 interface UniversalChordProgressionGameProps {
@@ -34,6 +36,10 @@ export default function UniversalChordProgressionGame({
   
   // Game logic
   const logic = useLevelLogic(state as any, levelConfig);
+  
+  // Auth state
+  const authState = useAuth();
+  const user = authState.user;
   
   // Start screen
   if (!state.hasStarted) {
@@ -55,10 +61,10 @@ export default function UniversalChordProgressionGame({
           </div>
         </header>
         
-        <main className="max-w-6xl mx-auto p-6">
-          <div className="flex flex-col lg:flex-row gap-8 items-start justify-center min-h-[80vh]">
+        <main className="max-w-7xl mx-auto p-6">
+          <div className="flex flex-col xl:flex-row gap-6 items-start justify-center min-h-[80vh]">
             {/* Main content */}
-            <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-8 lg:w-1/2">
+            <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-8 xl:w-1/3 w-full">
               <h2 className="text-3xl font-bold text-white mb-6">Ready to Start {levelConfig.title}?</h2>
               <div className="text-lg text-white/70 mb-8 space-y-2">
                 <p><strong>{levelConfig.totalProblems} problems</strong> to complete</p>
@@ -75,7 +81,7 @@ export default function UniversalChordProgressionGame({
             </div>
 
             {/* Level-specific information */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 lg:w-1/2">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 xl:w-1/3 w-full">
               <h3 className="text-2xl font-bold text-white mb-6 text-center">What You'll Practice</h3>
               <div className="space-y-4 text-white/80">
                 
@@ -148,6 +154,20 @@ export default function UniversalChordProgressionGame({
                 )}
               </div>
             </div>
+
+            {/* Leaderboard */}
+            {user && (
+              <div className="xl:w-1/3 w-full">
+                <LeaderboardComponent
+                  moduleType="chord-progressions"
+                  category={levelConfig.category}
+                  level={levelConfig.level.toString()}
+                  limit={5}
+                  showUserStats={true}
+                  compact={true}
+                />
+              </div>
+            )}
           </div>
         </main>
       </div>
@@ -285,7 +305,7 @@ export default function UniversalChordProgressionGame({
                   onKeyPress={logic.handleKeyPress}
                   placeholder="Enter roman numerals (e.g., I - V - vi - IV)"
                   className="w-full px-4 py-3 text-lg rounded-lg border-2 border-white/30 focus:border-blue-400 focus:outline-none bg-white/10 text-white placeholder-white/50"
-                  readOnly={state.feedback && state.feedback.show}
+                  readOnly={state.feedback?.show || false}
                 />
                 
                 <button

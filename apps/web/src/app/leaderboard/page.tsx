@@ -27,11 +27,64 @@ interface FilterOptions {
   level: string;
 }
 
-const CATEGORIES = [
-  { id: 'basic-triads', name: 'Basic Triads', levels: ['1', '2', '3', '4'] },
-  { id: 'seventh-chords', name: 'Seventh Chords', levels: ['1', '2', '3', '4', '5'] },
-  { id: 'jazz-chords', name: 'Jazz Chords', levels: ['1', '2', '3', '4', '5', '6'] },
+// Module definitions based on dashboard structure
+const MODULES = [
+  { 
+    id: 'chord-recognition', 
+    name: 'Chord Recognition',
+    categories: [
+      { id: 'basic-triads', name: 'Basic Triads', levels: ['1', '2', '3', '4'] },
+      { id: 'seventh-chords', name: 'Seventh Chords', levels: ['1', '2', '3', '4', '5'] },
+      { id: 'extended-chords', name: 'Extended Chords', levels: ['1', '2', '3', '4', '5', '6'] },
+    ]
+  },
+  { 
+    id: 'chord-construction', 
+    name: 'Chord Construction',
+    categories: [
+      { id: 'basic-triads', name: 'Basic Triads', levels: ['1', '2', '3'] },
+      { id: 'seventh-chords', name: 'Seventh Chords', levels: ['1', '2', '3'] },
+      { id: 'extended-chords', name: 'Extended Chords', levels: ['1', '2', '3'] },
+    ]
+  },
+  { 
+    id: 'chord-progressions', 
+    name: 'Chord Progressions',
+    categories: [
+      { id: 'roman-numerals', name: 'Roman Numerals', levels: ['1', '2', '3', '4'] },
+    ]
+  },
+  { 
+    id: 'transcription', 
+    name: 'Chord Transcription',
+    categories: [
+      { id: 'basic-triads', name: 'Basic Triads', levels: ['1', '2', '3', '4'] },
+      { id: 'seventh-chords', name: 'Seventh Chords', levels: ['1', '2', '3', '4'] },
+      { id: 'extended-chords', name: 'Extended Chords', levels: ['1', '2', '3', '4'] },
+      { id: 'jazz-chords', name: 'Jazz Chords', levels: ['1', '2', '3', '4'] },
+    ]
+  },
+  { 
+    id: 'chord-progression-transcription', 
+    name: 'Chord Progression Transcription',
+    categories: [
+      { id: 'major-progressions', name: 'Major Progressions', levels: ['1', '2', '3', '4'] },
+    ]
+  },
+  { 
+    id: 'counterpoint', 
+    name: 'Counterpoint',
+    categories: [
+      { id: 'species', name: 'Species Counterpoint', levels: ['1', '2', '3', '4', '5'] },
+    ]
+  }
 ];
+
+// Get categories for current module
+const getCurrentModuleCategories = (moduleType: string) => {
+  const module = MODULES.find(m => m.id === moduleType);
+  return module ? module.categories : [];
+};
 
 export default function FullLeaderboardPage(): ReactNode {
   const [searchParams] = useSearchParams();
@@ -89,7 +142,26 @@ export default function FullLeaderboardPage(): ReactNode {
 
   // Update URL when filters change
   const updateFilters = (newFilters: Partial<FilterOptions>) => {
-    const updatedFilters = { ...filters, ...newFilters };
+    let updatedFilters = { ...filters, ...newFilters };
+    
+    // If module changes, reset category and level to first available options
+    if (newFilters.moduleType && newFilters.moduleType !== filters.moduleType) {
+      const moduleCategories = getCurrentModuleCategories(newFilters.moduleType);
+      if (moduleCategories.length > 0) {
+        updatedFilters.category = moduleCategories[0].id;
+        updatedFilters.level = moduleCategories[0].levels[0];
+      }
+    }
+    
+    // If category changes, reset level to first available option
+    if (newFilters.category && newFilters.category !== filters.category) {
+      const moduleCategories = getCurrentModuleCategories(updatedFilters.moduleType);
+      const selectedCategory = moduleCategories.find(c => c.id === newFilters.category);
+      if (selectedCategory && selectedCategory.levels.length > 0) {
+        updatedFilters.level = selectedCategory.levels[0];
+      }
+    }
+    
     setFilters(updatedFilters);
     
     // Reset to first page when filters change
@@ -178,7 +250,25 @@ export default function FullLeaderboardPage(): ReactNode {
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
           <h2 className="text-xl font-bold text-white mb-4">Filter Rankings</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Module Filter */}
+            <div>
+              <label className="block text-white/70 text-sm font-medium mb-2">
+                Module
+              </label>
+              <select
+                value={filters.moduleType}
+                onChange={(e) => updateFilters({ moduleType: e.target.value })}
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {MODULES.map(module => (
+                  <option key={module.id} value={module.id} className="bg-gray-800">
+                    {module.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Category Filter */}
             <div>
               <label className="block text-white/70 text-sm font-medium mb-2">
@@ -186,10 +276,10 @@ export default function FullLeaderboardPage(): ReactNode {
               </label>
               <select
                 value={filters.category}
-                onChange={(e) => updateFilters({ category: e.target.value, level: '1' })}
+                onChange={(e) => updateFilters({ category: e.target.value })}
                 className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {CATEGORIES.map(category => (
+                {getCurrentModuleCategories(filters.moduleType).map(category => (
                   <option key={category.id} value={category.id} className="bg-gray-800">
                     {category.name}
                   </option>
@@ -207,7 +297,7 @@ export default function FullLeaderboardPage(): ReactNode {
                 onChange={(e) => updateFilters({ level: e.target.value })}
                 className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {CATEGORIES.find(c => c.id === filters.category)?.levels.map(level => (
+                {getCurrentModuleCategories(filters.moduleType).find(c => c.id === filters.category)?.levels.map(level => (
                   <option key={level} value={level} className="bg-gray-800">
                     Level {level}
                   </option>
@@ -218,7 +308,7 @@ export default function FullLeaderboardPage(): ReactNode {
             {/* Quick Actions */}
             <div className="flex items-end">
               <Link
-                to={`/chord-recognition/${filters.category}/${filters.level}`}
+                to={`/${filters.moduleType}/${filters.category}/${filters.level}`}
                 className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-center"
               >
                 Play This Level
@@ -230,7 +320,7 @@ export default function FullLeaderboardPage(): ReactNode {
         {/* Current Selection Info */}
         <div className="text-center mb-6">
           <h3 className="text-2xl font-bold text-white">
-            {CATEGORIES.find(c => c.id === filters.category)?.name} - Level {filters.level}
+            {MODULES.find(m => m.id === filters.moduleType)?.name} - {getCurrentModuleCategories(filters.moduleType).find(c => c.id === filters.category)?.name} - Level {filters.level}
           </h3>
           <p className="text-white/70">
             Showing top {statistics.leaderboard.length} players
@@ -290,7 +380,7 @@ export default function FullLeaderboardPage(): ReactNode {
                 Complete this level to see where you rank among other players!
               </p>
               <Link
-                to={`/chord-recognition/${filters.category}/${filters.level}`}
+                to={`/${filters.moduleType}/${filters.category}/${filters.level}`}
                 className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
               >
                 Play Now →
@@ -393,10 +483,10 @@ export default function FullLeaderboardPage(): ReactNode {
               <div className="text-6xl mb-4">🎯</div>
               <h3 className="text-xl font-bold text-white mb-2">No Rankings Yet</h3>
               <p className="text-white/70 mb-6">
-                Be the first to complete {CATEGORIES.find(c => c.id === filters.category)?.name} Level {filters.level}!
+                Be the first to complete {getCurrentModuleCategories(filters.moduleType).find(c => c.id === filters.category)?.name} Level {filters.level}!
               </p>
               <Link
-                to={`/chord-recognition/${filters.category}/${filters.level}`}
+                to={`/${filters.moduleType}/${filters.category}/${filters.level}`}
                 className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 Start Playing →
@@ -408,7 +498,7 @@ export default function FullLeaderboardPage(): ReactNode {
         {/* Footer Actions */}
         <div className="flex justify-center mt-8">
           <Link
-            to="/chord-recognition"
+            to={`/${filters.moduleType}`}
             className="px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
           >
             ← Back to Levels
