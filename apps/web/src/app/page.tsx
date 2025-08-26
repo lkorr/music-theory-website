@@ -45,6 +45,13 @@ export default function PailiaqHomePage() {
 
   const otherLinks: Platform[] = [
     {
+      name: 'MIDI Training App',
+      icon: '🎹',
+      url: '/dashboard',
+      description: 'Interactive music theory and chord recognition training',
+      isInternal: true
+    },
+    {
       name: 'YouTube Tutorials',
       icon: '📹',
       url: 'https://youtube.com/@pailiaq',

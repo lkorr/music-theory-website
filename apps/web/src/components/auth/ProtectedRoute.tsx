@@ -52,8 +52,10 @@ export default function ProtectedRoute({
     // Subscribe to authentication state changes
     const unsubscribe = subscribeToAuth(setAuthState);
 
-    // Initial auth check if not already loaded
-    if (authState.isLoading) {
+    // Always initialize auth check when ProtectedRoute mounts
+    // This replaces the auto-initialization that was removed from auth.ts
+    const currentState = getAuthState();
+    if (currentState.isLoading || (!currentState.isAuthenticated && !currentState.user)) {
       checkAuth();
     }
 
@@ -62,34 +64,29 @@ export default function ProtectedRoute({
 
   useEffect(() => {
     // Handle authentication state changes
-    if (!authState.isLoading) {
-      if (!authState.isAuthenticated) {
-        // User is not authenticated, redirect to login
-        const currentPath = location.pathname + location.search;
-        const loginUrl = `${redirectTo}?redirect=${encodeURIComponent(currentPath)}`;
-        navigate(loginUrl, { replace: true });
-        return;
-      }
+    if (!authState.isLoading && !authState.isAuthenticated && authState.user === null) {
+      // Auth check completed and user is definitely not authenticated
+      const currentPath = location.pathname + location.search;
+      const loginUrl = `${redirectTo}?redirect=${encodeURIComponent(currentPath)}`;
+      navigate(loginUrl, { replace: true });
+      return;
+    }
 
-      // Check role-based access if roles are specified
-      if (allowedRoles && allowedRoles.length > 0) {
-        const userRole = authState.user?.role;
-        if (!userRole || !allowedRoles.includes(userRole)) {
-          // User doesn't have required role, redirect to unauthorized page
-          navigate('/unauthorized', { replace: true });
-          return;
-        }
+    // Check role-based access if user is authenticated
+    if (authState.isAuthenticated && authState.user && allowedRoles && allowedRoles.length > 0) {
+      const userRole = authState.user?.role;
+      if (!userRole || !allowedRoles.includes(userRole)) {
+        // User doesn't have required role, redirect to unauthorized page
+        navigate('/unauthorized', { replace: true });
+        return;
       }
     }
   }, [authState, navigate, location, redirectTo, allowedRoles]);
 
-  // Show loading state while checking authentication
-  if (authState.isLoading) {
-    return fallback || <AuthLoadingFallback />;
-  }
-
-  // Show loading state while redirecting
-  if (!authState.isAuthenticated) {
+  // Only block if we have definitively determined the user is not authenticated
+  // Allow content to show while auth is loading
+  if (!authState.isLoading && !authState.isAuthenticated && authState.user === null) {
+    // Auth check completed and user is definitely not authenticated
     return fallback || <AuthLoadingFallback />;
   }
 

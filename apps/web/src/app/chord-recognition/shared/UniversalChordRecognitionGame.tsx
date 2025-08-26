@@ -14,6 +14,7 @@
  */
 
 import type { ReactNode } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router";
 import { useLevelState } from "./hooks/useLevelState.js";
 import { useLevelLogic } from "./hooks/useLevelLogic.js";
@@ -22,6 +23,7 @@ import { validateAnswer } from "./theory/chordValidation.js";
 import ChordPianoDisplay from "./components/ChordPianoDisplay.jsx";
 import ScoreDisplay from "./components/ScoreDisplay.jsx";
 import MiniPianoRoll from "./components/MiniPianoRoll.jsx";
+import LeaderboardComponent from "./components/LeaderboardComponent.tsx";
 import { CHORD_EXAMPLES } from "../data/chordExamples.js";
 import { CompactAuthButton } from "../../../components/auth/AuthButton.jsx";
 
@@ -90,7 +92,8 @@ export default function UniversalChordRecognitionGame({ levelConfig }: Universal
     isCompleted,
     levelResult,
     inputRef,
-    setShowLabels
+    setShowLabels,
+    statistics
   } = state;
   
   const {
@@ -120,6 +123,9 @@ export default function UniversalChordRecognitionGame({ levelConfig }: Universal
   const categoryUrl = `/chord-recognition`; // Could be extended for category pages
   const nextLevelUrl = `/chord-recognition/${category}/${nextLevel}`;
   const prevLevelUrl = prevLevel > 0 ? `/chord-recognition/${category}/${prevLevel}` : null;
+  
+  // Note: Statistics and leaderboard loading is now handled by LeaderboardComponent
+  // to avoid duplicate requests and improve performance
   
   if (!hasStarted) {
     // Level start screen
@@ -181,27 +187,46 @@ export default function UniversalChordRecognitionGame({ levelConfig }: Universal
               </div>
             )}
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white/10 rounded-xl p-4">
-                <div className="text-2xl font-bold text-white">{levelConfig.totalProblems}</div>
-                <div className="text-white/70">Problems</div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              {/* Level requirements */}
+              <div>
+                <h4 className="text-xl font-semibold text-white mb-4">Level Requirements</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="text-2xl font-bold text-white">{levelConfig.totalProblems}</div>
+                    <div className="text-white/70">Problems</div>
+                  </div>
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="text-2xl font-bold text-white">{levelConfig.passAccuracy}%</div>
+                    <div className="text-white/70">Pass Accuracy</div>
+                  </div>
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="text-2xl font-bold text-white">{levelConfig.passTime}s</div>
+                    <div className="text-white/70">Target Time</div>
+                  </div>
+                </div>
+                
+                {/* Start Level Button */}
+                <button
+                  onClick={startLevel}
+                  className={`w-full mt-6 ${buttonColor} hover:${buttonHoverColor} text-white font-bold py-4 px-8 rounded-lg text-xl transition-colors duration-200`}
+                >
+                  Start Level
+                </button>
               </div>
-              <div className="bg-white/10 rounded-xl p-4">
-                <div className="text-2xl font-bold text-white">{levelConfig.passAccuracy}%</div>
-                <div className="text-white/70">Pass Accuracy</div>
-              </div>
-              <div className="bg-white/10 rounded-xl p-4">
-                <div className="text-2xl font-bold text-white">{levelConfig.passTime}s</div>
-                <div className="text-white/70">Target Time</div>
+              
+              {/* Leaderboard Preview */}
+              <div>
+                <LeaderboardComponent 
+                  moduleType="chord-recognition"
+                  category={category}
+                  level={level.toString()}
+                  limit={5}
+                  showUserStats={true}
+                  compact={true}
+                />
               </div>
             </div>
-            
-            <button
-              onClick={startLevel}
-              className={`${buttonColor} hover:${buttonHoverColor} text-white font-bold py-4 px-8 rounded-lg text-xl transition-colors duration-200`}
-            >
-              Start Level
-            </button>
           </div>
         </main>
       </div>
@@ -212,6 +237,8 @@ export default function UniversalChordRecognitionGame({ levelConfig }: Universal
     // Level completion screen
     const passed = levelResult.passed;
     const canAdvance = passed; // Only allow advance if passed
+    const lastResult = statistics.lastResult;
+    const isPersonalBest = lastResult && lastResult.isPersonalBest;
     
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
@@ -240,12 +267,31 @@ export default function UniversalChordRecognitionGame({ levelConfig }: Universal
         <main className="max-w-4xl mx-auto p-8">
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
             <div className={`text-6xl font-bold mb-6 ${passed ? 'text-green-400' : 'text-red-400'}`}>
-              {passed ? '🎉 Success!' : '📚 Keep Practicing'}
+              {passed ? (isPersonalBest ? '🏆 New Record!' : '🎉 Success!') : '📚 Keep Practicing'}
             </div>
             
-            <h2 className="text-3xl font-bold text-white mb-8">
-              {passed ? 'Level Complete!' : 'Level Not Passed'}
+            <h2 className="text-3xl font-bold text-white mb-4">
+              {passed ? (isPersonalBest ? 'Personal Best Achieved!' : 'Level Complete!') : 'Level Not Passed'}
             </h2>
+            
+            {/* Personal Best Notification */}
+            {isPersonalBest && passed && (
+              <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-4 mb-6">
+                <div className="text-lg font-semibold text-yellow-200 mb-2">
+                  🥇 Congratulations on your new personal best!
+                </div>
+                {lastResult.previousBest && (
+                  <div className="text-sm text-yellow-300/80">
+                    Previous best: {lastResult.previousBest.accuracy.toFixed(1)}% in {lastResult.previousBest.time.toFixed(1)}s
+                  </div>
+                )}
+                {lastResult.newRank && (
+                  <div className="text-sm text-yellow-300/80">
+                    Your new rank: #{lastResult.newRank}
+                  </div>
+                )}
+              </div>
+            )}
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <div className="bg-white/10 rounded-xl p-4">

@@ -109,8 +109,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     title: 'Basic Triads',
     description: 'Identify basic triads (Major, Minor, Diminished, Augmented) in root position only',
     
-    // Scoring criteria
-    totalProblems: 30,
+    // Scoring criteria (reduced for testing)
+    totalProblems: 5,
     passAccuracy: 90,
     passTime: 5,
     

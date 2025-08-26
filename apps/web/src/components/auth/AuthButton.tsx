@@ -7,6 +7,7 @@
 
 import { Link } from "react-router";
 import { useAuth } from "./ProtectedRoute";
+import UserSettingsDropdown from "./UserSettingsDropdown";
 
 interface AuthButtonProps {
   className?: string;
@@ -35,16 +36,9 @@ export default function AuthButton({ className = "", showRegister = false }: Aut
     );
   }
 
-  // If user is authenticated, show Dashboard button
+  // If user is authenticated, show settings dropdown
   if (authState.isAuthenticated) {
-    return (
-      <Link
-        to="/dashboard"
-        className={`px-4 py-2 bg-blue-600/80 backdrop-blur-md rounded-full text-white font-medium hover:bg-blue-600 transition-all duration-300 border border-blue-500/50 ${className}`}
-      >
-        Dashboard
-      </Link>
-    );
+    return <UserSettingsDropdown className={className} />;
   }
 
   // If user is not authenticated, show Sign In (and optionally Register)
@@ -81,14 +75,7 @@ export function CompactAuthButton({ className = "" }: CompactAuthButtonProps): R
   }
 
   if (authState.isAuthenticated) {
-    return (
-      <Link
-        to="/dashboard"
-        className={`px-3 py-2 bg-blue-600/80 backdrop-blur-md rounded-lg text-white text-sm font-medium hover:bg-blue-600 transition-all duration-300 border border-blue-500/50 ${className}`}
-      >
-        Dashboard
-      </Link>
-    );
+    return <UserSettingsDropdown className={className} compact={true} />;
   }
 
   return (

@@ -5,10 +5,9 @@
  * Users can view their profile, practice progress, and account settings.
  */
 
-import { useState } from 'react';
 import { Link } from 'react-router';
 import ProtectedRoute, { useAuth } from '../../components/auth/ProtectedRoute';
-import { logout } from '../../lib/auth.js';
+import AuthButton from '../../components/auth/AuthButton';
 
 interface TrainingArea {
   title: string;
@@ -20,18 +19,6 @@ interface TrainingArea {
 
 function DashboardContent(): React.ReactNode {
   const { user } = useAuth();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  const handleLogout = async (): Promise<void> => {
-    setIsLoggingOut(true);
-    try {
-      await logout();
-      // Navigation will be handled by auth state change
-    } catch (error) {
-      console.error('Logout error:', error);
-      setIsLoggingOut(false);
-    }
-  };
 
   const coreTrainingAreas: TrainingArea[] = [
     {
@@ -103,20 +90,7 @@ function DashboardContent(): React.ReactNode {
                 Welcome, <span className="text-white font-medium">{user?.name || user?.email}</span>
               </div>
               
-              <button
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                className="bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-300 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoggingOut ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-300/30 border-t-red-300 mr-2"></div>
-                    Signing out...
-                  </div>
-                ) : (
-                  'Sign Out'
-                )}
-              </button>
+              <AuthButton />
             </div>
           </div>
         </div>

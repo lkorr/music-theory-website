@@ -169,10 +169,20 @@ export default function ChordRecognition2Page(): React.ReactNode {
           <h2 className="text-4xl font-bold text-white mb-4">
             Learn to Recognize Chords
           </h2>
-          <p className="text-xl text-white/70 max-w-3xl mx-auto">
+          <p className="text-xl text-white/70 max-w-3xl mx-auto mb-6">
             Master chord recognition through progressive difficulty levels. 
             Listen to chords and identify them by name to develop your ear training skills.
           </p>
+          
+          {/* Quick Navigation */}
+          <div className="flex justify-center space-x-4">
+            <Link
+              to="/leaderboard"
+              className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold"
+            >
+              🏆 View Global Leaderboard
+            </Link>
+          </div>
         </div>
 
         <div className="space-y-12">

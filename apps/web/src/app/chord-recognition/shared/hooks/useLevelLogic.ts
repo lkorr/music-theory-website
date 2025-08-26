@@ -37,8 +37,9 @@ export interface FeedbackState {
 
 export interface LevelStateHelpers {
   resetForNextQuestion: () => void;
-  updateScore: (isCorrect: boolean, timeTaken: number, totalProblems: number, passAccuracy: number, passTime: number) => void;
+  updateScore: (isCorrect: boolean, timeTaken: number, totalProblems: number, passAccuracy: number, passTime: number, moduleType: string, category: string, level: string) => void;
   resetLevel: () => void;
+  startSession: () => void;
 }
 
 export interface LevelState {
@@ -62,6 +63,9 @@ export interface LevelState {
 }
 
 export interface LevelConfig {
+  id: string;
+  category: string;
+  level: number;
   totalProblems: number;
   passAccuracy: number;
   passTime: number;
@@ -130,6 +134,10 @@ export const useLevelLogic = (
    */
   const startLevel = useCallback(() => {
     setHasStarted(true);
+    
+    // Start session timer for statistics
+    helpers.startSession();
+    
     const firstChord = generateChord(currentChord);
     setCurrentChord(firstChord);
     
@@ -144,7 +152,7 @@ export const useLevelLogic = (
         inputRef.current.focus();
       }
     }, 100);
-  }, [currentChord, generateChord, setHasStarted, setCurrentChord, setStartTime, setCurrentTime, inputRef]);
+  }, [currentChord, generateChord, setHasStarted, setCurrentChord, setStartTime, setCurrentTime, inputRef, helpers]);
   
   /**
    * Move to next chord - reset state for new question
@@ -198,7 +206,10 @@ export const useLevelLogic = (
       timeTaken, 
       config.totalProblems, 
       config.passAccuracy, 
-      config.passTime
+      config.passTime,
+      'chord-recognition',
+      config.category,
+      config.level.toString()
     );
     
     setIsAnswered(true);

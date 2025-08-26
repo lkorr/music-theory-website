@@ -163,6 +163,15 @@ async function registerRoutes() {
       console.log('✅ Registered GET /auth/me');
     }
 
+    // Register auth update-profile route
+    const authUpdateProfileRoute = await import('../src/app/api/auth/update-profile/route.js');
+    if (authUpdateProfileRoute.POST) {
+      api.post('/auth/update-profile', async (c) => {
+        return await authUpdateProfileRoute.POST(c.req.raw);
+      });
+      console.log('✅ Registered POST /auth/update-profile');
+    }
+
     // Register auth logout route
     const authLogoutRoute = await import('../src/app/api/auth/logout/route.js');
     if (authLogoutRoute.POST) {
@@ -170,6 +179,44 @@ async function registerRoutes() {
         return await authLogoutRoute.POST(c.req.raw);
       });
       console.log('✅ Registered POST /auth/logout');
+    }
+
+    // Register test route
+    const testRoute = await import('../src/app/api/test/route.js');
+    if (testRoute.GET) {
+      api.get('/test', async (c) => {
+        return await testRoute.GET(c.req.raw);
+      });
+      console.log('✅ Registered GET /test');
+    }
+
+    // Register progress save route
+    const progressSaveRoute = await import('../src/app/api/progress/save/route.js');
+    if (progressSaveRoute.POST) {
+      api.post('/progress/save', async (c) => {
+        return await progressSaveRoute.POST(c.req.raw);
+      });
+      console.log('✅ Registered POST /progress/save');
+    }
+
+    // Register dynamic progress level route
+    const progressLevelRoute = await import('../src/app/api/progress/level/[moduleType]/[category]/[level]/route.js');
+    if (progressLevelRoute.GET) {
+      api.get('/progress/level/:moduleType/:category/:level', async (c) => {
+        const params = c.req.param();
+        return await progressLevelRoute.GET(c.req.raw, { params });
+      });
+      console.log('✅ Registered GET /progress/level/:moduleType/:category/:level');
+    }
+
+    // Register dynamic leaderboard level route
+    const leaderboardLevelRoute = await import('../src/app/api/leaderboards/level/[moduleType]/[category]/[level]/route.js');
+    if (leaderboardLevelRoute.GET) {
+      api.get('/leaderboards/level/:moduleType/:category/:level', async (c) => {
+        const params = c.req.param();
+        return await leaderboardLevelRoute.GET(c.req.raw, { params });
+      });
+      console.log('✅ Registered GET /leaderboards/level/:moduleType/:category/:level');
     }
 
     console.log('🎉 Route registration completed');

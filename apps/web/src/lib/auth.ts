@@ -147,19 +147,31 @@ async function verifyToken(token: string): Promise<any> {
  * 
  * @returns True if authenticated
  */
+/**
+ * Wrapper to add timeout to fetch requests
+ */
+function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number = 5000): Promise<Response> {
+  return Promise.race([
+    fetch(url, options),
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ]);
+}
+
 export async function checkAuth(): Promise<boolean> {
   try {
     updateAuthState({ isLoading: true });
     
     // Don't try to read HttpOnly cookie - instead call /api/auth/me
     // The browser will automatically send the HttpOnly cookie with the request
-    const response = await fetch('/api/auth/me', {
+    const response = await fetchWithTimeout('/api/auth/me', {
       method: 'GET',
       credentials: 'include', // Important: include cookies
       headers: {
         'X-Requested-With': 'XMLHttpRequest'
       }
-    });
+    }, 5000); // 5 second timeout
     
     if (!response.ok) {
       updateAuthState({
@@ -421,7 +433,5 @@ export function initAuth(): void {
   }
 }
 
-// Auto-initialize when module is loaded in browser
-if (typeof window !== 'undefined') {
-  initAuth();
-}
+// Note: Auto-initialization removed for performance
+// Call initAuth() manually from components that need authentication

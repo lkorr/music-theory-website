@@ -3,9 +3,11 @@
  * 
  * Consolidates all state management that's duplicated across chord recognition levels.
  * This eliminates ~100 lines of duplicated state declarations per level.
+ * Now includes integration with statistics tracking for persistent progress.
  */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { useStatistics } from './useStatistics';
 
 // Type definitions
 export interface ChordResult {
@@ -92,8 +94,12 @@ export interface StateHelpers {
     timeTaken: number,
     totalProblems: number,
     passAccuracy: number,
-    passTime: number
+    passTime: number,
+    moduleType: string,
+    category: string,
+    level: string
   ) => void;
+  startSession: () => void;
 }
 
 export interface LevelState extends GameState, ProgressState, TimingState, UIState, Refs, StateSetters {
@@ -104,6 +110,11 @@ export interface LevelState extends GameState, ProgressState, TimingState, UISta
   refs: Refs;
   setters: StateSetters;
   helpers: StateHelpers;
+  
+  // Statistics integration
+  statistics: ReturnType<typeof useStatistics>;
+  sessionStartTime: string | null;
+  sessionToken: string;
 }
 
 /**
@@ -111,6 +122,12 @@ export interface LevelState extends GameState, ProgressState, TimingState, UISta
  * @returns Object containing all state variables and their setters
  */
 export const useLevelState = (): LevelState => {
+  // Initialize statistics hook
+  const statistics = useStatistics();
+  
+  // Session tracking for statistics
+  const [sessionStartTime, setSessionStartTime] = useState<string | null>(null);
+  const [sessionToken] = useState<string>(() => statistics.generateSessionToken());
   // Core game state
   const [currentChord, setCurrentChord] = useState<ChordResult | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>('');
@@ -203,6 +220,8 @@ export const useLevelState = (): LevelState => {
       setAvgTime(0);
       setTotalTime(0);
       setShowLabels(true);
+      setSessionStartTime(null);
+      // statistics.clearLastResult();
     },
     
     /**
@@ -217,19 +236,25 @@ export const useLevelState = (): LevelState => {
     },
     
     /**
-     * Update score with new result
+     * Update score with new result and save statistics when level completes
      * @param isCorrect - Whether the answer was correct
      * @param timeTaken - Time taken in seconds
      * @param totalProblems - Total problems in the level
      * @param passAccuracy - Required accuracy to pass
      * @param passTime - Required average time to pass
+     * @param moduleType - Module type for statistics
+     * @param category - Category for statistics
+     * @param level - Level for statistics
      */
     updateScore: (
       isCorrect: boolean,
       timeTaken: number,
       totalProblems: number,
       passAccuracy: number,
-      passTime: number
+      passTime: number,
+      moduleType: string,
+      category: string,
+      level: string
     ) => {
       setScore(prev => {
         const newTotal = prev.total + 1;
@@ -249,17 +274,51 @@ export const useLevelState = (): LevelState => {
           const finalAvgTime = newTotalTime / newTotal;
           const passed = finalAccuracy >= passAccuracy && finalAvgTime <= passTime;
           
-          setLevelResult({
+          const levelResult: LevelResult = {
             passed,
             accuracy: finalAccuracy,
             avgTime: finalAvgTime,
             score: newScore
-          });
+          };
+          
+          setLevelResult(levelResult);
           setIsCompleted(true);
+          
+          // Save statistics to server when level is completed
+          if (sessionStartTime) {
+            const sessionData = {
+              moduleType,
+              category,
+              level,
+              accuracy: finalAccuracy,
+              avgTime: finalAvgTime,
+              totalTime: Math.round(newTotalTime),
+              problemsSolved: totalProblems,
+              correctAnswers: newScore.correct,
+              bestStreak: newScore.streak,
+              completed: true,
+              passed,
+              startTime: sessionStartTime,
+              endTime: new Date().toISOString(),
+              sessionToken
+            };
+            
+            // Save session asynchronously (don't block UI)
+            statistics.saveSession(sessionData).catch(error => {
+              console.error('Failed to save session statistics:', error);
+            });
+          }
         }
         
         return newScore;
       });
+    },
+    
+    /**
+     * Start a new session timer for statistics tracking
+     */
+    startSession: () => {
+      setSessionStartTime(new Date().toISOString());
     }
   };
   
@@ -284,6 +343,11 @@ export const useLevelState = (): LevelState => {
     setters,
     
     // Helper functions
-    helpers
+    helpers,
+    
+    // Statistics integration
+    statistics,
+    sessionStartTime,
+    sessionToken
   };
 };
