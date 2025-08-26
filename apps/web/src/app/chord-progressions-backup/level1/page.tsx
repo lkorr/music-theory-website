@@ -11,10 +11,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
-import { useLevelState } from "../shared/hooks/useLevelState.js";
-import { useLevelLogic } from "../shared/hooks/useLevelLogic.js";
-import { getLevelConfig } from "../shared/config/levelConfigs.js";
-import { generateLevel1Progression, validateLevel1Answer } from "./level1Utils.js";
+import { useLevelState } from "../shared/hooks/useLevelState";
+import { useLevelLogic } from "../shared/hooks/useLevelLogic";
+import { getLevelConfig } from "../shared/config/levelConfigs";
+import { generateLevel1Progression, validateLevel1Answer } from "./level1Utils";
 import ProgressionPianoRoll from "../shared/ProgressionPianoRoll";
 import { CompactAuthButton } from "../../../components/auth/AuthButton.jsx";
 

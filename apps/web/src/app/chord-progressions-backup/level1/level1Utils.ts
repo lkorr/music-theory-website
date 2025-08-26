@@ -4,8 +4,6 @@
  */
 
 import { 
-  keySignatures, 
-  commonProgressions, 
   generateProgression as generateProgressionBase,
   validateProgressionAnswer 
 } from '../shared/progressionLogic';
@@ -43,23 +41,37 @@ const LEVEL_1_KEYS: string[] = ['C', 'Am'];
  * Generate a chord progression for level 1
  * @returns Chord progression data
  */
-export const generateLevel1Progression = (): ChordProgression => {
-  // Select a random key from level 1 keys
-  const key = LEVEL_1_KEYS[Math.floor(Math.random() * LEVEL_1_KEYS.length)];
+export const generateLevel1Progression = (_?: any): ChordProgression => {
+  try {
+    // Select a random key from level 1 keys
+    const key = LEVEL_1_KEYS[Math.floor(Math.random() * LEVEL_1_KEYS.length)];
+    
+    // Generate the progression
+    const progressionData = generateProgressionBase(key);
   
-  // Generate the progression
-  const progressionData = generateProgressionBase(key);
-  
-  // Format for compatibility with existing code
-  return {
-    key,
-    chords: progressionData.chords,
-    progression: progressionData.progression,
-    answer: progressionData.answer,
-    expectedAnswer: progressionData.answer,
-    romanNumerals: progressionData.romanNumerals,
-    name: progressionData.answer // Alias for compatibility
-  };
+    // Format for compatibility with existing code
+    return {
+      key,
+      chords: progressionData.chords,
+      progression: progressionData.progression,
+      answer: progressionData.answer,
+      expectedAnswer: progressionData.answer,
+      romanNumerals: progressionData.romanNumerals,
+      name: progressionData.answer
+    };
+  } catch (error) {
+    console.error('Error generating level 1 progression:', error);
+    // Return a fallback progression
+    return {
+      key: 'C',
+      chords: [[60, 64, 67], [67, 71, 74], [69, 72, 76], [60, 64, 67]],
+      progression: [0, 4, 5, 0],
+      answer: 'I - V - vi - I',
+      expectedAnswer: 'I - V - vi - I',
+      romanNumerals: ['I', 'V', 'vi', 'I'],
+      name: 'I - V - vi - I'
+    };
+  }
 };
 
 /**

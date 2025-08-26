@@ -53,7 +53,7 @@ function DashboardContent(): React.ReactNode {
       description: 'Roman numeral analysis and harmonic progressions',
       icon: '🎼',
       link: '/chord-progressions',
-      levels: 3
+      levels: 4
     },
     {
       title: 'Counterpoint',

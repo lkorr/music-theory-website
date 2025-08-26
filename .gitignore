@@ -15,6 +15,14 @@ out/
 .env.test.local
 .env.production.local
 
+# Claude Code settings (local user preferences)
+.claude/*.local.*
+.claude/settings.local.json
+
+# React Router generated types
+.react-router/
+apps/web/.react-router/
+
 # IDE files
 .vscode/
 .idea/

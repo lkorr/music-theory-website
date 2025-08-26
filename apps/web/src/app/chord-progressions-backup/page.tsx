@@ -1,23 +1,6 @@
-/**
- * Chord Progressions 2 Hub Page - Clean Architecture Version
- * 
- * This is the main landing page for the refactored chord progressions module.
- * It maintains identical functionality and UI to the original chord-progressions 
- * but uses dynamic routing and configuration-driven level management.
- * 
- * Key Improvements:
- * - Dynamic links point to new route structure (/chord-progressions/1, /2, etc.)
- * - Configuration-driven level information from levelConfigs.ts
- * - Clean separation of concerns
- * - Maintained identical visual design
- * - Easy to add new levels (just add to config)
- */
-
 "use client";
 
 import { Link } from "react-router";
-import { getAllLevels } from "./data/levelConfigs";
-import type { LevelConfig } from "./data/levelConfigs";
 
 interface Level {
   id: string;
@@ -36,61 +19,73 @@ interface ProgressionCategory {
   levels: Level[];
 }
 
-export default function ChordProgressions2Page() {
-  // Get all levels from configuration
-  const allLevels = getAllLevels();
-  
-  // Map levels to categories (identical structure to original)
-  const progressionCategories: ProgressionCategory[] = allLevels.map((levelConfig: LevelConfig) => {
-    // Map each level config to a category
-    const categoryInfo = {
-      1: {
-        id: 'basic-progressions',
-        title: 'Basic Progressions',
-        description: 'Common 4-chord progressions in major and minor keys',
-        difficulty: 'Beginner' as const,
-        color: 'bg-green-500'
-      },
-      2: {
-        id: 'progressions-with-inversions',
-        title: 'Progressions with Inversions',
-        description: 'Chord progressions with first and second inversions',
-        difficulty: 'Intermediate' as const,
-        color: 'bg-yellow-500'
-      },
-      3: {
-        id: 'non-diatonic-progressions',
-        title: 'Non-Diatonic Chords',
-        description: 'Borrowed chords, Neapolitan, and augmented chords',
-        difficulty: 'Advanced' as const,
-        color: 'bg-purple-500'
-      },
-      4: {
-        id: 'non-diatonic-inversions',
-        title: 'Non-Diatonic with Inversions',
-        description: 'Advanced borrowed chords with inversion labeling',
-        difficulty: 'Expert' as const,
-        color: 'bg-indigo-500'
-      }
-    };
-
-    const info = categoryInfo[levelConfig.level as keyof typeof categoryInfo];
-    
-    return {
-      id: info.id,
-      title: info.title,
-      description: info.description,
-      difficulty: info.difficulty,
-      color: info.color,
+export default function ChordProgressionsPage() {
+  const progressionCategories: ProgressionCategory[] = [
+    {
+      id: 'basic-progressions',
+      title: 'Basic Progressions',
+      description: 'Common 4-chord progressions in major and minor keys',
+      difficulty: 'Beginner',
+      color: 'bg-green-500',
       available: true,
-      levels: [{
-        id: levelConfig.id,
-        title: levelConfig.title,
-        description: levelConfig.description,
-        path: `/chord-progressions/${levelConfig.level}`
-      }]
-    };
-  });
+      levels: [
+        {
+          id: 'level1',
+          title: 'Level 1: Basic Progressions',
+          description: 'Identify common 4-chord progressions in major and minor keys using roman numerals',
+          path: '/chord-progressions/level1'
+        }
+      ]
+    },
+    {
+      id: 'progressions-with-inversions',
+      title: 'Progressions with Inversions',
+      description: 'Chord progressions with first and second inversions',
+      difficulty: 'Intermediate',
+      color: 'bg-yellow-500',
+      available: true,
+      levels: [
+        {
+          id: 'level2',
+          title: 'Level 2: Progressions with Inversions',
+          description: 'Identify chord progressions with first and second inversions, including slash chord notation',
+          path: '/chord-progressions/level2'
+        }
+      ]
+    },
+    {
+      id: 'non-diatonic-progressions',
+      title: 'Non-Diatonic Chords',
+      description: 'Borrowed chords, augmented chords, and modal interchange',
+      difficulty: 'Advanced',
+      color: 'bg-purple-500',
+      available: true,
+      levels: [
+        {
+          id: 'level3',
+          title: 'Level 3: Non-Diatonic Chords',
+          description: 'Identify progressions with borrowed chords, Neapolitan, and augmented chords',
+          path: '/chord-progressions/level3'
+        }
+      ]
+    },
+    {
+      id: 'non-diatonic-inversions',
+      title: 'Non-Diatonic with Inversions',
+      description: 'Advanced borrowed chords with inversion labeling',
+      difficulty: 'Expert',
+      color: 'bg-indigo-500',
+      available: true,
+      levels: [
+        {
+          id: 'level4',
+          title: 'Level 4: Non-Diatonic Chords with Inversions',
+          description: 'Master progressions with borrowed chords and precise inversion identification',
+          path: '/chord-progressions/level4'
+        }
+      ]
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] relative">
@@ -106,7 +101,7 @@ export default function ChordProgressions2Page() {
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-white">
-              Chord Progressions Training (Clean Architecture)
+              Chord Progressions Training
             </h1>
           </div>
         </div>
@@ -127,13 +122,6 @@ export default function ChordProgressions2Page() {
             Master the art of identifying chord progressions using roman numeral analysis. 
             Learn to recognize common harmonic patterns in different keys and understand how chords move together to create musical phrases.
           </p>
-          
-          <div className="mt-4 bg-blue-600/20 border border-blue-500/50 rounded-xl p-4 max-w-2xl mx-auto">
-            <p className="text-blue-300 text-sm">
-              <strong>Clean Architecture:</strong> This is the refactored version using modern React patterns. 
-              Same functionality, 75% less technical debt!
-            </p>
-          </div>
         </div>
 
         {/* Categories Grid - Now 4 categories */}
@@ -204,7 +192,7 @@ export default function ChordProgressions2Page() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl font-bold">5</span>
+                <span className="text-white text-2xl font-bold">4</span>
               </div>
               <h4 className="text-xl font-semibold text-white mb-2">Secondary Dominants</h4>
               <p className="text-white/60 text-sm">
@@ -214,7 +202,7 @@ export default function ChordProgressions2Page() {
             
             <div className="text-center">
               <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl font-bold">6</span>
+                <span className="text-white text-2xl font-bold">5</span>
               </div>
               <h4 className="text-xl font-semibold text-white mb-2">Jazz Progressions</h4>
               <p className="text-white/60 text-sm">
@@ -224,7 +212,7 @@ export default function ChordProgressions2Page() {
             
             <div className="text-center">
               <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl font-bold">7</span>
+                <span className="text-white text-2xl font-bold">6</span>
               </div>
               <h4 className="text-xl font-semibold text-white mb-2">Modulations</h4>
               <p className="text-white/60 text-sm">

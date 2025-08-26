@@ -39,16 +39,24 @@ type Pages = {
   "/chord-progressions": {
     params: {};
   };
-  "/chord-progressions/level1": {
+  "/chord-progressions/:level": {
+    params: {
+      "level": string;
+    };
+  };
+  "/chord-progressions-backup": {
     params: {};
   };
-  "/chord-progressions/level2": {
+  "/chord-progressions-backup/level1": {
     params: {};
   };
-  "/chord-progressions/level3": {
+  "/chord-progressions-backup/level2": {
     params: {};
   };
-  "/chord-progressions/level4": {
+  "/chord-progressions-backup/level3": {
+    params: {};
+  };
+  "/chord-progressions-backup/level4": {
     params: {};
   };
   "/chord-recognition": {
@@ -108,7 +116,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/register" | "/chord-construction" | "/chord-construction/:category/:level" | "/chord-progression-transcription" | "/chord-progression-transcription/:level" | "/chord-progressions" | "/chord-progressions/level1" | "/chord-progressions/level2" | "/chord-progressions/level3" | "/chord-progressions/level4" | "/chord-recognition" | "/chord-recognition/:category/:level" | "/counterpoint" | "/counterpoint/exercise" | "/counterpoint/:species/:voices/:level" | "/counterpoint/:species/:voices/:level/practice" | "/dashboard" | "/midi-training" | "/transcription" | "/transcription/:category/:level" | "/unauthorized" | "/*";
+    page: "/" | "/auth/login" | "/auth/register" | "/chord-construction" | "/chord-construction/:category/:level" | "/chord-progression-transcription" | "/chord-progression-transcription/:level" | "/chord-progressions" | "/chord-progressions/:level" | "/chord-progressions-backup" | "/chord-progressions-backup/level1" | "/chord-progressions-backup/level2" | "/chord-progressions-backup/level3" | "/chord-progressions-backup/level4" | "/chord-recognition" | "/chord-recognition/:category/:level" | "/counterpoint" | "/counterpoint/exercise" | "/counterpoint/:species/:voices/:level" | "/counterpoint/:species/:voices/:level/practice" | "/dashboard" | "/midi-training" | "/transcription" | "/transcription/:category/:level" | "/unauthorized" | "/*";
   };
   "./page.tsx": {
     id: "page";
@@ -142,21 +150,29 @@ type RouteFiles = {
     id: "chord-progressions/page";
     page: "/chord-progressions";
   };
-  "./chord-progressions/level1/page.tsx": {
-    id: "chord-progressions/level1/page";
-    page: "/chord-progressions/level1";
+  "./chord-progressions/[level]/page.tsx": {
+    id: "chord-progressions/[level]/page";
+    page: "/chord-progressions/:level";
   };
-  "./chord-progressions/level2/page.tsx": {
-    id: "chord-progressions/level2/page";
-    page: "/chord-progressions/level2";
+  "./chord-progressions-backup/page.tsx": {
+    id: "chord-progressions-backup/page";
+    page: "/chord-progressions-backup";
   };
-  "./chord-progressions/level3/page.tsx": {
-    id: "chord-progressions/level3/page";
-    page: "/chord-progressions/level3";
+  "./chord-progressions-backup/level1/page.tsx": {
+    id: "chord-progressions-backup/level1/page";
+    page: "/chord-progressions-backup/level1";
   };
-  "./chord-progressions/level4/page.tsx": {
-    id: "chord-progressions/level4/page";
-    page: "/chord-progressions/level4";
+  "./chord-progressions-backup/level2/page.tsx": {
+    id: "chord-progressions-backup/level2/page";
+    page: "/chord-progressions-backup/level2";
+  };
+  "./chord-progressions-backup/level3/page.tsx": {
+    id: "chord-progressions-backup/level3/page";
+    page: "/chord-progressions-backup/level3";
+  };
+  "./chord-progressions-backup/level4/page.tsx": {
+    id: "chord-progressions-backup/level4/page";
+    page: "/chord-progressions-backup/level4";
   };
   "./chord-recognition/page.tsx": {
     id: "chord-recognition/page";

@@ -1,378 +1,280 @@
 /**
- * Shared Level Logic Hook
+ * Level Logic Hook for Chord Progressions 2
  * 
- * Consolidates all event handlers and game flow logic that's duplicated across levels.
- * This eliminates ~180 lines of duplicated handler functions per level.
+ * Contains all game logic for chord progression levels:
+ * - Progression generation and validation
+ * - Score calculation and timing
+ * - Level completion assessment
+ * - Input handling and auto-advance
  */
 
-import { useCallback, useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
+import { generateProgression, validateProgressionAnswer, playChordProgression } from '../utils/progressionLogic';
+import type { LevelConfig } from '../../data/levelConfigs';
+import type { LevelState, Score, LevelResult, Feedback } from './useLevelState';
 
-// ============================================================================
-// TYPE DEFINITIONS
-// ============================================================================
-
-interface TimerRef {
-  current: NodeJS.Timeout | null;
-}
-
-interface ChordData {
-  chords?: any[];
-  expectedAnswer?: string;
-  answer?: string;
-  name?: string;
-}
-
-interface Feedback {
-  show: boolean;
-  isCorrect: boolean;
-  correctAnswer: string;
-  expectedAnswer: string;
-  userAnswer: string;
-  timeTaken: number;
-}
-
-interface Score {
-  correct: number;
-  total: number;
-  streak: number;
-}
-
-interface Helpers {
-  resetForNextQuestion: () => void;
-  updateScore: (
-    isCorrect: boolean, 
-    timeTaken: number, 
-    totalProblems: number, 
-    passAccuracy: number, 
-    passTime: number
-  ) => void;
-  resetLevel: () => void;
-}
-
-interface AutoAdvanceConfig {
-  correctDelay: number;
-  incorrectDelay: number;
-}
-
-interface LevelState {
-  currentChord: ChordData | null;
-  feedback: Feedback | null;
-  score: Score;
-  startTime: number | null;
-  isAnswered: boolean;
-  userAnswer: string;
-  totalTime: number;
-  inputRef: React.RefObject<HTMLInputElement>;
-  timerRef: TimerRef;
-  setCurrentChord: (chord: ChordData | null) => void;
-  setUserAnswer: (answer: string) => void;
-  setFeedback: (feedback: Feedback | null) => void;
-  setIsAnswered: (isAnswered: boolean) => void;
-  setHasStarted: (hasStarted: boolean) => void;
-  setStartTime: (startTime: number | null) => void;
-  setCurrentTime: (currentTime: number) => void;
-  helpers: Helpers;
-}
-
-interface LevelConfig {
-  totalProblems: number;
-  passAccuracy: number;
-  passTime: number;
-  autoAdvance: AutoAdvanceConfig;
-}
-
-interface Dependencies {
-  generateChord: (currentChord: ChordData | null) => ChordData;
-  validateAnswer: (userAnswer: string, correctAnswer: string) => boolean;
-}
-
-interface LevelLogicReturn {
-  // Core game flow handlers
+export interface LevelLogic {
+  // Core actions
   startLevel: () => void;
-  nextChord: () => void;
-  handleSubmit: () => void;
-  handleKeyPress: (e: React.KeyboardEvent) => void;
+  generateNewProgression: () => void;
+  submitAnswer: () => void;
+  nextProgression: () => void;
+  
+  // Input handling
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  restartLevel: () => void;
+  handleKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   
-  // State checks
+  // Audio control
+  playProgression: () => Promise<void>;
+  handleVolumeChange: (volume: number) => void;
+  
+  // Computed properties
   canSubmit: boolean;
-  
-  // Utility functions
-  focusInput: () => void;
+  progress: number;
+  timeRemaining: number;
 }
 
-// ============================================================================
-// TIMER HOOK
-// ============================================================================
-
-/**
- * Inline timer hook for tracking elapsed time during level play
- */
-const useTimer = (
-  startTime: number | null, 
-  isAnswered: boolean, 
-  setCurrentTime: (time: number) => void, 
-  timerRef: TimerRef
-): void => {
-  useEffect(() => {
-    if (startTime && !isAnswered) {
-      timerRef.current = setInterval(() => {
-        setCurrentTime((Date.now() - startTime) / 1000);
-      }, 100);
-    } else {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    }
-    
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [startTime, isAnswered, setCurrentTime, timerRef]);
-};
-
-// ============================================================================
-// MAIN HOOK
-// ============================================================================
-
-/**
- * Custom hook that provides all game logic for a chord recognition level
- * @param state - Level state from useLevelState hook
- * @param config - Level configuration object
- * @param dependencies - Level-specific functions
- * @returns Object containing all event handlers and logic functions
- */
-export const useLevelLogic = (
-  state: LevelState, 
-  config: LevelConfig, 
-  dependencies: Dependencies
-): LevelLogicReturn => {
-  const { generateChord, validateAnswer } = dependencies;
+export function useLevelLogic(
+  state: LevelState & {
+    setHasStarted: (value: boolean) => void;
+    setIsCompleted: (value: boolean) => void;
+    setCurrentProgression: (value: any) => void;
+    setUserAnswer: (value: string) => void;
+    setScore: (value: Score) => void;
+    setCurrentProblemIndex: (value: number) => void;
+    setStartTime: (value: number | null) => void;
+    setCurrentTime: (value: number) => void;
+    setAvgTime: (value: number) => void;
+    setProblemTimes: (value: number[]) => void;
+    setFeedback: (value: Feedback | null) => void;
+    setLevelResult: (value: LevelResult | null) => void;
+    setIsPlaying: (value: boolean) => void;
+    setVolume: (value: number) => void;
+    setPlayCount: (value: number) => void;
+  },
+  config: LevelConfig
+): LevelLogic {
   
-  // Destructure state for easier access
-  const {
-    currentChord,
-    feedback,
-    score,
-    startTime,
-    isAnswered,
-    userAnswer,
-    totalTime,
-    inputRef,
-    timerRef,
-    setCurrentChord,
-    setUserAnswer,
-    setFeedback,
-    setIsAnswered,
-    setHasStarted,
-    setStartTime,
-    setCurrentTime,
-    helpers
-  } = state;
+  // Computed properties (moved up to avoid circular dependencies)
+  const canSubmit = Boolean(
+    state.currentProgression && 
+    state.userAnswer.trim() && 
+    !state.feedback?.show &&
+    !state.isPlaying
+  );
   
-  // Initialize timer using existing hook
-  useTimer(startTime, isAnswered, setCurrentTime, timerRef);
+  const progress = config.totalProblems > 0 
+    ? Math.min((state.score.total / config.totalProblems) * 100, 100)
+    : 0;
+  
+  const timeRemaining = Math.max(0, config.passTime - state.currentTime);
   
   /**
-   * Start the level - initialize first chord and timer
+   * Complete the level and calculate final results
+   */
+  const completeLevel = useCallback(() => {
+    const accuracy = state.score.total > 0 ? (state.score.correct / state.score.total) * 100 : 0;
+    const passed = accuracy >= config.passAccuracy && state.avgTime <= config.passTime;
+    
+    const result: LevelResult = {
+      passed,
+      accuracy,
+      avgTime: state.avgTime,
+      score: state.score
+    };
+    
+    state.setLevelResult(result);
+    state.setIsCompleted(true);
+  }, [state.score, state.avgTime, config.passAccuracy, config.passTime]);
+  
+  /**
+   * Generate a new chord progression
+   */
+  const generateNewProgression = useCallback(() => {
+    try {
+      const progression = generateProgression(config.progressionGeneration);
+      state.setCurrentProgression(progression);
+      state.setUserAnswer('');
+      state.setFeedback(null);
+      state.setStartTime(Date.now());
+      state.setCurrentTime(0);
+      state.setPlayCount(0);
+      
+      // Focus input after a short delay
+      setTimeout(() => {
+        state.inputRef.current?.focus();
+      }, 100);
+      
+    } catch (error) {
+      console.error('Failed to generate progression:', error);
+    }
+  }, [config.progressionGeneration]);
+  
+  /**
+   * Move to the next progression
+   */
+  const nextProgression = useCallback(() => {
+    if (state.score.total < config.totalProblems) {
+      generateNewProgression();
+    } else {
+      completeLevel();
+    }
+  }, [state.score.total, config.totalProblems, generateNewProgression, completeLevel]);
+  
+  /**
+   * Start the level
    */
   const startLevel = useCallback(() => {
-    try {
-      setHasStarted(true);
-      const firstChord = generateChord(currentChord);
-      
-      // Ensure the chord was generated successfully
-      if (!firstChord || !firstChord.chords || firstChord.chords.length === 0) {
-        console.error('Failed to generate initial chord progression:', firstChord);
-        // Try generating again
-        const retryChord = generateChord(null);
-        if (retryChord && retryChord.chords && retryChord.chords.length > 0) {
-          setCurrentChord(retryChord);
-        } else {
-          console.error('Failed to generate chord progression after retry');
-          // Generate a fallback error message for the user
-          alert('Failed to generate chord progression. Please refresh the page.');
-          return;
-        }
-      } else {
-        setCurrentChord(firstChord);
-      }
-      
-      // Start timer for first problem
-      const now = Date.now();
-      setStartTime(now);
-      setCurrentTime(0);
-      
-      // Focus the input after a brief delay
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, 100);
-    } catch (error) {
-      console.error('Error starting level:', error);
-      alert('An error occurred while starting the level. Please refresh the page.');
-    }
-  }, [currentChord, generateChord, setHasStarted, setCurrentChord, setStartTime, setCurrentTime, inputRef]);
+    state.setHasStarted(true);
+    state.setStartTime(Date.now());
+    generateNewProgression();
+  }, [generateNewProgression]);
   
   /**
-   * Move to next chord - reset state for new question
+   * Submit the current answer
    */
-  const nextChord = useCallback(() => {
-    try {
-      const newChord = generateChord(currentChord);
-      
-      // Ensure the chord was generated successfully
-      if (!newChord || !newChord.chords || newChord.chords.length === 0) {
-        console.error('Failed to generate next chord progression:', newChord);
-        // Try generating again
-        const retryChord = generateChord(null);
-        if (retryChord && retryChord.chords && retryChord.chords.length > 0) {
-          setCurrentChord(retryChord);
-        } else {
-          console.error('Failed to generate chord progression after retry');
-          alert('Failed to generate next chord progression. Please refresh the page.');
-          return;
-        }
-      } else {
-        setCurrentChord(newChord);
-      }
-      
-      // Reset question-specific state
-      helpers.resetForNextQuestion();
-      
-      // Start timer for new problem
-      const now = Date.now();
-      setStartTime(now);
-      setCurrentTime(0);
-      
-      // Focus the input after a brief delay to ensure DOM is updated
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, 50);
-    } catch (error) {
-      console.error('Error generating next chord:', error);
-      alert('An error occurred while generating the next chord. Please refresh the page.');
+  const submitAnswer = useCallback(() => {
+    if (!state.currentProgression || !state.userAnswer.trim() || state.feedback?.show) {
+      return;
     }
-  }, [currentChord, generateChord, setCurrentChord, helpers, setStartTime, setCurrentTime, inputRef]);
-  
-  /**
-   * Handle answer submission - validate, score, and advance
-   */
-  const handleSubmit = useCallback(() => {
-    if (!currentChord || !userAnswer.trim() || !startTime) return;
     
-    // Calculate time taken for this problem
-    const endTime = Date.now();
-    const timeTaken = (endTime - startTime) / 1000; // Convert to seconds
-    
-    // Validate the answer using level-specific validator
-    const isCorrect = validateAnswer(userAnswer, currentChord.expectedAnswer || currentChord.answer || currentChord.name || '');
-    
-    // Set feedback for display
-    const correctAnswer = currentChord.expectedAnswer || currentChord.answer || currentChord.name || '';
-    setFeedback({
-      show: true,
-      isCorrect,
-      correctAnswer,
-      expectedAnswer: correctAnswer, // Add expectedAnswer property for page template
-      userAnswer: userAnswer.trim(),
-      timeTaken: timeTaken
-    });
-    
-    // Update score and check completion
-    helpers.updateScore(
-      isCorrect, 
-      timeTaken, 
-      config.totalProblems, 
-      config.passAccuracy, 
-      config.passTime
+    const isCorrect = validateProgressionAnswer(
+      state.userAnswer.trim(),
+      state.currentProgression.expectedAnswer
     );
     
-    setIsAnswered(true);
+    // Record timing
+    const problemTime = state.currentTime;
+    const newProblemTimes = [...state.problemTimes, problemTime];
+    state.setProblemTimes(newProblemTimes);
     
-    // Auto-advance only for correct answers
-    if (isCorrect) {
-      setTimeout(() => {
-        if (score.total + 1 < config.totalProblems) {
-          nextChord();
-        }
-      }, config.autoAdvance.correctDelay);
-    }
-    // For incorrect answers, wait for manual continuation
-  }, [
-    currentChord, 
-    userAnswer, 
-    startTime, 
-    validateAnswer, 
-    setFeedback, 
-    helpers, 
-    config.totalProblems, 
-    config.passAccuracy, 
-    config.passTime,
-    config.autoAdvance,
-    setIsAnswered, 
-    score.total, 
-    nextChord
-  ]);
-  
-  /**
-   * Handle keyboard input (Enter to submit or continue)
-   */
-  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      if (!isAnswered) {
-        // Submit answer if not answered yet
-        handleSubmit();
-      } else if (feedback && feedback.show && !feedback.isCorrect && score.total < config.totalProblems) {
-        // Continue to next question if wrong answer
-        nextChord();
-      }
-    }
-  }, [isAnswered, handleSubmit, feedback, score.total, config.totalProblems, nextChord]);
+    // Update score
+    const newScore: Score = {
+      correct: state.score.correct + (isCorrect ? 1 : 0),
+      total: state.score.total + 1
+    };
+    state.setScore(newScore);
+    state.setCurrentProblemIndex(newScore.total);
+    
+    // Calculate average time
+    const newAvgTime = newProblemTimes.reduce((sum, time) => sum + time, 0) / newProblemTimes.length;
+    state.setAvgTime(newAvgTime);
+    
+    // Show feedback
+    const feedback: Feedback = {
+      show: true,
+      isCorrect,
+      expectedAnswer: isCorrect ? undefined : state.currentProgression.expectedAnswer
+    };
+    state.setFeedback(feedback);
+    
+  }, [state.currentProgression, state.userAnswer, state.currentTime, state.problemTimes, state.score]);
   
   /**
    * Handle input change
    */
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserAnswer(e.target.value);
-  }, [setUserAnswer]);
+    state.setUserAnswer(e.target.value);
+  }, []);
   
   /**
-   * Restart the current level
+   * Handle key press (Enter to submit)
    */
-  const restartLevel = useCallback(() => {
-    helpers.resetLevel();
-    startLevel();
-  }, [helpers, startLevel]);
+  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && canSubmit) {
+      submitAnswer();
+    }
+  }, [canSubmit, submitAnswer]);
   
   /**
-   * Check if user can submit (has answer and not already answered)
+   * Play the current progression
    */
-  const canSubmit = Boolean(userAnswer.trim() && !isAnswered && currentChord);
+  const playProgression = useCallback(async (): Promise<void> => {
+    if (!state.currentProgression || state.isPlaying) return;
+    
+    state.setIsPlaying(true);
+    state.setPlayCount(prev => prev + 1);
+    
+    try {
+      await playChordProgression(
+        state.currentProgression.chords,
+        config.audioConfig.tempo,
+        config.audioConfig.chordDuration
+      );
+    } catch (error) {
+      console.error('Error playing progression:', error);
+    } finally {
+      state.setIsPlaying(false);
+    }
+  }, [state.currentProgression, state.isPlaying, config.audioConfig]);
+  
+  /**
+   * Handle volume change
+   */
+  const handleVolumeChange = useCallback((volume: number) => {
+    state.setVolume(volume);
+  }, []);
+  
+  // Timer effect for tracking problem time
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (state.hasStarted && !state.isCompleted && state.startTime && !state.feedback?.show) {
+      interval = setInterval(() => {
+        const newTime = (Date.now() - state.startTime!) / 1000;
+        state.setCurrentTime(newTime);
+      }, 100);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [state.hasStarted, state.isCompleted, state.startTime, state.feedback?.show]);
+  
+  // Auto-play progression when new one is generated
+  useEffect(() => {
+    if (state.currentProgression && state.playCount === 0 && state.hasStarted) {
+      playProgression();
+    }
+  }, [state.currentProgression, state.playCount, state.hasStarted, playProgression]);
+  
+  // Auto-advance after feedback is shown
+  useEffect(() => {
+    if (state.feedback?.show) {
+      const delay = state.feedback.isCorrect 
+        ? config.autoAdvance.correctDelay 
+        : config.autoAdvance.incorrectDelay;
+      
+      const timer = setTimeout(() => {
+        if (state.score.total < config.totalProblems) {
+          nextProgression();
+        } else {
+          completeLevel();
+        }
+      }, delay);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [state.feedback, config.autoAdvance, config.totalProblems, state.score.total, nextProgression, completeLevel]);
   
   return {
-    // Core game flow handlers
+    // Core actions
     startLevel,
-    nextChord,
-    handleSubmit,
-    handleKeyPress,
+    generateNewProgression,
+    submitAnswer,
+    nextProgression,
+    
+    // Input handling
     handleInputChange,
-    restartLevel,
+    handleKeyPress,
     
-    // State checks
+    // Audio control
+    playProgression,
+    handleVolumeChange,
+    
+    // Computed properties
     canSubmit,
-    
-    // Utility functions
-    focusInput: () => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }
+    progress,
+    timeRemaining
   };
-};
+}
