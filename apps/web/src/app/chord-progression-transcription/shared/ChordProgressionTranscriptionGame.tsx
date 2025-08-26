@@ -594,6 +594,7 @@ export function ChordProgressionTranscriptionGame({ levelConfig }: GameProps): J
       setPlacedNotes([]);
       setFeedback(null);
       setShowSolution(false);
+      
     } catch (error) {
       console.error('Error generating progression:', error);
       console.error('Error details:', (error as Error).message, (error as Error).stack);
@@ -622,6 +623,17 @@ export function ChordProgressionTranscriptionGame({ levelConfig }: GameProps): J
   useEffect(() => {
     audioManager.setVolume(volume);
   }, [volume]);
+
+  // Auto-play when new progression is generated
+  useEffect(() => {
+    if (currentProgression && !isPlaying) {
+      const timer = setTimeout(() => {
+        handlePlayProgression();
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentProgression?.key, currentProgression?.chords?.length]);
 
   // Toggle note on piano roll
   const handleNoteToggle = async (midiNote: number, beat: number) => {

@@ -55,13 +55,6 @@ export default function PailiaqHomePage() {
       icon: '💜',
       url: 'https://patreon.com/pailiaq',
       description: 'Support my work & get exclusive content'
-    },
-    {
-      name: 'MIDI Training',
-      icon: '🎹',
-      url: '/midi-training',
-      description: 'Interactive music theory training tools',
-      isInternal: true
     }
   ];
 

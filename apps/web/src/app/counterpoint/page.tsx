@@ -240,15 +240,6 @@ export default function CounterpointPage(): JSX.Element {
             </div>
           </div>
 
-          {/* Quick Access to Exercise Mode */}
-          <div className="mt-8">
-            <Link
-              to="/counterpoint/exercise"
-              className="inline-block bg-white/20 hover:bg-white/30 border border-white/30 rounded-xl px-8 py-4 text-white font-semibold transition-all duration-300 transform hover:scale-105"
-            >
-              Continue Current Exercise →
-            </Link>
-          </div>
         </div>
       </main>
     </div>

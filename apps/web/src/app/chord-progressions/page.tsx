@@ -106,7 +106,7 @@ export default function ChordProgressions2Page() {
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-white">
-              Chord Progressions Training (Clean Architecture)
+              Chord Progressions Training
             </h1>
           </div>
         </div>
@@ -127,13 +127,6 @@ export default function ChordProgressions2Page() {
             Master the art of identifying chord progressions using roman numeral analysis. 
             Learn to recognize common harmonic patterns in different keys and understand how chords move together to create musical phrases.
           </p>
-          
-          <div className="mt-4 bg-blue-600/20 border border-blue-500/50 rounded-xl p-4 max-w-2xl mx-auto">
-            <p className="text-blue-300 text-sm">
-              <strong>Clean Architecture:</strong> This is the refactored version using modern React patterns. 
-              Same functionality, 75% less technical debt!
-            </p>
-          </div>
         </div>
 
         {/* Categories Grid - Now 4 categories */}
@@ -187,51 +180,6 @@ export default function ChordProgressions2Page() {
               </div>
             </Link>
           ))}
-        </div>
-
-        {/* Coming Soon Section */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-12 border border-white/10">
-          <div className="text-center mb-8">
-            <h3 className="text-3xl font-bold text-white mb-4">
-              More Levels Coming Soon
-            </h3>
-            <p className="text-white/70 text-lg max-w-2xl mx-auto leading-relaxed">
-              Future levels will include secondary dominants, modulations, jazz harmony, 
-              and even more complex harmonic analysis techniques.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl font-bold">5</span>
-              </div>
-              <h4 className="text-xl font-semibold text-white mb-2">Secondary Dominants</h4>
-              <p className="text-white/60 text-sm">
-                Learn V/V, V/vi progressions and temporary tonicization
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl font-bold">6</span>
-              </div>
-              <h4 className="text-xl font-semibold text-white mb-2">Jazz Progressions</h4>
-              <p className="text-white/60 text-sm">
-                Master ii-V-I progressions and circle of fifths movements
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl font-bold">7</span>
-              </div>
-              <h4 className="text-xl font-semibold text-white mb-2">Modulations</h4>
-              <p className="text-white/60 text-sm">
-                Identify key changes, pivot chords, and modulation techniques
-              </p>
-            </div>
-          </div>
         </div>
 
         {/* Instructions Section */}

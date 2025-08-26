@@ -1,7 +1,6 @@
 "use client";
 
 import { Link } from "react-router";
-import { CompactAuthButton } from "../../components/auth/AuthButton";
 
 interface Level {
   id: string;
@@ -155,14 +154,13 @@ export default function ChordRecognition2Page(): React.ReactNode {
       <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4 ml-16">
-            <Link to="/midi-training" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+            <Link to="/dashboard" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-white">
-              Chord Recognition Training (New Architecture)
+              Chord Recognition Training
             </h1>
           </div>
-          <CompactAuthButton />
         </div>
       </header>
 
@@ -175,12 +173,6 @@ export default function ChordRecognition2Page(): React.ReactNode {
             Master chord recognition through progressive difficulty levels. 
             Listen to chords and identify them by name to develop your ear training skills.
           </p>
-          <div className="mt-4 bg-blue-600/20 border border-blue-500/50 rounded-xl p-4 max-w-2xl mx-auto">
-            <p className="text-blue-300 text-sm">
-              <strong>New Architecture:</strong> This is the refactored version using clean architecture patterns. 
-              Same functionality, 95% less technical debt!
-            </p>
-          </div>
         </div>
 
         <div className="space-y-12">
@@ -256,40 +248,36 @@ export default function ChordRecognition2Page(): React.ReactNode {
           ))}
         </div>
 
-        {/* Comparison Section */}
-        <div className="mt-16 bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-          <h3 className="text-2xl font-bold text-white mb-6 text-center">Architecture Comparison</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-red-600/20 border border-red-500/50 rounded-xl p-6">
-              <h4 className="text-lg font-bold text-red-300 mb-3">Old Architecture</h4>
-              <ul className="text-white/70 space-y-2 text-sm">
-                <li>• 15+ individual level pages</li>
-                <li>• 15+ levelUtils.js files</li>
-                <li>• Massive code duplication</li>
-                <li>• Hard to maintain consistency</li>
-                <li>• Adding new levels = new folders + files</li>
-                <li>• Scattered configuration</li>
-              </ul>
+        {/* How it works section */}
+        <div className="text-center mt-16">
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 max-w-4xl mx-auto">
+            <h3 className="text-xl font-semibold text-white mb-4">How Chord Recognition Works</h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm text-white/80">
+              <div className="text-center">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-white font-bold">1</span>
+                </div>
+                <p>Listen to the played chord</p>
+              </div>
+              <div className="text-center">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-white font-bold">2</span>
+                </div>
+                <p>Type the chord name and quality</p>
+              </div>
+              <div className="text-center">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-white font-bold">3</span>
+                </div>
+                <p>Submit your answer for validation</p>
+              </div>
+              <div className="text-center">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-white font-bold">4</span>
+                </div>
+                <p>Get instant feedback and learn</p>
+              </div>
             </div>
-            <div className="bg-green-600/20 border border-green-500/50 rounded-xl p-6">
-              <h4 className="text-lg font-bold text-green-300 mb-3">New Architecture</h4>
-              <ul className="text-white/70 space-y-2 text-sm">
-                <li>• 1 dynamic route handler</li>
-                <li>• 1 universal component</li>
-                <li>• Configuration-driven behavior</li>
-                <li>• Consistent across all levels</li>
-                <li>• Adding new levels = config entry only</li>
-                <li>• Centralized configuration</li>
-              </ul>
-            </div>
-          </div>
-          <div className="text-center mt-6">
-            <Link
-              to="/chord-recognition"
-              className="bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
-            >
-              Compare with Original Version
-            </Link>
           </div>
         </div>
       </main>

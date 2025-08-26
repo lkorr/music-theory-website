@@ -64,10 +64,10 @@ function LevelNotFoundError({ category, level }: ErrorComponentProps): JSX.Eleme
             Back to Chord Recognition Hub
           </Link>
           <Link
-            to="/midi-training"
+            to="/dashboard"
             className="block w-full bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
           >
-            Back to MIDI Training
+            Back to Dashboard
           </Link>
         </div>
         

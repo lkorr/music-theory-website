@@ -209,40 +209,6 @@ function DashboardContent(): React.ReactNode {
             </div>
           </div>
         </div>
-
-        {/* Quick Actions */}
-        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">Quick Start</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
-              to="/chord-recognition/basic-triads/recognition/level1"
-              className="bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg p-4 text-center transition-colors group"
-            >
-              <div className="text-2xl mb-2">🎵</div>
-              <h3 className="text-white font-medium mb-1">Beginner Practice</h3>
-              <p className="text-white/60 text-sm">Start with basic triads</p>
-            </Link>
-            
-            <Link
-              to="/counterpoint"
-              className="bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-lg p-4 text-center transition-colors group"
-            >
-              <div className="text-2xl mb-2">🎹</div>
-              <h3 className="text-white font-medium mb-1">Composition</h3>
-              <p className="text-white/60 text-sm">Try counterpoint exercises</p>
-            </Link>
-            
-            <Link
-              to="/midi-training"
-              className="bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-lg p-4 text-center transition-colors group"
-            >
-              <div className="text-2xl mb-2">🎛️</div>
-              <h3 className="text-white font-medium mb-1">MIDI Training</h3>
-              <p className="text-white/60 text-sm">General exercises</p>
-            </Link>
-          </div>
-        </div>
       </main>
     </div>
   );

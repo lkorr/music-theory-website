@@ -71,9 +71,6 @@ type Pages = {
   "/counterpoint": {
     params: {};
   };
-  "/counterpoint/exercise": {
-    params: {};
-  };
   "/counterpoint/:species/:voices/:level": {
     params: {
       "species": string;
@@ -89,9 +86,6 @@ type Pages = {
     };
   };
   "/dashboard": {
-    params: {};
-  };
-  "/midi-training": {
     params: {};
   };
   "/transcription": {
@@ -116,7 +110,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/register" | "/chord-construction" | "/chord-construction/:category/:level" | "/chord-progression-transcription" | "/chord-progression-transcription/:level" | "/chord-progressions" | "/chord-progressions/:level" | "/chord-progressions-backup" | "/chord-progressions-backup/level1" | "/chord-progressions-backup/level2" | "/chord-progressions-backup/level3" | "/chord-progressions-backup/level4" | "/chord-recognition" | "/chord-recognition/:category/:level" | "/counterpoint" | "/counterpoint/exercise" | "/counterpoint/:species/:voices/:level" | "/counterpoint/:species/:voices/:level/practice" | "/dashboard" | "/midi-training" | "/transcription" | "/transcription/:category/:level" | "/unauthorized" | "/*";
+    page: "/" | "/auth/login" | "/auth/register" | "/chord-construction" | "/chord-construction/:category/:level" | "/chord-progression-transcription" | "/chord-progression-transcription/:level" | "/chord-progressions" | "/chord-progressions/:level" | "/chord-progressions-backup" | "/chord-progressions-backup/level1" | "/chord-progressions-backup/level2" | "/chord-progressions-backup/level3" | "/chord-progressions-backup/level4" | "/chord-recognition" | "/chord-recognition/:category/:level" | "/counterpoint" | "/counterpoint/:species/:voices/:level" | "/counterpoint/:species/:voices/:level/practice" | "/dashboard" | "/transcription" | "/transcription/:category/:level" | "/unauthorized" | "/*";
   };
   "./page.tsx": {
     id: "page";
@@ -186,10 +180,6 @@ type RouteFiles = {
     id: "counterpoint/page";
     page: "/counterpoint";
   };
-  "./counterpoint/exercise/page.tsx": {
-    id: "counterpoint/exercise/page";
-    page: "/counterpoint/exercise";
-  };
   "./counterpoint/[species]/[voices]/[level]/page.tsx": {
     id: "counterpoint/[species]/[voices]/[level]/page";
     page: "/counterpoint/:species/:voices/:level";
@@ -201,10 +191,6 @@ type RouteFiles = {
   "./dashboard/page.tsx": {
     id: "dashboard/page";
     page: "/dashboard";
-  };
-  "./midi-training/page.tsx": {
-    id: "midi-training/page";
-    page: "/midi-training";
   };
   "./transcription/page.tsx": {
     id: "transcription/page";

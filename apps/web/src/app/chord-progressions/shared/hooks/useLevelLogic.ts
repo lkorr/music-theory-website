@@ -113,13 +113,30 @@ export function useLevelLogic(
   /**
    * Move to the next progression
    */
-  const nextProgression = useCallback(() => {
+  const nextProgression = useCallback(async () => {
     if (state.score.total < config.totalProblems) {
       generateNewProgression();
+      // Auto-play the new progression after a short delay
+      setTimeout(async () => {
+        if (state.currentProgression && !state.isPlaying) {
+          try {
+            state.setIsPlaying(true);
+            await playChordProgression(
+              state.currentProgression.chords,
+              config.audioConfig.tempo,
+              config.audioConfig.chordDuration
+            );
+          } catch (error) {
+            console.error('Error auto-playing next progression:', error);
+          } finally {
+            state.setIsPlaying(false);
+          }
+        }
+      }, 500);
     } else {
       completeLevel();
     }
-  }, [state.score.total, config.totalProblems, generateNewProgression, completeLevel]);
+  }, [state.score.total, config.totalProblems, generateNewProgression, completeLevel, state.currentProgression, state.isPlaying, config.audioConfig]);
   
   /**
    * Start the level

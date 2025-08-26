@@ -1,7 +1,6 @@
 "use client";
 
 import { Link } from "react-router";
-import { CompactAuthButton } from "../../components/auth/AuthButton";
 
 interface ProgressionLevel {
   id: string;
@@ -111,7 +110,6 @@ export default function ChordProgressionTranscriptionHub(): JSX.Element {
               Chord Progression Transcription
             </h1>
           </div>
-          <CompactAuthButton />
         </div>
       </header>
 

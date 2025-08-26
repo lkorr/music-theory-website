@@ -275,21 +275,6 @@ export default function UniversalChordProgressionGame({
                 theme={levelConfig.theme}
               />
               
-              {/* Play Button */}
-              <div className="mb-6 text-center">
-                <button
-                  onClick={logic.playProgression}
-                  disabled={!state.currentProgression || state.isPlaying}
-                  className={`px-8 py-4 rounded-xl font-bold text-white transition-colors ${
-                    state.isPlaying 
-                      ? 'bg-gray-500 cursor-not-allowed' 
-                      : 'bg-blue-600 hover:bg-blue-700'
-                  }`}
-                >
-                  {state.isPlaying ? 'Playing...' : 'Play Progression'}
-                </button>
-              </div>
-              
               {/* Input area */}
               <div className="space-y-4">
                 <input

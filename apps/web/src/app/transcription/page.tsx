@@ -1,7 +1,6 @@
 "use client";
 
 import { Link } from "react-router";
-import { CompactAuthButton } from "../../components/auth/AuthButton";
 
 // Type definitions for transcription system
 interface TranscriptionLevel {
@@ -188,7 +187,6 @@ export default function TranscriptionHub() {
               Chord Transcription Training
             </h1>
           </div>
-          <CompactAuthButton />
         </div>
       </header>
 
