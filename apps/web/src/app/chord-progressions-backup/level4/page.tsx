@@ -394,7 +394,7 @@ export default function ChordProgressionsLevel4(): JSX.Element {
                   onKeyPress={handleKeyPress}
                   placeholder="Enter roman numerals with inversions (e.g., I6 - N6 - V64 - I)"
                   className="w-full px-4 py-3 text-lg rounded-lg border-2 border-white/30 focus:border-blue-400 focus:outline-none bg-white/10 text-white placeholder-white/50"
-                  readOnly={feedback && feedback.show}
+                  readOnly={feedback?.show ?? false}
                 />
                 
                 <button

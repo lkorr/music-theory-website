@@ -2,13 +2,21 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router";
 import { CompactAuthButton } from "../auth/AuthButton.jsx";
 
+interface CounterpointHeaderProps {
+  currentExercise: any;
+  exercises: any[];
+  currentExerciseId: string;
+  handlePrevExercise: () => void;
+  handleNextExercise: () => void;
+}
+
 export default function CounterpointHeader({
   currentExercise,
   exercises,
   currentExerciseId,
   handlePrevExercise,
   handleNextExercise,
-}) {
+}: CounterpointHeaderProps) {
   const currentIndex = exercises.findIndex((ex) => ex.id === currentExerciseId);
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === exercises.length - 1;

@@ -1,14 +1,66 @@
 import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { Play, Pause, Square, RotateCcw, Volume2, ChevronRight, ChevronLeft, ZoomIn, ZoomOut, Eye, EyeOff, Info } from "lucide-react";
 
-const getMidiNoteName = (midiNote) => {
+// Types
+interface Note {
+  note: number;
+  beat: number;
+  duration: number;
+  validation?: any;
+}
+
+interface Exercise {
+  modalFinal: number;
+  measureCount: number;
+  cantus?: Note[];
+}
+
+interface VoiceRange {
+  min: number;
+  max: number;
+  name: string;
+}
+
+interface PianoRollConfig {
+  noteRange: {
+    min: number;
+    max: number;
+  };
+  beatCount: number;
+}
+
+interface RuleViolation {
+  measure: number;
+  beat: number;
+  rule: string;
+  description: string;
+}
+
+interface EnhancedPianoRollProps {
+  isPlaying: boolean;
+  setIsPlaying: (playing: boolean) => void;
+  handlePlayPause: () => void;
+  resetExercise: () => void;
+  tempo: number;
+  setTempo: (tempo: number) => void;
+  currentExercise: Exercise | null;
+  userNotes: Note[];
+  setUserNotes: (notes: Note[] | ((prev: Note[]) => Note[])) => void;
+  playNote: (midiNote: number) => void;
+  voiceRanges: Record<string, VoiceRange>;
+  pianoRollConfig: PianoRollConfig;
+  speciesNumber: number;
+  voiceCategory: string;
+}
+
+const getMidiNoteName = (midiNote: number): string => {
     const noteNames = ["C","C# / Db","D","D# / Eb","E","F","F# / Gb","G","G# / Ab","A","A# / Bb","B"];
     const octave = Math.floor(midiNote / 12) - 1;
     const note = noteNames[midiNote % 12];
     return `${note}${octave}`;
 };
 
-const isBlackKey = (midiNote) => {
+const isBlackKey = (midiNote: number): boolean => {
     const noteInOctave = midiNote % 12;
     return [1, 3, 6, 8, 10].includes(noteInOctave);
 };
@@ -28,22 +80,22 @@ export default function EnhancedPianoRoll({
     pianoRollConfig,
     speciesNumber,
     voiceCategory,
-}) {
+}: EnhancedPianoRollProps) {
     const [showLabels, setShowLabels] = useState(true);
     const [showVoiceRanges, setShowVoiceRanges] = useState(false);
     const [showGuidance, setShowGuidance] = useState(true);
-    const [ruleViolations, setRuleViolations] = useState([]);
-    const [validationResult, setValidationResult] = useState(null);
-    const pianoRollRef = useRef(null);
-    const scrollContainerRef = useRef(null);
-    const noteLabelsRef = useRef(null);
-    const [scrollPosition, setScrollPosition] = useState(0);
-    const [zoomLevel, setZoomLevel] = useState(0.6); // Default to 60% zoom to show 13 notes
-    const [isPanning, setIsPanning] = useState(false);
-    const [panStartPos, setPanStartPos] = useState({ x: 0, y: 0 });
-    const [panStartScroll, setPanStartScroll] = useState({ x: 0, y: 0 });
-    const [draggedNote, setDraggedNote] = useState(null);
-    const headerScrollRef = useRef(null);
+    const [ruleViolations, setRuleViolations] = useState<RuleViolation[]>([]);
+    const [validationResult, setValidationResult] = useState<any>(null);
+    const pianoRollRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const noteLabelsRef = useRef<HTMLDivElement>(null);
+    const [scrollPosition, setScrollPosition] = useState<number>(0);
+    const [zoomLevel, setZoomLevel] = useState<number>(0.6); // Default to 60% zoom to show 13 notes
+    const [isPanning, setIsPanning] = useState<boolean>(false);
+    const [panStartPos, setPanStartPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    const [panStartScroll, setPanStartScroll] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    const [draggedNote, setDraggedNote] = useState<Note | null>(null);
+    const headerScrollRef = useRef<HTMLDivElement>(null);
 
     // Piano roll dimensions and settings
     const noteHeight = 16;

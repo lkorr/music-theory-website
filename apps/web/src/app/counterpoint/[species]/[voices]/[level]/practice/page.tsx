@@ -4,7 +4,8 @@ import { useParams, Link } from "react-router";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { 
   getExerciseBySpeciesVoiceLevel,
-  getVoiceDisplayName 
+  getVoiceDisplayName,
+  type VoiceCategory 
 } from "../../../../shared/utils/exerciseUtils.js";
 import {
   convertFuxExerciseToPianoRollFormat,
@@ -15,7 +16,7 @@ import {
 } from "../../../../shared/utils/pianoRollUtils.js";
 
 // Import enhanced piano roll component
-import EnhancedPianoRoll from "../../../../../../components/Counterpoint/EnhancedPianoRoll.jsx";
+import EnhancedPianoRoll from "../../../../../../components/Counterpoint/EnhancedPianoRoll";
 
 // Types for route parameters
 interface CounterpointPracticeParams extends Record<string, string | undefined> {
@@ -97,10 +98,10 @@ export default function CounterpointPracticePage(): JSX.Element {
         setError(null);
 
         // Get the fux exercise data
-        const fuxExercise = getExerciseBySpeciesVoiceLevel(speciesNumber, voiceCategory, level);
+        const fuxExercise = getExerciseBySpeciesVoiceLevel(speciesNumber, voiceCategory as VoiceCategory, level);
         
         if (!fuxExercise) {
-          setError(`Exercise not found: Species ${speciesNumber}, ${getVoiceDisplayName(voiceCategory)}, Level ${level}`);
+          setError(`Exercise not found: Species ${speciesNumber}, ${getVoiceDisplayName(voiceCategory as VoiceCategory)}, Level ${level}`);
           return;
         }
 
@@ -111,7 +112,7 @@ export default function CounterpointPracticePage(): JSX.Element {
         setPianoRollExercise(pianoRollData as PianoRollExercise);
 
         // Calculate voice ranges and suggestions
-        const ranges = getCounterpointVoiceRanges(pianoRollData, voiceCategory);
+        const ranges = getCounterpointVoiceRanges(pianoRollData, voiceCategory as VoiceCategory);
         setVoiceRanges(ranges as VoiceRanges);
 
         // Create piano roll display configuration

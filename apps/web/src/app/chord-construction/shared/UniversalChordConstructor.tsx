@@ -83,6 +83,7 @@ interface LevelConfig {
   chordGeneration: ChordGeneration;
   backPath: string;
   nextLevelPath?: string;
+  theme?: string;
 }
 
 interface UniversalChordConstructorProps {

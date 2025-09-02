@@ -15,6 +15,7 @@ interface Feedback {
   show: boolean;
   isCorrect: boolean;
   correctAnswer: string;
+  expectedAnswer?: string;
   userAnswer: string;
   timeTaken: number;
 }
@@ -33,9 +34,11 @@ interface LevelResult {
 }
 
 interface ChordData {
-  chords?: any[];
+  chords: number[][];
+  key: string;
+  progression: string[];
   expectedAnswer?: string;
-  answer?: string;
+  answer: string;
   name?: string;
 }
 
@@ -117,7 +120,7 @@ interface Helpers {
   ) => void;
 }
 
-export interface LevelStateReturn extends GameState, ProgressState, TimingState, UIState, Refs {
+export interface LevelStateReturn extends GameState, ProgressState, TimingState, UIState, Refs, Setters {
   // Grouped state for convenience
   gameState: GameState;
   progressState: ProgressState;
@@ -125,7 +128,7 @@ export interface LevelStateReturn extends GameState, ProgressState, TimingState,
   uiState: UIState;
   refs: Refs;
   
-  // All setters
+  // All setters (grouped for convenience)
   setters: Setters;
   
   // Helper functions

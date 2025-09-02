@@ -5,7 +5,6 @@ import {
   Scripts,
   ScrollRestoration,
 } from 'react-router';
-import './global.css';
 
 export default function Root() {
   return (
@@ -15,6 +14,7 @@ export default function Root() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <link rel="stylesheet" href="/src/app/global.css" />
       </head>
       <body>
         <Outlet />

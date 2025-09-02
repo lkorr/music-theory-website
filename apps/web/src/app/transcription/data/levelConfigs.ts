@@ -516,8 +516,8 @@ export const getLevelsByCategory = (): { [category: string]: (LevelConfig & { le
       categories[category] = [];
     }
     categories[category].push({
-      levelId,
-      ...config
+      ...config,
+      levelId
     });
   });
   

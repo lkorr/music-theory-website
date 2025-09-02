@@ -13,7 +13,7 @@ import { chordTypes, extendedChordTypes } from "../../chord-recognition/shared/t
 
 interface ChordTypes {
   [key: string]: {
-    intervals: number[];
+    intervals: readonly number[];
     [key: string]: any;
   };
 }

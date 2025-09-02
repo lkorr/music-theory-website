@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import AuthButton from "../components/auth/AuthButton";
+import './global.css';
 
 interface Platform {
   name: string;

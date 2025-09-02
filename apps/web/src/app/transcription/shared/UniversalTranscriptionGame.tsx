@@ -600,7 +600,7 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
                                    chordTypeKey.includes('7') ? 4 : 3;
           
           if (testNotes.length >= Math.min(4, originalChordSize) && // Allow some note dropping for complex chords
-              testNotes.every(note => note >= PIANO_ROLL_MIN && note <= PIANO_ROLL_MAX)) {
+              testNotes.every((note: number) => note >= PIANO_ROLL_MIN && note <= PIANO_ROLL_MAX)) {
             baseOctave = testOctave;
             octaveFound = true;
             validChord = true;

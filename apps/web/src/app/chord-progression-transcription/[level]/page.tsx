@@ -165,6 +165,7 @@ export default function ChordProgressionTranscriptionLevelPage(): JSX.Element {
   return (
     <ChordProgressionTranscriptionGame 
       levelConfig={levelConfig}
+      level={params.level || '1'}
       key={`progression-${params.level}`} // Force re-mount on route change
     />
   );

@@ -17,6 +17,9 @@ export default defineConfig({
   // Keep them available via import.meta.env.NEXT_PUBLIC_*
   envPrefix: 'NEXT_PUBLIC_',
   assetsInclude: ['**/*.mxl', '**/*.xml'],
+  css: {
+    postcss: './postcss.config.js',
+  },
   optimizeDeps: {
     // Explicitly include fast-glob, since it gets dynamically imported and we
     // don't want that to cause a re-bundle.
@@ -65,7 +68,9 @@ export default defineConfig({
     reactRouter(),
     tsconfigPaths(),
     aliases(),
-    layoutWrapperPlugin(),
+    layoutWrapperPlugin({
+      layoutFiles: ['layout.jsx', 'layout.tsx']
+    }),
   ],
   resolve: {
     alias: {

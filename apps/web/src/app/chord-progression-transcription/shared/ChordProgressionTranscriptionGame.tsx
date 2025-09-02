@@ -7,6 +7,9 @@ import { noteNames, getMidiNoteName, isBlackKey } from "../../chord-recognition/
 import { audioManager } from "../../transcription/shared/audioManager";
 import { generateRandomProgression, validateTranscription } from "./progressionTranscriptionLogic";
 import { CompactAuthButton } from "../../../components/auth/AuthButton";
+import { useAuth } from "../../../components/auth/ProtectedRoute";
+import { useStatistics } from "./hooks/useStatistics";
+import LeaderboardComponent from "./components/LeaderboardComponent";
 
 // Type definitions
 interface PlacedNote {
@@ -551,9 +554,22 @@ function ProgressionTranscriptionPianoRoll({
 // Main Game Component
 interface GameProps {
   levelConfig: LevelConfig;
+  level: string;
 }
 
-export function ChordProgressionTranscriptionGame({ levelConfig }: GameProps): JSX.Element {
+export function ChordProgressionTranscriptionGame({ levelConfig, level }: GameProps): JSX.Element {
+  // Auth state
+  const authState = useAuth();
+  const user = authState.user;
+
+  // Statistics integration
+  const statistics = useStatistics();
+  const [sessionStartTime, setSessionStartTime] = useState<string | null>(null);
+  const [sessionToken] = useState<string>(() => statistics.generateSessionToken());
+
+  // Game state
+  const [hasStarted, setHasStarted] = useState<boolean>(false);
+  const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [currentProgression, setCurrentProgression] = useState<Progression | null>(null);
   const [placedNotes, setPlacedNotes] = useState<PlacedNote[]>([]);
   const [feedback, setFeedback] = useState<ValidationResult | null>(null);
@@ -563,7 +579,14 @@ export function ChordProgressionTranscriptionGame({ levelConfig }: GameProps): J
   const [volume, setVolume] = useState(0.3);
   const [score, setScore] = useState(0);
   const [questionsCompleted, setQuestionsCompleted] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Progression timing
+  const [progressionStartTime, setProgressionStartTime] = useState<number | null>(null);
+  const [progressionTimes, setProgressionTimes] = useState<number[]>([]);
+  
+  // Constants
+  const TOTAL_PROGRESSIONS_REQUIRED = 10;
   
   const theme = THEMES[levelConfig?.theme] || THEMES.teal;
 
@@ -595,6 +618,9 @@ export function ChordProgressionTranscriptionGame({ levelConfig }: GameProps): J
       setFeedback(null);
       setShowSolution(false);
       
+      // Start timing this progression
+      setProgressionStartTime(Date.now());
+      
     } catch (error) {
       console.error('Error generating progression:', error);
       console.error('Error details:', (error as Error).message, (error as Error).stack);
@@ -613,11 +639,25 @@ export function ChordProgressionTranscriptionGame({ levelConfig }: GameProps): J
     }
   };
 
-  // Initialize on mount
+  // Start level function
+  const startLevel = async () => {
+    try {
+      await audioManager.initialize();
+      setHasStarted(true);
+      setSessionStartTime(new Date().toISOString());
+      generateNewProgression();
+    } catch (error) {
+      console.error('Failed to start level:', error);
+      alert('Failed to initialize audio. Please check your browser settings and try again.');
+    }
+  };
+
+  // Initialize only when game has started
   useEffect(() => {
-    generateNewProgression();
-    audioManager.setVolume(volume);
-  }, [levelConfig]);
+    if (hasStarted) {
+      audioManager.setVolume(volume);
+    }
+  }, [hasStarted, volume]);
 
   // Update volume
   useEffect(() => {
@@ -689,7 +729,7 @@ export function ChordProgressionTranscriptionGame({ levelConfig }: GameProps): J
 
   // Submit answer
   const handleSubmit = () => {
-    if (!currentProgression || !currentProgression.chords) return;
+    if (!currentProgression || !currentProgression.chords || !progressionStartTime) return;
 
     const userNotes = placedNotes.map(note => note.midiNote);
     const result = validateTranscription(userNotes, currentProgression, {
@@ -700,8 +740,54 @@ export function ChordProgressionTranscriptionGame({ levelConfig }: GameProps): J
     setShowSolution(true);
     
     if (result.isCorrect) {
+      // Calculate time for this progression
+      const progressionTime = (Date.now() - progressionStartTime) / 1000; // seconds
+      setProgressionTimes(prev => [...prev, progressionTime]);
+      
       setScore(prev => prev + result.score);
-      setQuestionsCompleted(prev => prev + 1);
+      setQuestionsCompleted(prev => {
+        const newCount = prev + 1;
+        
+        // Check if level is completed (10 progressions)
+        if (newCount >= TOTAL_PROGRESSIONS_REQUIRED) {
+          const allTimes = [...progressionTimes, progressionTime];
+          const avgTime = allTimes.reduce((sum, time) => sum + time, 0) / allTimes.length;
+          const totalSessionTime = sessionStartTime ? (Date.now() - new Date(sessionStartTime).getTime()) / 1000 : 0;
+          const finalAccuracy = 100; // Since all completed progressions are correct
+          const passed = true;
+          
+          setTimeout(() => {
+            setIsCompleted(true);
+            
+            // Save statistics to server when level is completed
+            if (sessionStartTime) {
+              const sessionData = {
+                moduleType: 'chord-progression-transcription',
+                category: 'progression-transcription',
+                level: level,
+                accuracy: finalAccuracy,
+                avgTime: Math.round(avgTime * 100) / 100, // Round to 2 decimal places
+                totalTime: Math.round(totalSessionTime),
+                problemsSolved: TOTAL_PROGRESSIONS_REQUIRED,
+                correctAnswers: newCount,
+                bestStreak: newCount,
+                completed: true,
+                passed,
+                startTime: sessionStartTime,
+                endTime: new Date().toISOString(),
+                sessionToken: sessionToken
+              };
+              
+              // Save session asynchronously (don't block UI)
+              statistics.saveSession(sessionData).catch(error => {
+                console.error('Failed to save session statistics:', error);
+              });
+            }
+          }, 2000);
+        }
+        
+        return newCount;
+      });
     }
   };
 
@@ -723,6 +809,185 @@ export function ChordProgressionTranscriptionGame({ levelConfig }: GameProps): J
     );
   }
 
+  // Start screen
+  if (!hasStarted) {
+    return (
+      <div className={`min-h-screen ${theme.background} relative`}>
+        {/* Logo in absolute top-left corner */}
+        <Link to="/" className="absolute top-2 left-2 z-50">
+          <img src="/pailiaq-logo-small.png" alt="Logo" className="w-12 h-12" />
+        </Link>
+
+        <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-4 ml-16">
+              <Link to="/chord-progression-transcription" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+                <span className="text-white text-sm font-bold">←</span>
+              </Link>
+              <h1 className="text-xl font-bold text-white">
+                {levelConfig?.title || 'Loading...'}
+              </h1>
+            </div>
+            <CompactAuthButton />
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto p-6">
+          {user ? (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Main content */}
+              <div className="lg:col-span-2 space-y-6">
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
+                  <h2 className="text-3xl font-bold text-white mb-4">
+                    {levelConfig?.title}
+                  </h2>
+                  <p className="text-white/80 mb-8 text-lg leading-relaxed">
+                    {levelConfig?.description}
+                  </p>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-sm">
+                    <div className="bg-white/5 rounded-lg p-3">
+                      <div className="text-white/60">Tempo</div>
+                      <div className="text-white font-semibold">{levelConfig?.audio.tempo} BPM</div>
+                    </div>
+                    <div className="bg-white/5 rounded-lg p-3">
+                      <div className="text-white/60">Duration</div>
+                      <div className="text-white font-semibold">{(levelConfig?.audio.chordDuration || 0) / 1000}s</div>
+                    </div>
+                    <div className="bg-white/5 rounded-lg p-3">
+                      <div className="text-white/60">Max Attempts</div>
+                      <div className="text-white font-semibold">{levelConfig?.maxAttempts}</div>
+                    </div>
+                    <div className="bg-white/5 rounded-lg p-3">
+                      <div className="text-white/60">Hints</div>
+                      <div className="text-white font-semibold">{levelConfig?.showHints ? 'Yes' : 'No'}</div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={startLevel}
+                    className={`px-8 py-4 ${theme.buttons.primary} text-white font-bold text-xl rounded-xl transition-all transform hover:scale-105`}
+                  >
+                    🎵 Start Level
+                  </button>
+                </div>
+              </div>
+
+              {/* Sidebar */}
+              <div className="lg:col-span-1">
+                <LeaderboardComponent
+                  moduleType="chord-progression-transcription"
+                  category="progression-transcription"
+                  level={level}
+                  compact={true}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
+              <h2 className="text-2xl font-bold text-white mb-4">Sign in Required</h2>
+              <p className="text-white/70 mb-6">Please sign in to play chord progression transcription levels and track your progress.</p>
+              <CompactAuthButton />
+            </div>
+          )}
+        </main>
+      </div>
+    );
+  }
+
+  // Completion screen
+  if (isCompleted && sessionStartTime) {
+    const sessionDuration = Math.round((Date.now() - new Date(sessionStartTime).getTime()) / 1000);
+    
+    return (
+      <div className={`min-h-screen ${theme.background} relative`}>
+        {/* Logo in absolute top-left corner */}
+        <Link to="/" className="absolute top-2 left-2 z-50">
+          <img src="/pailiaq-logo-small.png" alt="Logo" className="w-12 h-12" />
+        </Link>
+
+        <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-4 ml-16">
+              <Link to="/chord-progression-transcription" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+                <span className="text-white text-sm font-bold">←</span>
+              </Link>
+              <h1 className="text-xl font-bold text-white">
+                Level Complete!
+              </h1>
+            </div>
+            <CompactAuthButton />
+          </div>
+        </header>
+
+        <main className="max-w-4xl mx-auto p-6">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
+            <div className="text-6xl mb-4">🎉</div>
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Congratulations!
+            </h2>
+            <p className="text-white/80 mb-8">
+              You've completed {levelConfig?.title}!
+            </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-white/5 rounded-lg p-4">
+                <div className="text-2xl font-bold text-green-300">{score}</div>
+                <div className="text-white/60">Final Score</div>
+              </div>
+              <div className="bg-white/5 rounded-lg p-4">
+                <div className="text-2xl font-bold text-blue-300">{questionsCompleted}</div>
+                <div className="text-white/60">Completed</div>
+              </div>
+              <div className="bg-white/5 rounded-lg p-4">
+                <div className="text-2xl font-bold text-purple-300">{sessionDuration}s</div>
+                <div className="text-white/60">Time</div>
+              </div>
+              <div className="bg-white/5 rounded-lg p-4">
+                <div className="text-2xl font-bold text-yellow-300">
+                  {questionsCompleted > 0 ? Math.round((score / questionsCompleted) * 100) / 100 : 0}
+                </div>
+                <div className="text-white/60">Avg Score</div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => {
+                  setHasStarted(false);
+                  setIsCompleted(false);
+                  setScore(0);
+                  setQuestionsCompleted(0);
+                  setSessionStartTime(null);
+                  setFeedback(null);
+                  setPlacedNotes([]);
+                  setShowSolution(false);
+                  setProgressionStartTime(null);
+                  setProgressionTimes([]);
+                }}
+                className={`px-6 py-3 ${theme.buttons.primary} text-white font-semibold rounded-xl transition-colors`}
+              >
+                🔄 Play Again
+              </button>
+              <Link
+                to="/chord-progression-transcription"
+                className={`px-6 py-3 ${theme.buttons.secondary} text-white font-semibold rounded-xl transition-colors text-center`}
+              >
+                🏠 Back to Hub
+              </Link>
+              <Link
+                to={`/leaderboard?module=chord-progression-transcription&category=progression-transcription&level=${level}`}
+                className={`px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-xl transition-colors text-center`}
+              >
+                🏆 View Leaderboard
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className={`min-h-screen ${theme.background} relative`}>
       {/* Logo in absolute top-left corner */}
@@ -737,85 +1002,160 @@ export function ChordProgressionTranscriptionGame({ levelConfig }: GameProps): J
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-white">
-              {levelConfig?.title || 'Loading...'}
+              {levelConfig?.title || 'Loading...'} - Progression {questionsCompleted + 1}/{TOTAL_PROGRESSIONS_REQUIRED}
             </h1>
           </div>
-          <CompactAuthButton />
+          <div className="flex items-center space-x-6">
+            <div className="text-white font-semibold">
+              Score: {score}
+            </div>
+            <div className="text-white font-semibold">
+              Progress: {questionsCompleted}/{TOTAL_PROGRESSIONS_REQUIRED}
+            </div>
+            <CompactAuthButton />
+          </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto p-6">
-        {/* Progress Stats */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="text-white">
-              <span className="text-lg font-semibold">Score: {score}</span>
-              <span className="mx-4 text-white/70">|</span>
-              <span>Completed: {questionsCompleted}</span>
-            </div>
-            <div className="text-white/70">
-              Key: {currentProgression ? currentProgression.key : '--'} | 
-              Pattern: {currentProgression ? currentProgression.pattern.join(' - ') : '--'}
-            </div>
+        {/* Progress bar */}
+        <div className="mb-8">
+          <div className="w-full bg-white/10 rounded-full h-3">
+            <div 
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 h-3 rounded-full transition-all duration-500"
+              style={{ width: `${(questionsCompleted / TOTAL_PROGRESSIONS_REQUIRED) * 100}%` }}
+            />
           </div>
         </div>
 
-        {/* Piano Roll */}
-        <ProgressionTranscriptionPianoRoll
-          placedNotes={placedNotes}
-          onNoteToggle={handleNoteToggle}
-          currentProgression={currentProgression}
-          showSolution={showSolution}
-          feedback={feedback}
-          showLabels={showLabels}
-          setShowLabels={setShowLabels}
-          theme={theme}
-          onPlayProgression={handlePlayProgression}
-          isPlaying={isPlaying}
-          volume={volume}
-          onVolumeChange={setVolume}
-        />
+        <div className="flex flex-col xl:flex-row gap-8 items-start">
+          {/* Main content */}
+          <div className="flex-1">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">
+                Transcribe this chord progression
+              </h2>
+              
+              {/* Current Progression Info */}
+              {currentProgression && (
+                <div className="bg-white/5 rounded-lg p-4 mb-6 text-center">
+                  <div className="text-white/70 text-sm">Playing in key of</div>
+                  <div className="text-xl font-semibold text-white">{currentProgression.key}</div>
+                  <div className="text-white/70 text-sm">Pattern: {currentProgression.pattern.join(' - ')}</div>
+                </div>
+              )}
+              
+              {/* Piano Roll */}
+              <ProgressionTranscriptionPianoRoll
+                placedNotes={placedNotes}
+                onNoteToggle={handleNoteToggle}
+                currentProgression={currentProgression}
+                showSolution={showSolution}
+                feedback={feedback}
+                showLabels={showLabels}
+                setShowLabels={setShowLabels}
+                theme={theme}
+                onPlayProgression={handlePlayProgression}
+                isPlaying={isPlaying}
+                volume={volume}
+                onVolumeChange={setVolume}
+              />
 
-        {/* Feedback */}
-        {feedback && (
-          <div className={`bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6 ${feedback?.isCorrect ? 'border border-green-500/50' : 'border border-red-500/50'}`}>
-            <h3 className={`text-lg font-semibold mb-2 ${feedback?.isCorrect ? 'text-green-300' : 'text-red-300'}`}>
-              {feedback?.isCorrect ? '✅ Correct!' : '❌ Not quite right'}
-            </h3>
-            <p className="text-white/80 mb-4">{feedback?.feedback || 'No feedback available'}</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-white/70">
-              <div>Total Notes: {feedback?.totalNotes || 0}</div>
-              <div>Correct: {feedback?.correctNotes || 0}</div>
-              <div>Missing: {feedback?.missingNotes?.length || 0}</div>
-              <div>Wrong: {feedback?.wrongNotes || 0}</div>
+              {/* Feedback */}
+              {feedback && (
+                <div className={`mt-6 p-6 rounded-lg ${feedback?.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  <p className="font-semibold">
+                    {feedback?.isCorrect ? '✓ Correct!' : '✗ Not quite right'}
+                  </p>
+                  <p className="mt-2">{feedback?.feedback || 'No feedback available'}</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
+                    <div>Total Notes: {feedback?.totalNotes || 0}</div>
+                    <div>Correct: {feedback?.correctNotes || 0}</div>
+                    <div>Missing: {feedback?.missingNotes?.length || 0}</div>
+                    <div>Wrong: {feedback?.wrongNotes || 0}</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex justify-center space-x-4 mt-6">
+                <button
+                  onClick={handleReset}
+                  className={`px-6 py-3 ${theme.buttons.secondary} text-white font-semibold rounded-lg transition-colors flex items-center space-x-2`}
+                >
+                  <RotateCcw size={20} />
+                  <span>Reset</span>
+                </button>
+                
+                <button
+                  onClick={handleSubmit}
+                  disabled={placedNotes.length === 0}
+                  className={`px-6 py-3 ${theme.buttons.primary} text-white font-semibold rounded-lg transition-colors disabled:opacity-50`}
+                >
+                  Submit
+                </button>
+                
+                <button
+                  onClick={generateNewProgression}
+                  className={`px-6 py-3 ${theme.buttons.primary} text-white font-semibold rounded-lg transition-colors`}
+                >
+                  New Progression
+                </button>
+              </div>
             </div>
           </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="flex justify-center space-x-4 mb-8">
-          <button
-            onClick={handleReset}
-            className={`px-6 py-3 ${theme.buttons.secondary} text-white font-semibold rounded-xl transition-colors flex items-center space-x-2`}
-          >
-            <RotateCcw size={20} />
-            <span>Reset</span>
-          </button>
           
-          <button
-            onClick={handleSubmit}
-            disabled={placedNotes.length === 0}
-            className={`px-6 py-3 ${theme.buttons.primary} text-white font-semibold rounded-xl transition-colors disabled:opacity-50`}
-          >
-            Submit Transcription
-          </button>
-          
-          <button
-            onClick={generateNewProgression}
-            className={`px-6 py-3 ${theme.buttons.primary} text-white font-semibold rounded-xl transition-colors`}
-          >
-            New Progression
-          </button>
+          {/* Statistics sidebar */}
+          <div className="xl:w-80">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4">Statistics</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-white/70">Accuracy:</span>
+                  <span className="font-semibold text-white">
+                    {questionsCompleted > 0 ? 100 : 0}%
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Avg Time:</span>
+                  <span className="font-semibold text-white">
+                    {progressionTimes.length > 0 ? 
+                      (progressionTimes.reduce((sum, time) => sum + time, 0) / progressionTimes.length).toFixed(2) : 0.00}s
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Progress:</span>
+                  <span className="font-semibold text-white">
+                    {questionsCompleted}/{TOTAL_PROGRESSIONS_REQUIRED}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Score:</span>
+                  <span className="font-semibold text-white">{score}</span>
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <h4 className="font-semibold text-white mb-2">Instructions:</h4>
+                <div className="text-sm text-white/70 space-y-2">
+                  <p>• Listen to the chord progression</p>
+                  <p>• Click on the piano roll to place notes</p>
+                  <p>• Match all the notes in the progression</p>
+                  <p>• Complete {TOTAL_PROGRESSIONS_REQUIRED} progressions to finish</p>
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <h4 className="font-semibold text-white mb-2">Tips:</h4>
+                <div className="text-sm text-white/70 space-y-2">
+                  <p>• Use the Play button to replay the progression</p>
+                  <p>• Toggle labels to see note names</p>
+                  <p>• Listen for chord progressions and patterns</p>
+                  <p>• Reset if you need to start over</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>

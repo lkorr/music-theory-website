@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { 
   getExerciseBySpeciesVoiceLevel,
   getVoiceDisplayName,
-  getExercisesForSpeciesAndVoice
+  getExercisesForSpeciesAndVoice,
+  type VoiceCategory
 } from "../../../shared/utils/exerciseUtils.js";
 
 // Types for route parameters
@@ -49,15 +50,15 @@ export default function CounterpointExercisePage(): JSX.Element {
         setError(null);
 
         // Get the specific exercise
-        const exerciseData = getExerciseBySpeciesVoiceLevel(speciesNumber, voiceCategory, level);
+        const exerciseData = getExerciseBySpeciesVoiceLevel(speciesNumber, voiceCategory as VoiceCategory, level);
         
         if (!exerciseData) {
-          setError(`Exercise not found: Species ${speciesNumber}, ${getVoiceDisplayName(voiceCategory)}, Level ${level}`);
+          setError(`Exercise not found: Species ${speciesNumber}, ${getVoiceDisplayName(voiceCategory as VoiceCategory)}, Level ${level}`);
           return;
         }
 
         // Get all exercises for navigation
-        const allExerciseData = getExercisesForSpeciesAndVoice(speciesNumber, voiceCategory);
+        const allExerciseData = getExercisesForSpeciesAndVoice(speciesNumber, voiceCategory as VoiceCategory);
 
         setExercise(exerciseData as Exercise);
         setAllExercises(allExerciseData as Exercise[]);
@@ -142,7 +143,7 @@ export default function CounterpointExercisePage(): JSX.Element {
             </Link>
             <div>
               <h1 className="text-lg font-bold text-white">
-                Species {speciesNumber} • {getVoiceDisplayName(voiceCategory)}
+                Species {speciesNumber} • {getVoiceDisplayName(voiceCategory as VoiceCategory)}
               </h1>
               <p className="text-white/60 text-sm">
                 Level {level} of {allExercises.length} • Figure {exercise?.figure}
