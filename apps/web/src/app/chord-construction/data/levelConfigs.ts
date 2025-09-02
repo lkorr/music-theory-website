@@ -55,7 +55,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     id: 'basic-triads-1',
     category: 'basic-triads',
     level: 1,
-    title: 'Level 1: Build Basic Triads',
+    title: 'Basic Triads',
     description: 'Root position triads',
     
     // Scoring criteria
@@ -88,7 +88,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     id: 'basic-triads-2',
     category: 'basic-triads', 
     level: 2,
-    title: 'Level 2: Build First Inversions',
+    title: 'Triads with First Inversions',
     description: 'Triads with first inversion',
     
     totalProblems: 20,
@@ -117,7 +117,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     id: 'basic-triads-3',
     category: 'basic-triads',
     level: 3,
-    title: 'Level 3: Build All Inversions',
+    title: 'Triads with All Inversions',
     description: 'Root, first, and second inversions',
     
     totalProblems: 20,
@@ -138,19 +138,48 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null // Allow any inversion
     },
     
+    nextLevelPath: '/chord-construction/basic-triads/4',
+    backPath: '/chord-construction'
+  },
+
+  'basic-triads-4': {
+    id: 'basic-triads-4',
+    category: 'basic-triads',
+    level: 4,
+    title: 'Open Voicing Triads',
+    description: 'Basic triads in open voicings with octave spacing',
+    
+    totalProblems: 20,
+    passAccuracy: 75, // Easier since open voicings are challenging
+    passTime: 12, // More time needed
+    
+    theme: 'orange',
+    progressColor: 'bg-orange-500',
+    buttonColor: 'bg-orange-500',
+    buttonHoverColor: 'bg-orange-600',
+    difficulty: 'Intermediate',
+    
+    chordGeneration: {
+      type: 'open-voicing-triads',
+      roots: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+      chordTypes: ['major', 'minor', 'diminished', 'augmented'],
+      allowInversions: false,
+      requireSpecificInversion: null
+    },
+    
     nextLevelPath: '/chord-construction/seventh-chords/1',
     backPath: '/chord-construction'
   },
 
   // ============================================================================
-  // SEVENTH CHORDS LEVELS (3 levels)  
+  // SEVENTH CHORDS LEVELS (5 levels)  
   // ============================================================================
 
   'seventh-chords-1': {
     id: 'seventh-chords-1',
     category: 'seventh-chords',
     level: 1,
-    title: 'Level 1: Build 7th Chords',
+    title: 'Basic Seventh Chords',
     description: 'Root position 7th chords',
     
     totalProblems: 20,
@@ -179,7 +208,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     id: 'seventh-chords-2',
     category: 'seventh-chords',
     level: 2,
-    title: 'Level 2: Build First Inversions',
+    title: '7th Chords with First Inversions',
     description: '7th chords with first inversion',
     
     totalProblems: 20,
@@ -208,7 +237,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     id: 'seventh-chords-3',
     category: 'seventh-chords',
     level: 3,
-    title: 'Level 3: Build All Inversions',
+    title: '7th Chords with Second Inversions',
     description: 'All 7th chord inversions',
     
     totalProblems: 20,
@@ -229,19 +258,77 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null
     },
     
+    nextLevelPath: '/chord-construction/seventh-chords/4',
+    backPath: '/chord-construction'
+  },
+
+  'seventh-chords-4': {
+    id: 'seventh-chords-4',
+    category: 'seventh-chords',
+    level: 4,
+    title: '7th Chords with Third Inversions',
+    description: '7th chords with all inversions including third inversion',
+    
+    totalProblems: 20,
+    passAccuracy: 85,
+    passTime: 12,
+    
+    theme: 'orange',
+    progressColor: 'bg-orange-500',
+    buttonColor: 'bg-orange-500',
+    buttonHoverColor: 'bg-orange-600',
+    difficulty: 'Intermediate',
+    
+    chordGeneration: {
+      type: 'seventh-chords-third-inversions',
+      roots: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+      chordTypes: ['major7', 'minor7', 'dominant7'],
+      allowInversions: true,
+      requireSpecificInversion: 'third' // Force third inversion
+    },
+    
+    nextLevelPath: '/chord-construction/seventh-chords/5',
+    backPath: '/chord-construction'
+  },
+
+  'seventh-chords-5': {
+    id: 'seventh-chords-5',
+    category: 'seventh-chords',
+    level: 5,
+    title: 'Open Voicing 7th Chords',
+    description: '7th chords in open voicings with octave spacing',
+    
+    totalProblems: 15, // Fewer problems for advanced level
+    passAccuracy: 75, // Lower accuracy for advanced level
+    passTime: 15, // More time for complex chords
+    
+    theme: 'red',
+    progressColor: 'bg-red-500',
+    buttonColor: 'bg-red-500',
+    buttonHoverColor: 'bg-red-600',
+    difficulty: 'Advanced',
+    
+    chordGeneration: {
+      type: 'seventh-chords-open-voicings',
+      roots: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+      chordTypes: ['major7', 'minor7', 'dominant7'],
+      allowInversions: false,
+      requireSpecificInversion: null
+    },
+    
     nextLevelPath: '/chord-construction/extended-chords/1',
     backPath: '/chord-construction'
   },
 
   // ============================================================================
-  // EXTENDED CHORDS LEVELS (3 levels)
+  // EXTENDED CHORDS LEVELS (6 levels)
   // ============================================================================
 
   'extended-chords-1': {
     id: 'extended-chords-1',
     category: 'extended-chords',
     level: 1,
-    title: 'Level 1: Build 9th Chords',
+    title: '9th Chords',
     description: 'Major 9th, minor 9th, dominant 9th',
     
     totalProblems: 15, // Fewer problems for advanced level
@@ -270,7 +357,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     id: 'extended-chords-2',
     category: 'extended-chords',
     level: 2,
-    title: 'Level 2: Build 11th Chords',
+    title: '11th Chords',
     description: 'Major 11th, minor 11th variations',
     
     totalProblems: 15,
@@ -299,7 +386,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     id: 'extended-chords-3',
     category: 'extended-chords',
     level: 3,
-    title: 'Level 3: Build 13th Chords',
+    title: '13th Chords',
     description: 'Major 13th, minor 13th variations',
     
     totalProblems: 12, // Even fewer for most advanced
@@ -317,6 +404,93 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       roots: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
       chordTypes: ['maj13', 'min13'],
       allowInversions: false,
+      requireSpecificInversion: null
+    },
+    
+    nextLevelPath: '/chord-construction/extended-chords/4',
+    backPath: '/chord-construction'
+  },
+
+  'extended-chords-4': {
+    id: 'extended-chords-4',
+    category: 'extended-chords',
+    level: 4,
+    title: '9th Chord Inversions',
+    description: 'All inversions of 9th chords (root, 1st, 2nd, 3rd, 4th)',
+    
+    totalProblems: 15,
+    passAccuracy: 75, // Lower for advanced inversions
+    passTime: 20,
+    
+    theme: 'purple',
+    progressColor: 'bg-purple-600',
+    buttonColor: 'bg-purple-600',
+    buttonHoverColor: 'bg-purple-700',
+    difficulty: 'Expert',
+    
+    chordGeneration: {
+      type: 'ninth-chord-inversions',
+      roots: ['C', 'D', 'E', 'F', 'G', 'A', 'B'], // Natural notes for complex inversions
+      chordTypes: ['maj9', 'min9', 'dom9'],
+      allowInversions: true,
+      requireSpecificInversion: null // Allow any inversion
+    },
+    
+    nextLevelPath: '/chord-construction/extended-chords/5',
+    backPath: '/chord-construction'
+  },
+
+  'extended-chords-5': {
+    id: 'extended-chords-5',
+    category: 'extended-chords',
+    level: 5,
+    title: '11th Chord Inversions',
+    description: '11th chords with inversions - advanced harmony',
+    
+    totalProblems: 12,
+    passAccuracy: 70,
+    passTime: 25,
+    
+    theme: 'indigo',
+    progressColor: 'bg-indigo-600',
+    buttonColor: 'bg-indigo-600',
+    buttonHoverColor: 'bg-indigo-700',
+    difficulty: 'Expert',
+    
+    chordGeneration: {
+      type: 'eleventh-chord-inversions',
+      roots: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+      chordTypes: ['maj11', 'min11', 'dom11'],
+      allowInversions: true,
+      requireSpecificInversion: null
+    },
+    
+    nextLevelPath: '/chord-construction/extended-chords/6',
+    backPath: '/chord-construction'
+  },
+
+  'extended-chords-6': {
+    id: 'extended-chords-6',
+    category: 'extended-chords',
+    level: 6,
+    title: '13th Chord Inversions',
+    description: '13th chords with inversions - master level harmony',
+    
+    totalProblems: 10,
+    passAccuracy: 70,
+    passTime: 30,
+    
+    theme: 'pink',
+    progressColor: 'bg-pink-600',
+    buttonColor: 'bg-pink-600',
+    buttonHoverColor: 'bg-pink-700',
+    difficulty: 'Expert',
+    
+    chordGeneration: {
+      type: 'thirteenth-chord-inversions',
+      roots: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+      chordTypes: ['maj13', 'min13', 'dom13'],
+      allowInversions: true,
       requireSpecificInversion: null
     },
     

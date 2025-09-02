@@ -16,6 +16,7 @@
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { Link } from "react-router";
+import { useAuth } from "../../../components/auth/ProtectedRoute";
 import { useLevelState } from "./hooks/useLevelState.js";
 import { useLevelLogic } from "./hooks/useLevelLogic.js";
 import { generateChord } from "./theory/chordGeneration.js";
@@ -70,6 +71,10 @@ interface UniversalChordRecognitionGameProps {
  * @returns The game component
  */
 export default function UniversalChordRecognitionGame({ levelConfig }: UniversalChordRecognitionGameProps): ReactNode {
+  // Initialize auth and user
+  const authState = useAuth();
+  const user = authState.user;
+  
   // Initialize shared state management
   const state = useLevelState();
   
@@ -168,22 +173,95 @@ export default function UniversalChordRecognitionGame({ levelConfig }: Universal
             {/* Visual chord examples (skip for open voicings) */}
             {(CHORD_EXAMPLES as Record<string, ChordExampleData>)[levelConfig.id] && levelConfig.id !== 'basic-triads-4' && (
               <div className="mb-8">
-                <h4 className="text-xl font-semibold text-white mb-4">Chord Types You'll Identify:</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  {(CHORD_EXAMPLES as Record<string, ChordExampleData>)[levelConfig.id].examples.map((example, idx) => (
-                    <div key={idx} className="bg-white/10 rounded-lg p-4 text-center">
-                      <div className="text-sm font-semibold text-white mb-2">{example.name}</div>
-                      <div className="flex justify-center">
-                        <MiniPianoRoll 
-                          midiNotes={example.midiNotes} 
-                          width={100} 
-                          noteHeight={10}
-                          showRoot={false}
-                        />
-                      </div>
+                <h4 className="text-xl font-semibold text-white mb-4">New Chords You'll Identify:</h4>
+                {/* Custom layout for seventh chords levels with first 3 in first row, last 2 in second row */}
+                {levelConfig.category === 'seventh-chords' ? (
+                  <div className="mb-6">
+                    {/* First row - first 3 chords */}
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      {(CHORD_EXAMPLES as Record<string, ChordExampleData>)[levelConfig.id].examples.slice(0, 3).map((example, idx) => (
+                        <div key={idx} className="bg-white/10 rounded-lg p-4 text-center">
+                          <div className="text-sm font-semibold text-white mb-2">{example.name}</div>
+                          <div className="flex justify-center">
+                            <MiniPianoRoll 
+                              midiNotes={example.midiNotes} 
+                              width={100} 
+                              noteHeight={10}
+                              showRoot={false}
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                    {/* Second row - last 2 chords */}
+                    {(CHORD_EXAMPLES as Record<string, ChordExampleData>)[levelConfig.id].examples.length > 3 && (
+                      <div className="grid grid-cols-2 gap-4 justify-center max-w-md mx-auto">
+                        {(CHORD_EXAMPLES as Record<string, ChordExampleData>)[levelConfig.id].examples.slice(3).map((example, idx) => (
+                          <div key={idx + 3} className="bg-white/10 rounded-lg p-4 text-center">
+                            <div className="text-sm font-semibold text-white mb-2">{example.name}</div>
+                            <div className="flex justify-center">
+                              <MiniPianoRoll 
+                                midiNotes={example.midiNotes} 
+                                width={100} 
+                                noteHeight={10}
+                                showRoot={false}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : levelConfig.category === 'extended-chords' ? (
+                  /* Custom scrollable layout for extended chords - 4 per row, multiple rows */
+                  <div className="mb-6">
+                    <div className="max-h-80 overflow-y-auto space-y-4 px-2">
+                      {/* Group examples into rows of 4 */}
+                      {Array.from({ length: Math.ceil((CHORD_EXAMPLES as Record<string, ChordExampleData>)[levelConfig.id].examples.length / 4) }, (_, rowIdx) => (
+                        <div key={rowIdx} className="grid grid-cols-4 gap-4">
+                          {(CHORD_EXAMPLES as Record<string, ChordExampleData>)[levelConfig.id].examples
+                            .slice(rowIdx * 4, (rowIdx + 1) * 4)
+                            .map((example, idx) => (
+                              <div key={rowIdx * 4 + idx} className="bg-white/10 rounded-lg p-3 text-center">
+                                <div className="text-xs font-semibold text-white mb-2 truncate" title={example.name}>
+                                  {example.name}
+                                </div>
+                                <div className="flex justify-center">
+                                  <MiniPianoRoll 
+                                    midiNotes={example.midiNotes} 
+                                    width={80} 
+                                    noteHeight={8}
+                                    showRoot={false}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      ))}
+                    </div>
+                    {/* Scroll indicator */}
+                    <div className="text-center text-white/50 text-xs mt-2">
+                      {(CHORD_EXAMPLES as Record<string, ChordExampleData>)[levelConfig.id].examples.length > 4 && '↓ Scroll to see more chord types ↓'}
+                    </div>
+                  </div>
+                ) : (
+                  /* Default layout for other categories */
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    {(CHORD_EXAMPLES as Record<string, ChordExampleData>)[levelConfig.id].examples.map((example, idx) => (
+                      <div key={idx} className="bg-white/10 rounded-lg p-4 text-center">
+                        <div className="text-sm font-semibold text-white mb-2">{example.name}</div>
+                        <div className="flex justify-center">
+                          <MiniPianoRoll 
+                            midiNotes={example.midiNotes} 
+                            width={100} 
+                            noteHeight={10}
+                            showRoot={false}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
             
@@ -313,6 +391,20 @@ export default function UniversalChordRecognitionGame({ levelConfig }: Universal
                 <div className="text-white/70">Best Streak</div>
               </div>
             </div>
+            
+            {/* Leaderboard */}
+            {user && levelConfig.category && levelConfig.level && (
+              <div className="mb-8">
+                <LeaderboardComponent
+                  moduleType="chord-recognition"
+                  category={levelConfig.category}
+                  level={levelConfig.level.toString()}
+                  limit={10}
+                  showUserStats={false}
+                  compact={false}
+                />
+              </div>
+            )}
             
             <div className="flex flex-wrap justify-center gap-4">
               <button
@@ -504,12 +596,60 @@ export default function UniversalChordRecognitionGame({ levelConfig }: Universal
                       <p>• <strong>Half Dim 7:</strong> Fm7b5, Fø7</p>
                     </>
                   )}
-                  {levelConfig.category === 'extended-chords' && (
+                  {levelConfig.category === 'extended-chords' && levelConfig.level === 1 && (
                     <>
-                      <p>• <strong>9th chords:</strong> Cmaj9, Dm9, G9</p>
-                      <p>• <strong>11th chords:</strong> Cmaj11, Dm11</p>
-                      <p>• <strong>13th chords:</strong> Cmaj13, G13</p>
-                      <p>• <strong>Alterations:</strong> G7b9, C7#11</p>
+                      <p>• <strong>Major 9th:</strong> Cmaj9, CM9, CΔ9</p>
+                      <p>• <strong>Minor 9th:</strong> Dm9, Dmin9, D-9</p>
+                      <p>• <strong>Dominant 9th:</strong> G9, Gdom9</p>
+                      <p>• <strong>Dom 7b9:</strong> G7b9, G7♭9</p>
+                      <p>• <strong>Dom 7#9:</strong> G7#9, G7♯9</p>
+                      <p>• <strong>Minor 7b9:</strong> Dm7b9, Dm7♭9</p>
+                      <p>• <strong>Add 9:</strong> Cadd9, C(add9)</p>
+                      <p>• <strong>Minor Add 9:</strong> Dmadd9, Dm(add9)</p>
+                      <p>• <strong>Dim 7 Add 9:</strong> Bdim7add9, B°7add9</p>
+                      <p>• <strong>Dim 7b9:</strong> Bdim7b9, B°7♭9</p>
+                      <p>• <strong>Half Dim 9:</strong> Bø9, Bm7b5add9</p>
+                      <p>• <strong>Half Dimb9:</strong> Bø7b9, Bm7b5b9</p>
+                    </>
+                  )}
+                  {levelConfig.category === 'extended-chords' && levelConfig.level === 2 && (
+                    <>
+                      <p>• <strong>Major 11th:</strong> Cmaj11, CM11, CΔ11</p>
+                      <p>• <strong>Minor 11th:</strong> Cm11, Cmin11, C-11</p>
+                      <p>• <strong>Dominant 11th:</strong> C11, Cdom11</p>
+                      <p>• <strong>Major 7#11:</strong> Cmaj7#11, CM7#11</p>
+                      <p>• <strong>Dom 7#11:</strong> C7#11, Cdom7#11</p>
+                      <p>• <strong>Minor 7#11:</strong> Cm7#11, Cmin7#11</p>
+                      <p>• <strong>Add 11:</strong> Cadd11, C(add11)</p>
+                      <p>• <strong>Minor Add 11:</strong> Cmadd11, Cm(add11)</p>
+                      <p>• <strong>Dom 11b9:</strong> C11b9, C11♭9</p>
+                      <p>• <strong>Dom 11#9:</strong> C11#9, C11♯9</p>
+                      <p>• <strong>Min 11b9:</strong> Cm11b9, Cm11♭9</p>
+                    </>
+                  )}
+                  {levelConfig.category === 'extended-chords' && levelConfig.level === 3 && (
+                    <>
+                      <p>• <strong>Major 13th:</strong> Cmaj13, CM13, CΔ13</p>
+                      <p>• <strong>Minor 13th:</strong> Cm13, Cmin13, C-13</p>
+                      <p>• <strong>Dominant 13th:</strong> C13, Cdom13</p>
+                      <p>• <strong>Major 13#11:</strong> Cmaj13#11, CM13#11</p>
+                      <p>• <strong>Dom 13#11:</strong> C13#11, Cdom13#11</p>
+                      <p>• <strong>Dom 13b9:</strong> C13b9, Cdom13b9</p>
+                      <p>• <strong>Dom 13#9:</strong> C13#9, Cdom13#9</p>
+                      <p>• <strong>Add 13:</strong> Cadd13, C(add13)</p>
+                      <p>• <strong>Minor Add 13:</strong> Cmadd13, Cm(add13)</p>
+                      <p>• <strong>Dom 13#11b9:</strong> C13#11b9, Cdom13#11b9</p>
+                      <p>• <strong>Dom 13#11#9:</strong> C13#11#9, Cdom13#11#9</p>
+                      <p>• <strong>Min 13#11:</strong> Cm13#11, Cmin13#11</p>
+                      <p>• <strong>Min 13b9:</strong> Cm13b9, Cmin13b9</p>
+                    </>
+                  )}
+                  {levelConfig.category === 'extended-chords' && levelConfig.level >= 4 && (
+                    <>
+                      <p>• <strong>Extended Inversions:</strong> Complex harmonic structures</p>
+                      <p>• <strong>9th Inversions:</strong> Cmaj9/E, Cmaj9/G, etc.</p>
+                      <p>• <strong>11th Inversions:</strong> Cmaj11/G, etc.</p>
+                      <p>• <strong>13th Inversions:</strong> Advanced voicings</p>
                     </>
                   )}
                 </div>

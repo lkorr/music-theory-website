@@ -204,6 +204,20 @@ export default function UniversalChordProgressionGame({
             </div>
           </div>
 
+          {/* Leaderboard */}
+          {user && levelConfig.category && levelConfig.level && (
+            <div className="mb-8">
+              <LeaderboardComponent
+                moduleType="chord-progressions"
+                category={levelConfig.category}
+                level={levelConfig.level.toString()}
+                limit={10}
+                showUserStats={false}
+                compact={false}
+              />
+            </div>
+          )}
+
           <div className="space-y-4">
             {state.levelResult.passed && levelConfig.nextLevelPath && (
               <Link 

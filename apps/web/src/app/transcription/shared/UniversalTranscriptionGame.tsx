@@ -214,6 +214,28 @@ function TranscriptionPianoRoll({
   const containerHeight = 600;
   
   // Auto-scroll to center around middle C
+  /**
+   * Reset state when level config changes (for navigation between levels)
+   */
+  useEffect(() => {
+    setHasStarted(false);
+    setIsCompleted(false);
+    setCurrentTask(null);
+    setPlacedNotes([]);
+    setFeedback(null);
+    setIsAnswered(false);
+    setShowSolution(false);
+    setShowLabels(false);
+    setIsPlaying(false);
+    setCorrect(0);
+    setTotal(0);
+    setStreak(0);
+    setCurrentTime(0);
+    setAvgTime(0);
+    setStartTime(null);
+    setLevelResult(null);
+  }, [levelConfig.id]);
+
   useEffect(() => {
     if (pianoKeysRef.current && pianoRollRef.current) {
       const middleC = 60; // C4
@@ -945,6 +967,20 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
                 <div className="text-sm text-white/50">Required: {levelResult?.required.time}s</div>
               </div>
             </div>
+            
+            {/* Leaderboard */}
+            {user && category && level && (
+              <div className="mb-8">
+                <LeaderboardComponent
+                  moduleType="transcription"
+                  category={category}
+                  level={level}
+                  limit={10}
+                  showUserStats={false}
+                  compact={false}
+                />
+              </div>
+            )}
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

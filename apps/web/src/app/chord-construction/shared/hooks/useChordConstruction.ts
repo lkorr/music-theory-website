@@ -17,7 +17,7 @@
  * - State reset functionality
  */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { noteNames } from "../../../chord-recognition/shared/theory/core/notes.js";
 import { chordTypes, extendedChordTypes, inversionTypes } from "../../../chord-recognition/shared/theory/core/constants.js";
 import type { ChordData } from "../../../chord-recognition/shared/theory/core/constants.js";
@@ -116,6 +116,24 @@ export default function useChordConstruction(levelConfig: LevelConfig): ChordCon
   const [sessionToken, setSessionToken] = useState<string>('');
   const startTimeRef = useRef<Date | null>(null);
   const bestStreakRef = useRef<number>(0);
+  
+  /**
+   * Reset state when level config changes (for navigation between levels)
+   */
+  useEffect(() => {
+    setHasStarted(false);
+    setIsCompleted(false);
+    setCurrentTask(null);
+    setPlacedNotes([]);
+    setFeedback(null);
+    setIsAnswered(false);
+    setShowSolution(false);
+    setScore({ correct: 0, total: 0, streak: 0 });
+    setLevelResult(null);
+    setSessionToken('');
+    startTimeRef.current = null;
+    bestStreakRef.current = 0;
+  }, [levelConfig.id]);
   
   /**
    * Generate a unique session token for anti-cheat protection

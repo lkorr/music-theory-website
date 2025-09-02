@@ -42,9 +42,9 @@ const MODULES = [
     id: 'chord-construction', 
     name: 'Chord Construction',
     categories: [
-      { id: 'basic-triads', name: 'Basic Triads', levels: ['1', '2', '3'] },
-      { id: 'seventh-chords', name: 'Seventh Chords', levels: ['1', '2', '3'] },
-      { id: 'extended-chords', name: 'Extended Chords', levels: ['1', '2', '3'] },
+      { id: 'basic-triads', name: 'Basic Triads', levels: ['1', '2', '3', '4'] },
+      { id: 'seventh-chords', name: 'Seventh Chords', levels: ['1', '2', '3', '4', '5'] },
+      { id: 'extended-chords', name: 'Extended Chords', levels: ['1', '2', '3', '4', '5', '6'] },
     ]
   },
   { 
@@ -235,7 +235,7 @@ export default function FullLeaderboardPage(): ReactNode {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4 ml-16">
             <Link 
-              to="/chord-recognition" 
+              to="/" 
               className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
             >
               <span className="text-white text-sm font-bold">←</span>

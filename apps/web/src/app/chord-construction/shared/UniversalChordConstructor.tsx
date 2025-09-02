@@ -426,6 +426,20 @@ export default function UniversalChordConstructor({ levelConfig, category, level
               </div>
             )}
             
+            {/* Leaderboard */}
+            {user && category && level && (
+              <div className="mb-8">
+                <LeaderboardComponent
+                  moduleType="chord-construction"
+                  category={category}
+                  level={level}
+                  limit={10}
+                  showUserStats={false}
+                  compact={false}
+                />
+              </div>
+            )}
+            
             {/* Action buttons */}
             <div className="flex gap-4 justify-center">
               <button
@@ -517,17 +531,10 @@ export default function UniversalChordConstructor({ levelConfig, category, level
               />
               
               {/* Target chord information */}
-              {currentTask && (
-                <div className="text-center mb-6">
-                  <div className={`text-3xl font-bold mb-2 ${theme.text}`}>
-                    {currentTask.chordName}
-                  </div>
-                  <p className="text-white/70">
-                    {currentTask.description}
-                  </p>
-                </div>
-              )}
 
+              {/* Instructions */}
+              <p className="text-center text-white/70 mb-4">Click on the piano roll to place notes</p>
+              
               {/* Action buttons and feedback */}
               <div className="space-y-4">
                 <div className="flex justify-center gap-4">
