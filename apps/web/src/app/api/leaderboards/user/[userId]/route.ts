@@ -9,6 +9,7 @@
 import { Response } from 'react-router';
 import { getUserRank } from '../../../../../lib/statistics.js';
 import { verifyJWT } from '../../../../../lib/auth.ts';
+import { secureJsonResponse } from '../../../../../lib/security-headers.js';
 
 interface RouteParams {
   params: {
@@ -24,7 +25,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     const authResult = await verifyJWT(request);
     
     if (!authResult.valid || !authResult.user) {
-      return Response.json(
+      return secureJsonResponse(
         { error: 'Authentication required' },
         { status: 401 }
       );
@@ -33,7 +34,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     // Security check: users can only access their own rank data
     // (unless they have admin privileges - could be added later)
     if (authResult.user.id !== userId) {
-      return Response.json(
+      return secureJsonResponse(
         { error: 'Access denied. You can only view your own ranking data.' },
         { status: 403 }
       );
@@ -47,7 +48,7 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     // Validate required parameters for specific rank lookup
     if (!moduleType || !category || !level) {
-      return Response.json(
+      return secureJsonResponse(
         { error: 'Module type, category, and level are required for rank lookup' },
         { status: 400 }
       );
@@ -57,14 +58,14 @@ export async function GET(request: Request, { params }: RouteParams) {
     const userRank = await getUserRank(userId, moduleType, category, level);
 
     if (!userRank) {
-      return Response.json({
+      return secureJsonResponse({
         success: true,
         hasRank: false,
         message: 'User has not played this level yet'
       });
     }
 
-    return Response.json({
+    return secureJsonResponse({
       success: true,
       hasRank: true,
       rank: {
@@ -83,7 +84,7 @@ export async function GET(request: Request, { params }: RouteParams) {
   } catch (error) {
     console.error('Error in user rank API:', error);
 
-    return Response.json(
+    return secureJsonResponse(
       { error: 'Failed to retrieve user ranking' },
       { status: 500 }
     );
@@ -92,7 +93,7 @@ export async function GET(request: Request, { params }: RouteParams) {
 
 // Method not allowed for other HTTP methods
 export async function POST() {
-  return Response.json(
+  return secureJsonResponse(
     { error: 'Method not allowed' },
     { status: 405 }
   );

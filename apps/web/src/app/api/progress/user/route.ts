@@ -9,13 +9,14 @@
 import { Response } from 'react-router';
 import { getUserStatistics } from '../../../../lib/statistics.js';
 import { verifyJWT } from '../../../../lib/auth.ts';
+import { secureJsonResponse } from '../../../../lib/security-headers.js';
 
 export async function GET(request: Request) {
   try {
     // Verify JWT token and get user
     const authResult = await verifyJWT(request);
     if (!authResult.valid || !authResult.user) {
-      return Response.json(
+      return secureJsonResponse(
         { error: 'Authentication required' },
         { status: 401 }
       );
@@ -48,7 +49,7 @@ export async function GET(request: Request) {
       rankPosition: stat.rank_position
     }));
 
-    return Response.json({
+    return secureJsonResponse({
       success: true,
       statistics: responseData
     });
@@ -56,7 +57,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Error in user progress API:', error);
 
-    return Response.json(
+    return secureJsonResponse(
       { error: 'Failed to retrieve user progress' },
       { status: 500 }
     );
@@ -65,7 +66,7 @@ export async function GET(request: Request) {
 
 // Method not allowed for other HTTP methods
 export async function POST() {
-  return Response.json(
+  return secureJsonResponse(
     { error: 'Method not allowed' },
     { status: 405 }
   );

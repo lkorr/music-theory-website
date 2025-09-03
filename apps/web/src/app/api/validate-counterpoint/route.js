@@ -1,6 +1,8 @@
 // Comprehensive MIDI Training App Validation System
 // Based on traditional 16th-century counterpoint rules
 
+import { secureJsonResponse } from '../../../lib/security-headers.js';
+
 // Helper functions for music theory calculations
 function getInterval(note1, note2) {
   return Math.abs(note1 - note2) % 12;
@@ -653,7 +655,7 @@ export async function POST(request) {
     const { cantusFirmus, userNotes, speciesType = 1 } = body;
 
     if (!cantusFirmus || !userNotes) {
-      return Response.json(
+      return secureJsonResponse(
         {
           success: false,
           error: "Missing cantus firmus or user notes",
@@ -700,7 +702,7 @@ export async function POST(request) {
         feedback = species5Result.feedback;
         break;
       default:
-        return Response.json(
+        return secureJsonResponse(
           {
             success: false,
             error: "Unsupported species type",
@@ -716,7 +718,7 @@ export async function POST(request) {
     
     const score = Math.max(0, 100 - errorCount * 20 - warningCount * 10 - suggestionCount * 5);
 
-    return Response.json({
+    return secureJsonResponse({
       success: true,
       violations,
       feedback,
@@ -732,7 +734,7 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("Error validating counterpoint:", error);
-    return Response.json(
+    return secureJsonResponse(
       {
         success: false,
         error: "Failed to validate counterpoint",

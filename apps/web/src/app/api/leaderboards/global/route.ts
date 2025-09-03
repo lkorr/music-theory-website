@@ -9,6 +9,7 @@
 import { Response } from 'react-router';
 import { getGlobalLeaderboard } from '../../../../lib/statistics.js';
 import { verifyJWT } from '../../../../lib/auth.ts';
+import { secureJsonResponse } from '../../../../lib/security-headers.js';
 
 export async function GET(request: Request) {
   try {
@@ -17,7 +18,7 @@ export async function GET(request: Request) {
     
     // For now, require authentication - can be made public later if needed
     if (!authResult.valid || !authResult.user) {
-      return Response.json(
+      return secureJsonResponse(
         { error: 'Authentication required' },
         { status: 401 }
       );
@@ -45,7 +46,7 @@ export async function GET(request: Request) {
       bestAchievedAt: entry.best_achieved_at
     }));
 
-    return Response.json({
+    return secureJsonResponse({
       success: true,
       leaderboard: responseData,
       pagination: {
@@ -58,7 +59,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Error in global leaderboard API:', error);
 
-    return Response.json(
+    return secureJsonResponse(
       { error: 'Failed to retrieve global leaderboard' },
       { status: 500 }
     );
@@ -67,7 +68,7 @@ export async function GET(request: Request) {
 
 // Method not allowed for other HTTP methods
 export async function POST() {
-  return Response.json(
+  return secureJsonResponse(
     { error: 'Method not allowed' },
     { status: 405 }
   );

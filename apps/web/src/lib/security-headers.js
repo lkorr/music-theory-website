@@ -15,8 +15,9 @@ function generateCSP(isDevelopment = false) {
     'default-src': ["'self'"],
     'script-src': [
       "'self'",
-      "'unsafe-eval'", // Required for React development
+      isDevelopment ? "'unsafe-eval'" : '', // Only allow eval in development
       isDevelopment ? "'unsafe-inline'" : '', // Only allow inline scripts in dev
+      "'sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='", // Placeholder for nonce-based CSP
       'https://cdn.jsdelivr.net', // For CDN libraries
       'https://unpkg.com' // For package CDN
     ].filter(Boolean),
@@ -42,6 +43,7 @@ function generateCSP(isDevelopment = false) {
     'connect-src': [
       "'self'",
       isDevelopment ? 'ws://localhost:*' : '', // WebSocket for HMR in dev
+      isDevelopment ? 'http://localhost:*' : '', // Dev server connections
       'https://api.youtube.com', // YouTube API
       'https://mailchimp.com',   // Mailchimp API
       'https://*.mailchimp.com', // Mailchimp domains
@@ -64,7 +66,8 @@ function generateCSP(isDevelopment = false) {
       "'none'" // Prevent clickjacking
     ],
     'upgrade-insecure-requests': [], // Upgrade HTTP to HTTPS
-    'block-all-mixed-content': []   // Block mixed content
+    'block-all-mixed-content': [],   // Block mixed content
+    'report-uri': isDevelopment ? [] : ['/api/security/csp-violation-report']
   };
 
   return Object.entries(policies)
@@ -116,8 +119,17 @@ export function applySecurityHeaders(response, options = {}) {
     
     // Strict Transport Security (HTTPS only)
     ...(process.env.NODE_ENV === 'production' ? {
-      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload'
+      'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload'
     } : {}),
+    
+    // DNS Prefetch Control
+    'X-DNS-Prefetch-Control': 'off',
+    
+    // Download Options (IE only but good practice)
+    'X-Download-Options': 'noopen',
+    
+    // Cross-Domain Policies
+    'X-Permitted-Cross-Domain-Policies': 'none',
     
     // Cache Control for security-sensitive responses
     ...(options.noCache ? {
@@ -156,4 +168,64 @@ export function applyAPISecurityHeaders(response) {
   return applySecurityHeaders(response, {
     noCache: true // API responses should not be cached
   });
+}
+
+/**
+ * Secure Response.json() replacement that includes security headers
+ * @param {any} data - JSON data to return
+ * @param {ResponseInit} init - Response init options
+ * @param {object} securityOptions - Security-specific options
+ * @returns {Response} Secure JSON response
+ */
+export function secureJsonResponse(data, init = {}, securityOptions = {}) {
+  const response = Response.json(data, init);
+  return applyAPISecurityHeaders(response);
+}
+
+/**
+ * Enhanced CORS validation for API endpoints
+ * @param {Request} request - HTTP request
+ * @param {string[]} allowedOrigins - Allowed origins list
+ * @returns {boolean} True if origin is allowed
+ */
+export function isValidOrigin(request, allowedOrigins = []) {
+  const origin = request.headers.get('origin');
+  
+  if (!origin) {
+    // Allow requests without origin (same-origin requests)
+    return true;
+  }
+  
+  // In development, be more permissive
+  if (process.env.NODE_ENV === 'development') {
+    return origin.startsWith('http://localhost:') || 
+           origin.startsWith('http://127.0.0.1:') ||
+           allowedOrigins.includes(origin);
+  }
+  
+  // In production, be strict
+  return allowedOrigins.includes(origin);
+}
+
+/**
+ * Apply CORS headers with validation
+ * @param {Response} response - HTTP response
+ * @param {Request} request - HTTP request
+ * @param {string[]} allowedOrigins - Allowed origins
+ * @returns {Response} Response with CORS headers
+ */
+export function applyCORSHeaders(response, request, allowedOrigins = []) {
+  const origin = request.headers.get('origin');
+  
+  if (isValidOrigin(request, allowedOrigins)) {
+    if (origin) {
+      response.headers.set('Access-Control-Allow-Origin', origin);
+    }
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    response.headers.set('Access-Control-Max-Age', '86400'); // 24 hours
+  }
+  
+  return response;
 }

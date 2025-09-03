@@ -3,15 +3,11 @@
  * GET /api/test
  */
 
+import { secureJsonResponse } from '../../../lib/security-headers.js';
+
 export async function GET() {
-  return new Response(
-    JSON.stringify({ 
-      message: "API routing works!",
-      timestamp: new Date().toISOString()
-    }),
-    {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    }
-  );
+  return secureJsonResponse({ 
+    message: "API routing works!",
+    timestamp: new Date().toISOString()
+  });
 }

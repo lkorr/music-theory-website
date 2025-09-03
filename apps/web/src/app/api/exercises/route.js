@@ -1,5 +1,6 @@
 import sql from "../utils/sql.js";
 import { jwtVerify } from 'jose';
+import { secureJsonResponse } from '../../../lib/security-headers.js';
 
 if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET environment variable is required for JWT signing');
@@ -57,7 +58,7 @@ export async function GET(request) {
 
     const exercises = await sql(query, params);
 
-    return Response.json({
+    return secureJsonResponse({
       success: true,
       exercises: exercises.map((ex) => ({
         ...ex,
@@ -69,7 +70,7 @@ export async function GET(request) {
     });
   } catch (error) {
     console.error("Error fetching exercises:", error);
-    return Response.json(
+    return secureJsonResponse(
       {
         success: false,
         error: "Failed to fetch exercises",
@@ -84,7 +85,7 @@ export async function POST(request) {
     // Verify authentication
     const user = await verifyAuth(request);
     if (!user) {
-      return Response.json(
+      return secureJsonResponse(
         {
           success: false,
           error: "Authentication required",
@@ -95,7 +96,7 @@ export async function POST(request) {
 
     // Check if user has permission to create exercises (admin or teacher role)
     if (!['admin', 'teacher'].includes(user.role)) {
-      return Response.json(
+      return secureJsonResponse(
         {
           success: false,
           error: "Insufficient permissions to create exercises",
@@ -115,7 +116,7 @@ export async function POST(request) {
 
     // Input validation
     if (!species_type || !cantus_firmus) {
-      return Response.json(
+      return secureJsonResponse(
         {
           success: false,
           error: "Missing required fields: species_type and cantus_firmus",
@@ -126,7 +127,7 @@ export async function POST(request) {
 
     // Validate species_type
     if (![1, 2, 3, 4, 5].includes(parseInt(species_type))) {
-      return Response.json(
+      return secureJsonResponse(
         {
           success: false,
           error: "species_type must be between 1 and 5",
@@ -137,7 +138,7 @@ export async function POST(request) {
 
     // Validate cantus_firmus is an array
     if (!Array.isArray(cantus_firmus)) {
-      return Response.json(
+      return secureJsonResponse(
         {
           success: false,
           error: "cantus_firmus must be an array",
@@ -149,7 +150,7 @@ export async function POST(request) {
     // Validate MIDI notes in cantus_firmus
     for (const note of cantus_firmus) {
       if (typeof note.note !== 'number' || note.note < 0 || note.note > 127) {
-        return Response.json(
+        return secureJsonResponse(
           {
             success: false,
             error: "Invalid MIDI note values (must be 0-127)",
@@ -161,7 +162,7 @@ export async function POST(request) {
 
     // Validate title and description length
     if (title && title.length > 100) {
-      return Response.json(
+      return secureJsonResponse(
         {
           success: false,
           error: "Title must be 100 characters or less",
@@ -171,7 +172,7 @@ export async function POST(request) {
     }
 
     if (description && description.length > 500) {
-      return Response.json(
+      return secureJsonResponse(
         {
           success: false,
           error: "Description must be 500 characters or less",
@@ -186,7 +187,7 @@ export async function POST(request) {
       RETURNING *
     `;
 
-    return Response.json({
+    return secureJsonResponse({
       success: true,
       exercise: {
         ...result[0],
@@ -195,7 +196,7 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("Error creating exercise:", error);
-    return Response.json(
+    return secureJsonResponse(
       {
         success: false,
         error: "Failed to create exercise",

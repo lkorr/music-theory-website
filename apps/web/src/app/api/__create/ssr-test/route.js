@@ -1,4 +1,6 @@
 // Mock dependencies for development
+import { secureJsonResponse } from '../../../../lib/security-headers.js';
+
 const getToken = () => Promise.resolve(null);
 const React = { createElement: (component, props) => component };
 const path = { join: (...paths) => paths.join('/') };
@@ -63,5 +65,5 @@ export async function GET(request) {
 			return null;
 		})
 		.filter((result) => result !== null);
-	return Response.json({ results: cleanedResults });
+	return secureJsonResponse({ results: cleanedResults });
 }

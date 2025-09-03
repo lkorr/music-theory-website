@@ -1,11 +1,12 @@
 import sql from "../../utils/sql.js";
+import { secureJsonResponse } from '../../../../lib/security-headers.js';
 
 export async function GET(request, { params }) {
   try {
     const { id } = params;
 
     if (!id || isNaN(parseInt(id))) {
-      return Response.json(
+      return secureJsonResponse(
         {
           success: false,
           error: "Invalid exercise ID",
@@ -19,7 +20,7 @@ export async function GET(request, { params }) {
     ]);
 
     if (exercises.length === 0) {
-      return Response.json(
+      return secureJsonResponse(
         {
           success: false,
           error: "Exercise not found",
@@ -36,7 +37,7 @@ export async function GET(request, { params }) {
       [exercise.species_type],
     );
 
-    return Response.json({
+    return secureJsonResponse({
       success: true,
       exercise: {
         ...exercise,
@@ -54,7 +55,7 @@ export async function GET(request, { params }) {
     });
   } catch (error) {
     console.error("Error fetching exercise:", error);
-    return Response.json(
+    return secureJsonResponse(
       {
         success: false,
         error: "Failed to fetch exercise",
