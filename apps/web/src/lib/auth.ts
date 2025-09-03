@@ -348,7 +348,7 @@ export function hasRole(role: string): boolean {
  * @returns {boolean} - True if user is admin
  */
 export function isAdmin(): boolean {
-  return hasRole('admin');
+  return hasRole('ADMIN');
 }
 
 /**

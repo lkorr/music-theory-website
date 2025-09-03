@@ -1,4 +1,7 @@
-import { fuxExercisesComplete as fuxExercises } from '../../fux-exercises/original-mxl/fuxExercisesComplete.js';
+import { getFuxExercisesComplete } from '../../../../../lib/fux-data.js';
+
+// Get exercise data using utility function
+const fuxExercises = getFuxExercisesComplete();
 
 // Type definitions
 export interface CantusFirmus {

@@ -68,6 +68,7 @@ export default function PailiaqHomePage() {
     }
   ];
 
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
       {/* YouTube Live Stream Banner */}
@@ -83,30 +84,56 @@ export default function PailiaqHomePage() {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0a0a]/50 to-[#0a0a0a]"></div>
         </div>
         
-        <div className="absolute top-6 right-6 z-20 flex items-center gap-4">
-          <Link 
-            to="/dashboard" 
-            className="text-white hover:text-white font-medium transition-colors px-4 py-2 rounded-full bg-blue-600/80 backdrop-blur-md border border-blue-500/30 hover:bg-blue-600"
-          >
-            Dashboard
-          </Link>
-          <Link 
-            to="/contact" 
-            className="text-white/90 hover:text-white font-medium transition-colors px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20"
-          >
-            Contact
-          </Link>
+        <div className="absolute top-6 right-6 z-20 flex items-center gap-8">
+          <nav className="flex items-center gap-1 bg-black/20 backdrop-blur-md rounded-lg px-1 py-1 border border-white/10">
+            <Link 
+              to="/about" 
+              className="text-white/80 hover:text-white font-medium transition-colors px-4 py-2 rounded-md hover:bg-white/10"
+            >
+              About
+            </Link>
+            <span className="text-white/30">•</span>
+            <a 
+              href="/blog" 
+              className="text-white/80 hover:text-white font-medium transition-colors px-4 py-2 rounded-md hover:bg-white/10"
+            >
+              Blog
+            </a>
+            <span className="text-white/30">•</span>
+            <Link 
+              to="/store" 
+              className="text-white/80 hover:text-white font-medium transition-colors px-4 py-2 rounded-md hover:bg-white/10"
+            >
+              Store
+            </Link>
+            <span className="text-white/30">•</span>
+            <Link 
+              to="/dashboard" 
+              className="text-white/80 hover:text-white font-medium transition-colors px-4 py-2 rounded-md hover:bg-white/10"
+            >
+              Dashboard
+            </Link>
+            <span className="text-white/30">•</span>
+            <Link 
+              to="/contact" 
+              className="text-white/80 hover:text-white font-medium transition-colors px-4 py-2 rounded-md hover:bg-white/10"
+            >
+              Contact
+            </Link>
+          </nav>
           <AuthButton showRegister={true} />
         </div>
         
         <div className="relative z-10 px-6 py-16">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex items-center justify-center mb-8">
-              <img 
-                src="/pailiaq-logo-small.png" 
-                alt="pailiaq logo"
-                className="w-32 h-32 rounded-full shadow-2xl border-4 border-white/20"
-              />
+              <a href="/" className="hover:scale-105 transition-transform duration-300">
+                <img 
+                  src="/pailiaq-logo-small.png" 
+                  alt="pailiaq logo"
+                  className="w-32 h-32 rounded-full shadow-2xl border-4 border-white/20 cursor-pointer"
+                />
+              </a>
             </div>
             
             <h1 className="text-6xl font-bold text-white mb-4 tracking-wider">

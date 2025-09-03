@@ -23,6 +23,11 @@ out/
 .react-router/
 apps/web/.react-router/
 
+# Test and build cache
+.vitest/
+__create/
+generated/
+
 # IDE files
 .vscode/
 .idea/
@@ -108,3 +113,6 @@ web_modules/
 
 # Embedded git repository (original project structure)
 createxyz-project/
+
+# Archive directory for historical files
+archive/

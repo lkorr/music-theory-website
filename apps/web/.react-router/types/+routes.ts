@@ -13,11 +13,22 @@ type Pages = {
   "/": {
     params: {};
   };
+  "/about": {
+    params: {};
+  };
   "/auth/login": {
     params: {};
   };
   "/auth/register": {
     params: {};
+  };
+  "/blog": {
+    params: {};
+  };
+  "/blog/:slug": {
+    params: {
+      "slug": string;
+    };
   };
   "/contact": {
     params: {};
@@ -88,6 +99,9 @@ type Pages = {
       "level": string;
     };
   };
+  "/store": {
+    params: {};
+  };
   "/unauthorized": {
     params: {};
   };
@@ -101,11 +115,15 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/register" | "/contact" | "/core-training/chord-construction" | "/core-training/chord-construction/:category/:level" | "/core-training/chord-progressions" | "/core-training/chord-progressions/:level" | "/core-training/chord-recognition" | "/core-training/chord-recognition/:category/:level" | "/dashboard" | "/ear-training/chord-progression-transcription" | "/ear-training/chord-progression-transcription/:level" | "/ear-training/transcription" | "/ear-training/transcription/:category/:level" | "/leaderboard" | "/practice/counterpoint" | "/practice/counterpoint/:species/:voices/:level" | "/practice/counterpoint/:species/:voices/:level/practice" | "/unauthorized" | "/*";
+    page: "/" | "/about" | "/auth/login" | "/auth/register" | "/blog" | "/blog/:slug" | "/contact" | "/core-training/chord-construction" | "/core-training/chord-construction/:category/:level" | "/core-training/chord-progressions" | "/core-training/chord-progressions/:level" | "/core-training/chord-recognition" | "/core-training/chord-recognition/:category/:level" | "/dashboard" | "/ear-training/chord-progression-transcription" | "/ear-training/chord-progression-transcription/:level" | "/ear-training/transcription" | "/ear-training/transcription/:category/:level" | "/leaderboard" | "/practice/counterpoint" | "/practice/counterpoint/:species/:voices/:level" | "/practice/counterpoint/:species/:voices/:level/practice" | "/store" | "/unauthorized" | "/*";
   };
   "./page.tsx": {
     id: "page";
     page: "/";
+  };
+  "./about/page.tsx": {
+    id: "about/page";
+    page: "/about";
   };
   "./auth/login/page.tsx": {
     id: "auth/login/page";
@@ -114,6 +132,14 @@ type RouteFiles = {
   "./auth/register/page.tsx": {
     id: "auth/register/page";
     page: "/auth/register";
+  };
+  "./blog/page.tsx": {
+    id: "blog/page";
+    page: "/blog";
+  };
+  "./blog/[slug]/page.tsx": {
+    id: "blog/[slug]/page";
+    page: "/blog/:slug";
   };
   "./contact/page.tsx": {
     id: "contact/page";
@@ -178,6 +204,10 @@ type RouteFiles = {
   "./practice/counterpoint/[species]/[voices]/[level]/practice/page.tsx": {
     id: "practice/counterpoint/[species]/[voices]/[level]/practice/page";
     page: "/practice/counterpoint/:species/:voices/:level/practice";
+  };
+  "./store/page.tsx": {
+    id: "store/page";
+    page: "/store";
   };
   "./unauthorized/page.tsx": {
     id: "unauthorized/page";

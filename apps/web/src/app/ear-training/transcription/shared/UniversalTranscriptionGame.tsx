@@ -294,13 +294,7 @@ function TranscriptionPianoRoll({
   };
   
   return (
-    <>
-      <style dangerouslySetInnerHTML={{__html: `
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}} />
-      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8">
+    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8">
         {/* Header with controls */}
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-semibold text-white text-center flex-1">Transcription Piano Roll</h3>
@@ -487,7 +481,6 @@ function TranscriptionPianoRoll({
           </div>
         )}
       </div>
-    </>
   );
 }
 
