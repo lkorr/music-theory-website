@@ -25,29 +25,22 @@ function DashboardContent(): React.ReactNode {
       title: 'Chord Recognition',
       description: 'Learn major, minor, diminished, and augmented triads',
       icon: '🎵',
-      link: '/chord-recognition',
+      link: '/core-training/chord-recognition',
       levels: 7
     },
     {
       title: 'Chord Construction',
       description: 'Learn to build chords by placing notes on the piano roll',
       icon: '🎹',
-      link: '/chord-construction',
+      link: '/core-training/chord-construction',
       levels: 9
     },
     {
       title: 'Chord Progressions',
       description: 'Roman numeral analysis and harmonic progressions',
       icon: '🎼',
-      link: '/chord-progressions',
+      link: '/core-training/chord-progressions',
       levels: 4
-    },
-    {
-      title: 'Counterpoint',
-      description: 'Species counterpoint and voice leading',
-      icon: '🎶',
-      link: '/counterpoint',
-      levels: 5
     }
   ];
 
@@ -56,15 +49,25 @@ function DashboardContent(): React.ReactNode {
       title: 'Chord Transcription',
       description: 'Develop ear training by transcribing chords from audio',
       icon: '🎧',
-      link: '/transcription',
+      link: '/ear-training/transcription',
       levels: 16
     },
     {
       title: 'Chord Progression Transcription',
       description: 'Transcribe complete 4-chord progressions using piano roll',
       icon: '🎼',
-      link: '/chord-progression-transcription',
+      link: '/ear-training/chord-progression-transcription',
       levels: 4
+    }
+  ];
+
+  const practiceAreas: TrainingArea[] = [
+    {
+      title: 'Counterpoint',
+      description: 'Species counterpoint and voice leading',
+      icon: '🎶',
+      link: '/practice/counterpoint',
+      levels: 5
     }
   ];
 
@@ -173,6 +176,42 @@ function DashboardContent(): React.ReactNode {
                       </p>
                       
                       <div className="flex items-center text-purple-300 font-medium">
+                        Start Training
+                        <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Practice Areas */}
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-6">Practice</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {practiceAreas.map((area, index) => (
+                  <Link
+                    key={index}
+                    to={area.link}
+                    className="group block"
+                  >
+                    <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 border border-green-500/30 backdrop-blur-md rounded-2xl p-6 transition-all duration-300 transform group-hover:scale-105 group-hover:bg-green-500/20">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="text-4xl">{area.icon}</div>
+                        <div className="text-green-200/80 text-sm">
+                          {area.levels} levels
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-xl font-bold text-white mb-2">
+                        {area.title}
+                      </h3>
+                      
+                      <p className="text-white/70 text-sm mb-4">
+                        {area.description}
+                      </p>
+                      
+                      <div className="flex items-center text-green-300 font-medium">
                         Start Training
                         <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                       </div>

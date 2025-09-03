@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router';
 import { useAuth } from '../../components/auth/ProtectedRoute';
-import { useStatistics } from '../chord-recognition/shared/hooks/useStatistics';
+import { useStatistics } from '../core-training/chord-recognition/shared/hooks/useStatistics';
 
 interface LeaderboardEntry {
   rankPosition: number;

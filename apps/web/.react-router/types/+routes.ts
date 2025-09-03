@@ -19,84 +19,72 @@ type Pages = {
   "/auth/register": {
     params: {};
   };
-  "/chord-construction": {
+  "/contact": {
     params: {};
   };
-  "/chord-construction/:category/:level": {
+  "/core-training/chord-construction": {
+    params: {};
+  };
+  "/core-training/chord-construction/:category/:level": {
     params: {
       "category": string;
       "level": string;
     };
   };
-  "/chord-progression-transcription": {
+  "/core-training/chord-progressions": {
     params: {};
   };
-  "/chord-progression-transcription/:level": {
+  "/core-training/chord-progressions/:level": {
     params: {
       "level": string;
     };
   };
-  "/chord-progressions": {
+  "/core-training/chord-recognition": {
     params: {};
   };
-  "/chord-progressions/:level": {
-    params: {
-      "level": string;
-    };
-  };
-  "/chord-progressions-backup": {
-    params: {};
-  };
-  "/chord-progressions-backup/level1": {
-    params: {};
-  };
-  "/chord-progressions-backup/level2": {
-    params: {};
-  };
-  "/chord-progressions-backup/level3": {
-    params: {};
-  };
-  "/chord-progressions-backup/level4": {
-    params: {};
-  };
-  "/chord-recognition": {
-    params: {};
-  };
-  "/chord-recognition/:category/:level": {
+  "/core-training/chord-recognition/:category/:level": {
     params: {
       "category": string;
-      "level": string;
-    };
-  };
-  "/counterpoint": {
-    params: {};
-  };
-  "/counterpoint/:species/:voices/:level": {
-    params: {
-      "species": string;
-      "voices": string;
-      "level": string;
-    };
-  };
-  "/counterpoint/:species/:voices/:level/practice": {
-    params: {
-      "species": string;
-      "voices": string;
       "level": string;
     };
   };
   "/dashboard": {
     params: {};
   };
+  "/ear-training/chord-progression-transcription": {
+    params: {};
+  };
+  "/ear-training/chord-progression-transcription/:level": {
+    params: {
+      "level": string;
+    };
+  };
+  "/ear-training/transcription": {
+    params: {};
+  };
+  "/ear-training/transcription/:category/:level": {
+    params: {
+      "category": string;
+      "level": string;
+    };
+  };
   "/leaderboard": {
     params: {};
   };
-  "/transcription": {
+  "/practice/counterpoint": {
     params: {};
   };
-  "/transcription/:category/:level": {
+  "/practice/counterpoint/:species/:voices/:level": {
     params: {
-      "category": string;
+      "species": string;
+      "voices": string;
+      "level": string;
+    };
+  };
+  "/practice/counterpoint/:species/:voices/:level/practice": {
+    params: {
+      "species": string;
+      "voices": string;
       "level": string;
     };
   };
@@ -113,7 +101,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/register" | "/chord-construction" | "/chord-construction/:category/:level" | "/chord-progression-transcription" | "/chord-progression-transcription/:level" | "/chord-progressions" | "/chord-progressions/:level" | "/chord-progressions-backup" | "/chord-progressions-backup/level1" | "/chord-progressions-backup/level2" | "/chord-progressions-backup/level3" | "/chord-progressions-backup/level4" | "/chord-recognition" | "/chord-recognition/:category/:level" | "/counterpoint" | "/counterpoint/:species/:voices/:level" | "/counterpoint/:species/:voices/:level/practice" | "/dashboard" | "/leaderboard" | "/transcription" | "/transcription/:category/:level" | "/unauthorized" | "/*";
+    page: "/" | "/auth/login" | "/auth/register" | "/contact" | "/core-training/chord-construction" | "/core-training/chord-construction/:category/:level" | "/core-training/chord-progressions" | "/core-training/chord-progressions/:level" | "/core-training/chord-recognition" | "/core-training/chord-recognition/:category/:level" | "/dashboard" | "/ear-training/chord-progression-transcription" | "/ear-training/chord-progression-transcription/:level" | "/ear-training/transcription" | "/ear-training/transcription/:category/:level" | "/leaderboard" | "/practice/counterpoint" | "/practice/counterpoint/:species/:voices/:level" | "/practice/counterpoint/:species/:voices/:level/practice" | "/unauthorized" | "/*";
   };
   "./page.tsx": {
     id: "page";
@@ -127,85 +115,69 @@ type RouteFiles = {
     id: "auth/register/page";
     page: "/auth/register";
   };
-  "./chord-construction/page.tsx": {
-    id: "chord-construction/page";
-    page: "/chord-construction";
+  "./contact/page.tsx": {
+    id: "contact/page";
+    page: "/contact";
   };
-  "./chord-construction/[category]/[level]/page.tsx": {
-    id: "chord-construction/[category]/[level]/page";
-    page: "/chord-construction/:category/:level";
+  "./core-training/chord-construction/page.tsx": {
+    id: "core-training/chord-construction/page";
+    page: "/core-training/chord-construction";
   };
-  "./chord-progression-transcription/page.tsx": {
-    id: "chord-progression-transcription/page";
-    page: "/chord-progression-transcription";
+  "./core-training/chord-construction/[category]/[level]/page.tsx": {
+    id: "core-training/chord-construction/[category]/[level]/page";
+    page: "/core-training/chord-construction/:category/:level";
   };
-  "./chord-progression-transcription/[level]/page.tsx": {
-    id: "chord-progression-transcription/[level]/page";
-    page: "/chord-progression-transcription/:level";
+  "./core-training/chord-progressions/page.tsx": {
+    id: "core-training/chord-progressions/page";
+    page: "/core-training/chord-progressions";
   };
-  "./chord-progressions/page.tsx": {
-    id: "chord-progressions/page";
-    page: "/chord-progressions";
+  "./core-training/chord-progressions/[level]/page.tsx": {
+    id: "core-training/chord-progressions/[level]/page";
+    page: "/core-training/chord-progressions/:level";
   };
-  "./chord-progressions/[level]/page.tsx": {
-    id: "chord-progressions/[level]/page";
-    page: "/chord-progressions/:level";
+  "./core-training/chord-recognition/page.tsx": {
+    id: "core-training/chord-recognition/page";
+    page: "/core-training/chord-recognition";
   };
-  "./chord-progressions-backup/page.tsx": {
-    id: "chord-progressions-backup/page";
-    page: "/chord-progressions-backup";
-  };
-  "./chord-progressions-backup/level1/page.tsx": {
-    id: "chord-progressions-backup/level1/page";
-    page: "/chord-progressions-backup/level1";
-  };
-  "./chord-progressions-backup/level2/page.tsx": {
-    id: "chord-progressions-backup/level2/page";
-    page: "/chord-progressions-backup/level2";
-  };
-  "./chord-progressions-backup/level3/page.tsx": {
-    id: "chord-progressions-backup/level3/page";
-    page: "/chord-progressions-backup/level3";
-  };
-  "./chord-progressions-backup/level4/page.tsx": {
-    id: "chord-progressions-backup/level4/page";
-    page: "/chord-progressions-backup/level4";
-  };
-  "./chord-recognition/page.tsx": {
-    id: "chord-recognition/page";
-    page: "/chord-recognition";
-  };
-  "./chord-recognition/[category]/[level]/page.tsx": {
-    id: "chord-recognition/[category]/[level]/page";
-    page: "/chord-recognition/:category/:level";
-  };
-  "./counterpoint/page.tsx": {
-    id: "counterpoint/page";
-    page: "/counterpoint";
-  };
-  "./counterpoint/[species]/[voices]/[level]/page.tsx": {
-    id: "counterpoint/[species]/[voices]/[level]/page";
-    page: "/counterpoint/:species/:voices/:level";
-  };
-  "./counterpoint/[species]/[voices]/[level]/practice/page.tsx": {
-    id: "counterpoint/[species]/[voices]/[level]/practice/page";
-    page: "/counterpoint/:species/:voices/:level/practice";
+  "./core-training/chord-recognition/[category]/[level]/page.tsx": {
+    id: "core-training/chord-recognition/[category]/[level]/page";
+    page: "/core-training/chord-recognition/:category/:level";
   };
   "./dashboard/page.tsx": {
     id: "dashboard/page";
     page: "/dashboard";
   };
+  "./ear-training/chord-progression-transcription/page.tsx": {
+    id: "ear-training/chord-progression-transcription/page";
+    page: "/ear-training/chord-progression-transcription";
+  };
+  "./ear-training/chord-progression-transcription/[level]/page.tsx": {
+    id: "ear-training/chord-progression-transcription/[level]/page";
+    page: "/ear-training/chord-progression-transcription/:level";
+  };
+  "./ear-training/transcription/page.tsx": {
+    id: "ear-training/transcription/page";
+    page: "/ear-training/transcription";
+  };
+  "./ear-training/transcription/[category]/[level]/page.tsx": {
+    id: "ear-training/transcription/[category]/[level]/page";
+    page: "/ear-training/transcription/:category/:level";
+  };
   "./leaderboard/page.tsx": {
     id: "leaderboard/page";
     page: "/leaderboard";
   };
-  "./transcription/page.tsx": {
-    id: "transcription/page";
-    page: "/transcription";
+  "./practice/counterpoint/page.tsx": {
+    id: "practice/counterpoint/page";
+    page: "/practice/counterpoint";
   };
-  "./transcription/[category]/[level]/page.tsx": {
-    id: "transcription/[category]/[level]/page";
-    page: "/transcription/:category/:level";
+  "./practice/counterpoint/[species]/[voices]/[level]/page.tsx": {
+    id: "practice/counterpoint/[species]/[voices]/[level]/page";
+    page: "/practice/counterpoint/:species/:voices/:level";
+  };
+  "./practice/counterpoint/[species]/[voices]/[level]/practice/page.tsx": {
+    id: "practice/counterpoint/[species]/[voices]/[level]/practice/page";
+    page: "/practice/counterpoint/:species/:voices/:level/practice";
   };
   "./unauthorized/page.tsx": {
     id: "unauthorized/page";

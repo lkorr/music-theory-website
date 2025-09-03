@@ -10,13 +10,15 @@
 
 import { jwtVerify, SignJWT } from 'jose';
 
+const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET || 'your-secret-key');
+
 // Type definitions
 export interface User {
   id: string;
   email: string;
-  name?: string;
-  role?: string;
-  emailVerified?: boolean;
+  name: string;
+  role: string;
+  last_login?: string;
 }
 
 export interface AuthState {
@@ -26,26 +28,31 @@ export interface AuthState {
   token: string | null;
 }
 
+export type AuthListener = (state: AuthState) => void;
+
 export interface LoginCredentials {
   email: string;
   password: string;
 }
 
-export interface UserRegistrationData {
+export interface RegistrationData {
+  name: string;
   email: string;
   password: string;
-  name?: string;
-  acceptTerms: boolean;
 }
 
-export interface AuthResult {
+export interface LoginResult {
+  success: boolean;
+  user?: User;
+  error?: string;
+}
+
+export interface RegistrationResult {
   success: boolean;
   user?: User;
   error?: string;
   details?: any;
 }
-
-const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET || 'your-secret-key');
 
 /**
  * Authentication state management
@@ -57,15 +64,15 @@ let authState: AuthState = {
   token: null
 };
 
-let authListeners: ((state: AuthState) => void)[] = [];
+let authListeners: AuthListener[] = [];
 
 /**
  * Subscribe to authentication state changes
  * 
- * @param callback - Callback function to call on state change
- * @returns Unsubscribe function
+ * @param {Function} callback - Callback function to call on state change
+ * @returns {Function} - Unsubscribe function
  */
-export function subscribeToAuth(callback: (state: AuthState) => void): () => void {
+export function subscribeToAuth(callback: AuthListener): () => void {
   authListeners.push(callback);
   
   // Return unsubscribe function
@@ -77,7 +84,7 @@ export function subscribeToAuth(callback: (state: AuthState) => void): () => voi
 /**
  * Notify all listeners of authentication state changes
  */
-function notifyAuthListeners(): void {
+function notifyAuthListeners() {
   authListeners.forEach(callback => {
     try {
       callback(authState);
@@ -90,7 +97,7 @@ function notifyAuthListeners(): void {
 /**
  * Update authentication state securely
  * 
- * @param newState - New authentication state
+ * @param {Object} newState - New authentication state
  */
 function updateAuthState(newState: Partial<AuthState>): void {
   authState = { ...authState, ...newState };
@@ -100,9 +107,9 @@ function updateAuthState(newState: Partial<AuthState>): void {
 /**
  * Get authentication token from secure HTTP-only cookie
  * 
- * @returns Authentication token or null
+ * @returns {string|null} - Authentication token or null
  */
-function getTokenFromCookie(): string | null {
+function getTokenFromCookie() {
   if (typeof document === 'undefined') return null;
   
   try {
@@ -123,10 +130,10 @@ function getTokenFromCookie(): string | null {
 /**
  * Verify JWT token
  * 
- * @param token - JWT token to verify
- * @returns Decoded token payload or null
+ * @param {string} token - JWT token to verify
+ * @returns {Object|null} - Decoded token payload or null
  */
-async function verifyToken(token: string): Promise<any> {
+async function verifyToken(token: string): Promise<any | null> {
   if (!token) return null;
   
   try {
@@ -145,33 +152,21 @@ async function verifyToken(token: string): Promise<any> {
 /**
  * Check if user is authenticated
  * 
- * @returns True if authenticated
+ * @returns {Promise<boolean>} - True if authenticated
  */
-/**
- * Wrapper to add timeout to fetch requests
- */
-function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number = 5000): Promise<Response> {
-  return Promise.race([
-    fetch(url, options),
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
-    )
-  ]);
-}
-
-export async function checkAuth(): Promise<boolean> {
+export async function checkAuth() {
   try {
     updateAuthState({ isLoading: true });
     
     // Don't try to read HttpOnly cookie - instead call /api/auth/me
     // The browser will automatically send the HttpOnly cookie with the request
-    const response = await fetchWithTimeout('/api/auth/me', {
+    const response = await fetch('/api/auth/me', {
       method: 'GET',
       credentials: 'include', // Important: include cookies
       headers: {
         'X-Requested-With': 'XMLHttpRequest'
       }
-    }, 5000); // 5 second timeout
+    });
     
     if (!response.ok) {
       updateAuthState({
@@ -211,10 +206,10 @@ export async function checkAuth(): Promise<boolean> {
 /**
  * Login user with credentials
  * 
- * @param credentials - Login credentials
- * @returns Login result
+ * @param {Object} credentials - Login credentials
+ * @returns {Promise<Object>} - Login result
  */
-export async function login(credentials: LoginCredentials): Promise<AuthResult> {
+export async function login(credentials: LoginCredentials): Promise<LoginResult> {
   try {
     const response = await fetch('/api/auth/login', {
       method: 'POST',
@@ -260,10 +255,10 @@ export async function login(credentials: LoginCredentials): Promise<AuthResult> 
 /**
  * Register new user
  * 
- * @param userData - User registration data
- * @returns Registration result
+ * @param {Object} userData - User registration data
+ * @returns {Promise<Object>} - Registration result
  */
-export async function register(userData: UserRegistrationData): Promise<AuthResult> {
+export async function register(userData: RegistrationData): Promise<RegistrationResult> {
   try {
     const response = await fetch('/api/auth/register', {
       method: 'POST',
@@ -302,7 +297,7 @@ export async function register(userData: UserRegistrationData): Promise<AuthResu
 /**
  * Logout user securely
  * 
- * @returns True if logout successful
+ * @returns {Promise<boolean>} - True if logout successful
  */
 export async function logout(): Promise<boolean> {
   try {
@@ -343,7 +338,7 @@ export async function logout(): Promise<boolean> {
 /**
  * Get current authentication state
  * 
- * @returns Current auth state
+ * @returns {Object} - Current auth state
  */
 export function getAuthState(): AuthState {
   return { ...authState };
@@ -352,7 +347,7 @@ export function getAuthState(): AuthState {
 /**
  * Get current user
  * 
- * @returns Current user or null
+ * @returns {Object|null} - Current user or null
  */
 export function getCurrentUser(): User | null {
   return authState.user;
@@ -361,8 +356,8 @@ export function getCurrentUser(): User | null {
 /**
  * Check if user has specific role
  * 
- * @param role - Role to check
- * @returns True if user has role
+ * @param {string} role - Role to check
+ * @returns {boolean} - True if user has role
  */
 export function hasRole(role: string): boolean {
   return authState.user?.role === role;
@@ -371,7 +366,7 @@ export function hasRole(role: string): boolean {
 /**
  * Check if user is admin
  * 
- * @returns True if user is admin
+ * @returns {boolean} - True if user is admin
  */
 export function isAdmin(): boolean {
   return hasRole('admin');
@@ -380,7 +375,7 @@ export function isAdmin(): boolean {
 /**
  * Get authorization header for API requests
  * 
- * @returns Authorization headers
+ * @returns {Object} - Authorization headers
  */
 export function getAuthHeaders(): Record<string, string> {
   if (!authState.token) {
@@ -396,9 +391,9 @@ export function getAuthHeaders(): Record<string, string> {
 /**
  * Make authenticated API request
  * 
- * @param url - API endpoint URL
- * @param options - Fetch options
- * @returns Fetch response
+ * @param {string} url - API endpoint URL
+ * @param {Object} options - Fetch options
+ * @returns {Promise<Response>} - Fetch response
  */
 export async function authenticatedFetch(url: string, options: RequestInit = {}): Promise<Response> {
   const headers = {
@@ -416,9 +411,7 @@ export async function authenticatedFetch(url: string, options: RequestInit = {})
   // Handle authentication errors
   if (response.status === 401) {
     await logout();
-    if (typeof window !== 'undefined') {
-      window.location.href = '/auth/login';
-    }
+    window.location.href = '/auth/login';
   }
   
   return response;
@@ -427,11 +420,13 @@ export async function authenticatedFetch(url: string, options: RequestInit = {})
 /**
  * Initialize authentication on app startup
  */
-export function initAuth(): void {
+export function initAuth() {
   if (typeof window !== 'undefined') {
     checkAuth();
   }
 }
 
-// Note: Auto-initialization removed for performance
-// Call initAuth() manually from components that need authentication
+// Auto-initialize when module is loaded in browser
+if (typeof window !== 'undefined') {
+  initAuth();
+}

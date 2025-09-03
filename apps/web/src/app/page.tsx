@@ -1,5 +1,7 @@
 import { Link } from "react-router";
 import AuthButton from "../components/auth/AuthButton";
+import LiveStreamBanner from "../components/LiveStreamBanner";
+import NewsletterSignup from "../components/NewsletterSignup";
 import './global.css';
 
 interface Platform {
@@ -53,6 +55,13 @@ export default function PailiaqHomePage() {
       isInternal: true
     },
     {
+      name: 'Contact',
+      icon: '📧',
+      url: '/contact',
+      description: 'Bookings, mixing/mastering, and lessons',
+      isInternal: true
+    },
+    {
       name: 'YouTube Tutorials',
       icon: '📹',
       url: 'https://youtube.com/@pailiaq',
@@ -68,6 +77,9 @@ export default function PailiaqHomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e]">
+      {/* YouTube Live Stream Banner */}
+      <LiveStreamBanner />
+      
       <header className="relative overflow-hidden">
         <div className="absolute inset-0">
           <img 
@@ -78,7 +90,13 @@ export default function PailiaqHomePage() {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0a0a]/50 to-[#0a0a0a]"></div>
         </div>
         
-        <div className="absolute top-6 right-6 z-20">
+        <div className="absolute top-6 right-6 z-20 flex items-center gap-4">
+          <Link 
+            to="/contact" 
+            className="text-white/90 hover:text-white font-medium transition-colors px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20"
+          >
+            Contact
+          </Link>
           <AuthButton showRegister={true} />
         </div>
         
@@ -171,6 +189,13 @@ export default function PailiaqHomePage() {
               </div>
             </div>
           </a>
+        </section>
+
+        {/* Newsletter Signup Section */}
+        <section className="mb-16">
+          <div className="max-w-md mx-auto">
+            <NewsletterSignup />
+          </div>
         </section>
 
         <section>

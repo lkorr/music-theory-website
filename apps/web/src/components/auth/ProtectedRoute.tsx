@@ -12,7 +12,7 @@
 import { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router';
-import { checkAuth, subscribeToAuth, getAuthState } from '../../lib/auth.js';
+import { checkAuth, subscribeToAuth, getAuthState } from '../../lib/auth';
 import type { AuthState } from '../../lib/auth.js';
 
 interface ProtectedRouteProps {

@@ -7,56 +7,14 @@
 
 import DOMPurify from 'isomorphic-dompurify';
 
-// Type definitions
-export interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-  sanitized?: string | null;
-}
-
-export interface RegistrationValidationResult {
-  isValid: boolean;
-  errors: string[];
-  sanitizedData?: RegistrationData | null;
-}
-
-export interface LoginValidationResult {
-  isValid: boolean;
-  errors: string[];
-  sanitizedData?: LoginData | null;
-}
-
-export interface RegistrationData {
-  email: string;
-  password: string;
-  name?: string;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface UserRegistrationInput {
-  email?: string;
-  password?: string;
-  name?: string;
-  acceptTerms?: boolean;
-}
-
-export interface LoginInput {
-  email?: string;
-  password?: string;
-}
-
 /**
  * Email validation with security considerations
  * 
- * @param email - Email to validate
- * @returns Validation result
+ * @param {string} email - Email to validate
+ * @returns {Object} - Validation result
  */
-export function validateEmail(email: string): ValidationResult {
-  const errors: string[] = [];
+export function validateEmail(email: string): ValidationResult<string> {
+  const errors = [];
 
   if (!email || typeof email !== 'string') {
     return {
@@ -112,11 +70,11 @@ export function validateEmail(email: string): ValidationResult {
 /**
  * Name validation and sanitization
  * 
- * @param name - Name to validate
- * @returns Validation result
+ * @param {string} name - Name to validate
+ * @returns {Object} - Validation result
  */
-export function validateName(name: string): ValidationResult {
-  const errors: string[] = [];
+export function validateName(name: string): ValidationResult<string> {
+  const errors = [];
 
   if (!name || typeof name !== 'string') {
     return {
@@ -177,11 +135,11 @@ export function validateName(name: string): ValidationResult {
 /**
  * General text input sanitization
  * 
- * @param input - Text input to sanitize
- * @param maxLength - Maximum allowed length
- * @returns Sanitized text
+ * @param {string} input - Text input to sanitize
+ * @param {number} maxLength - Maximum allowed length
+ * @returns {string} - Sanitized text
  */
-export function sanitizeTextInput(input: string, maxLength: number = 1000): string {
+export function sanitizeTextInput(input: string, maxLength: number = 1000): ValidationResult<string> {
   if (!input || typeof input !== 'string') {
     return '';
   }
@@ -206,19 +164,19 @@ export function sanitizeTextInput(input: string, maxLength: number = 1000): stri
 /**
  * Validate and sanitize user registration data
  * 
- * @param userData - User registration data
- * @returns Validation result with sanitized data
+ * @param {Object} userData - User registration data
+ * @returns {Object} - Validation result with sanitized data
  */
-export function validateRegistrationData(userData: UserRegistrationInput): RegistrationValidationResult {
+export function validateRegistrationData(userData: any): RegistrationValidationResult {
   const { email, password, name, acceptTerms } = userData || {};
-  const errors: string[] = [];
-  const sanitizedData: Partial<RegistrationData> = {};
+  const errors = [];
+  const sanitizedData = {};
 
   // Validate email
-  const emailValidation = validateEmail(email || '');
+  const emailValidation = validateEmail(email);
   if (!emailValidation.isValid) {
     errors.push(...emailValidation.errors);
-  } else if (emailValidation.sanitized) {
+  } else {
     sanitizedData.email = emailValidation.sanitized;
   }
 
@@ -238,7 +196,7 @@ export function validateRegistrationData(userData: UserRegistrationInput): Regis
     const nameValidation = validateName(name);
     if (!nameValidation.isValid) {
       errors.push(...nameValidation.errors);
-    } else if (nameValidation.sanitized) {
+    } else {
       sanitizedData.name = nameValidation.sanitized;
     }
   }
@@ -251,26 +209,26 @@ export function validateRegistrationData(userData: UserRegistrationInput): Regis
   return {
     isValid: errors.length === 0,
     errors,
-    sanitizedData: errors.length === 0 ? sanitizedData as RegistrationData : null
+    sanitizedData: errors.length === 0 ? sanitizedData : null
   };
 }
 
 /**
  * Validate and sanitize login data
  * 
- * @param loginData - Login credentials
- * @returns Validation result
+ * @param {Object} loginData - Login credentials
+ * @returns {Object} - Validation result
  */
-export function validateLoginData(loginData: LoginInput): LoginValidationResult {
+export function validateLoginData(loginData: any): LoginValidationResult {
   const { email, password } = loginData || {};
-  const errors: string[] = [];
-  const sanitizedData: Partial<LoginData> = {};
+  const errors = [];
+  const sanitizedData = {};
 
   // Validate email
-  const emailValidation = validateEmail(email || '');
+  const emailValidation = validateEmail(email);
   if (!emailValidation.isValid) {
     errors.push('Please enter a valid email address');
-  } else if (emailValidation.sanitized) {
+  } else {
     sanitizedData.email = emailValidation.sanitized;
   }
 
@@ -286,15 +244,15 @@ export function validateLoginData(loginData: LoginInput): LoginValidationResult 
   return {
     isValid: errors.length === 0,
     errors,
-    sanitizedData: errors.length === 0 ? sanitizedData as LoginData : null
+    sanitizedData: errors.length === 0 ? sanitizedData : null
   };
 }
 
 /**
  * Validate IP address format
  * 
- * @param ip - IP address to validate
- * @returns True if valid IP address
+ * @param {string} ip - IP address to validate
+ * @returns {boolean} - True if valid IP address
  */
 export function validateIPAddress(ip: string): boolean {
   if (!ip || typeof ip !== 'string') {
@@ -313,8 +271,8 @@ export function validateIPAddress(ip: string): boolean {
 /**
  * Sanitize User-Agent string for storage
  * 
- * @param userAgent - User-Agent string
- * @returns Sanitized User-Agent
+ * @param {string} userAgent - User-Agent string
+ * @returns {string} - Sanitized User-Agent
  */
 export function sanitizeUserAgent(userAgent: string): string {
   if (!userAgent || typeof userAgent !== 'string') {
@@ -339,9 +297,9 @@ export function sanitizeUserAgent(userAgent: string): string {
 /**
  * Rate limiting key generation
  * 
- * @param ip - Client IP address
- * @param identifier - Additional identifier (email, user ID, etc.)
- * @returns Rate limiting key
+ * @param {string} ip - Client IP address
+ * @param {string} identifier - Additional identifier (email, user ID, etc.)
+ * @returns {string} - Rate limiting key
  */
 export function generateRateLimitKey(ip: string, identifier: string = ''): string {
   const sanitizedIp = validateIPAddress(ip) ? ip : 'unknown';

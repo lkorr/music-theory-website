@@ -1,6 +1,6 @@
 // Convert Fux exercises to API format
-import { fuxExercisesComplete } from '../../counterpoint/fux-exercises/original-mxl/fuxExercisesComplete.js';
-import { fuxSolutions } from '../../counterpoint/fux-exercises/original-mxl/fuxSolutions.js';
+import { fuxExercisesComplete } from '../../practice/counterpoint/fux-exercises/original-mxl/fuxExercisesComplete.js';
+import { fuxSolutions } from '../../practice/counterpoint/fux-exercises/original-mxl/fuxSolutions.js';
 
 // Convert Fux exercise data to the format expected by the API
 export function convertFuxExerciseToApiFormat(fuxExercise, solutionData = null) {

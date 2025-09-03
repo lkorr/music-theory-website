@@ -12,7 +12,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import DOMPurify from 'isomorphic-dompurify';
-import { checkAuth } from '../../lib/auth.js';
+import { checkAuth } from '../../lib/auth';
 
 interface FormData {
   email: string;

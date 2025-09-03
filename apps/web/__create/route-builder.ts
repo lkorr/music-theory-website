@@ -14,7 +14,7 @@ if (globalThis.fetch) {
   globalThis.fetch = updatedFetch;
 }
 
-// Recursively find all route.js files
+// Recursively find all route.js and route.ts files
 async function findRouteFiles(dir: string): Promise<string[]> {
   const files = await readdir(dir);
   let routes: string[] = [];
@@ -26,9 +26,9 @@ async function findRouteFiles(dir: string): Promise<string[]> {
 
       if (statResult.isDirectory()) {
         routes = routes.concat(await findRouteFiles(filePath));
-      } else if (file === 'route.js') {
-        // Handle root route.js specially
-        if (filePath === join(__dirname, 'route.js')) {
+      } else if (file === 'route.js' || file === 'route.ts') {
+        // Handle root route.js or route.ts specially
+        if (filePath === join(__dirname, 'route.js') || filePath === join(__dirname, 'route.ts')) {
           routes.unshift(filePath); // Add to beginning of array
         } else {
           routes.push(filePath);
@@ -46,7 +46,7 @@ async function findRouteFiles(dir: string): Promise<string[]> {
 function getHonoPath(routeFile: string): { name: string; pattern: string }[] {
   const relativePath = routeFile.replace(__dirname, '');
   const parts = relativePath.split('/').filter(Boolean);
-  const routeParts = parts.slice(0, -1); // Remove 'route.js'
+  const routeParts = parts.slice(0, -1); // Remove 'route.js' or 'route.ts'
   if (routeParts.length === 0) {
     return [{ name: 'root', pattern: '' }];
   }
@@ -217,6 +217,30 @@ async function registerRoutes() {
         return await leaderboardLevelRoute.GET(c.req.raw, { params });
       });
       console.log('✅ Registered GET /leaderboards/level/:moduleType/:category/:level');
+    }
+
+    // Register YouTube livestream status route
+    const youtubeLiveStatusRoute = await import('../src/app/api/youtube/livestream-status/route.ts');
+    if (youtubeLiveStatusRoute.GET) {
+      api.get('/youtube/livestream-status', async (c) => {
+        return await youtubeLiveStatusRoute.GET();
+      });
+      console.log('✅ Registered GET /youtube/livestream-status');
+    }
+
+    // Register newsletter subscription route
+    const newsletterSubscribeRoute = await import('../src/app/api/newsletter/subscribe/route.ts');
+    if (newsletterSubscribeRoute.POST) {
+      api.post('/newsletter/subscribe', async (c) => {
+        return await newsletterSubscribeRoute.POST(c.req.raw);
+      });
+      console.log('✅ Registered POST /newsletter/subscribe');
+    }
+    if (newsletterSubscribeRoute.GET) {
+      api.get('/newsletter/subscribe', async (c) => {
+        return await newsletterSubscribeRoute.GET();
+      });
+      console.log('✅ Registered GET /newsletter/subscribe');
     }
 
     console.log('🎉 Route registration completed');

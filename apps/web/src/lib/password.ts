@@ -8,10 +8,11 @@
 import argon2 from 'argon2';
 import crypto from 'crypto';
 
-// Type definitions
-export interface PasswordValidationResult {
-  isValid: boolean;
-  errors: string[];
+// Type definitions for password utilities
+export interface PasswordStrength {
+  score: number;
+  feedback: string[];
+  isStrong: boolean;
 }
 
 /**
@@ -34,9 +35,9 @@ const ARGON2_OPTIONS = {
 /**
  * Hash a password using Argon2id
  * 
- * @param password - Plain text password
- * @returns Hashed password with salt
- * @throws Error - If password is invalid or hashing fails
+ * @param {string} password - Plain text password
+ * @returns {Promise<string>} - Hashed password with salt
+ * @throws {Error} - If password is invalid or hashing fails
  */
 export async function hashPassword(password: string): Promise<string> {
   // Input validation
@@ -72,10 +73,10 @@ export async function hashPassword(password: string): Promise<string> {
 /**
  * Verify a password against its hash
  * 
- * @param hashedPassword - Stored password hash
- * @param plainPassword - Plain text password to verify
- * @returns True if password matches, false otherwise
- * @throws Error - If verification fails due to invalid input
+ * @param {string} hashedPassword - Stored password hash
+ * @param {string} plainPassword - Plain text password to verify
+ * @returns {Promise<boolean>} - True if password matches, false otherwise
+ * @throws {Error} - If verification fails due to invalid input
  */
 export async function verifyPassword(hashedPassword: string, plainPassword: string): Promise<boolean> {
   // Input validation
@@ -102,11 +103,11 @@ export async function verifyPassword(hashedPassword: string, plainPassword: stri
 /**
  * Validate password strength
  * 
- * @param password - Password to validate
- * @returns Validation result with isValid and errors
+ * @param {string} password - Password to validate
+ * @returns {Object} - Validation result with isValid and errors
  */
-export function validatePasswordStrength(password: string): PasswordValidationResult {
-  const errors: string[] = [];
+export function validatePasswordStrength(password: string): PasswordStrength {
+  const errors = [];
   
   if (!password) {
     return {
@@ -165,8 +166,8 @@ export function validatePasswordStrength(password: string): PasswordValidationRe
 /**
  * Generate a secure random password
  * 
- * @param length - Password length (default: 16)
- * @returns Secure random password
+ * @param {number} length - Password length (default: 16)
+ * @returns {string} - Secure random password
  */
 export function generateSecurePassword(length: number = 16): string {
   const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
@@ -199,9 +200,9 @@ export function generateSecurePassword(length: number = 16): string {
 /**
  * Constant-time string comparison to prevent timing attacks
  * 
- * @param a - First string
- * @param b - Second string  
- * @returns True if strings are equal
+ * @param {string} a - First string
+ * @param {string} b - Second string  
+ * @returns {boolean} - True if strings are equal
  */
 export function constantTimeEquals(a: string, b: string): boolean {
   if (typeof a !== 'string' || typeof b !== 'string') {
