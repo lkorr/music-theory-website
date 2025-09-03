@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { DOMParser } = require('xmldom');
+const { DOMParser } = require('@xmldom/xmldom');
 
 // Parse MusicXML files and convert to fuxExercisesOptimized.js format
 class MusicXMLParser {

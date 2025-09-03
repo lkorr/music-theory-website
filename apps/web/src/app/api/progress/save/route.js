@@ -5,8 +5,12 @@
 
 import { jwtVerify } from 'jose';
 import { recordGameSession } from '../../../../lib/statistics';
+import { validateCSRFHeader } from '../../../../lib/csrf.js';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET || 'your-secret-key');
+if (!process.env.AUTH_SECRET) {
+  throw new Error('AUTH_SECRET environment variable is required for JWT signing');
+}
+const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET);
 
 /**
  * Verify JWT token and get user
@@ -54,6 +58,18 @@ export async function POST(request) {
     }
 
     const user = authResult.user;
+    
+    // Validate CSRF token for additional security
+    if (!validateCSRFHeader(request, user.id)) {
+      return new Response(
+        JSON.stringify({ error: 'CSRF token validation failed' }),
+        { 
+          status: 403,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
     const body = await request.json();
     
     // Validate required session data

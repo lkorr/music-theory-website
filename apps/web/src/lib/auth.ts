@@ -8,9 +8,8 @@
  * - Session state management with security checks
  */
 
-import { jwtVerify, SignJWT } from 'jose';
-
-const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET || 'your-secret-key');
+// Client-side auth utility - does not handle JWT directly
+// JWT operations are handled server-side via HttpOnly cookies
 
 // Type definitions
 export interface User {
@@ -127,27 +126,7 @@ function getTokenFromCookie() {
   return null;
 }
 
-/**
- * Verify JWT token
- * 
- * @param {string} token - JWT token to verify
- * @returns {Object|null} - Decoded token payload or null
- */
-async function verifyToken(token: string): Promise<any | null> {
-  if (!token) return null;
-  
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, {
-      issuer: 'midi-training-app',
-      audience: 'midi-training-app-users'
-    });
-    
-    return payload;
-  } catch (error) {
-    console.error('Token verification failed:', error);
-    return null;
-  }
-}
+// JWT verification is handled server-side via /api/auth/me endpoint
 
 /**
  * Check if user is authenticated

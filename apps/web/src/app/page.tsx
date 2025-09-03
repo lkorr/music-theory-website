@@ -55,13 +55,6 @@ export default function PailiaqHomePage() {
       isInternal: true
     },
     {
-      name: 'Contact',
-      icon: '📧',
-      url: '/contact',
-      description: 'Bookings, mixing/mastering, and lessons',
-      isInternal: true
-    },
-    {
       name: 'YouTube Tutorials',
       icon: '📹',
       url: 'https://youtube.com/@pailiaq',
@@ -91,6 +84,12 @@ export default function PailiaqHomePage() {
         </div>
         
         <div className="absolute top-6 right-6 z-20 flex items-center gap-4">
+          <Link 
+            to="/dashboard" 
+            className="text-white hover:text-white font-medium transition-colors px-4 py-2 rounded-full bg-blue-600/80 backdrop-blur-md border border-blue-500/30 hover:bg-blue-600"
+          >
+            Dashboard
+          </Link>
           <Link 
             to="/contact" 
             className="text-white/90 hover:text-white font-medium transition-colors px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20"
@@ -191,13 +190,6 @@ export default function PailiaqHomePage() {
           </a>
         </section>
 
-        {/* Newsletter Signup Section */}
-        <section className="mb-16">
-          <div className="max-w-md mx-auto">
-            <NewsletterSignup />
-          </div>
-        </section>
-
         <section>
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-white mb-4">
@@ -214,9 +206,9 @@ export default function PailiaqHomePage() {
                 {link.isInternal ? (
                   <Link
                     to={link.url}
-                    className="block group"
+                    className="block group cursor-pointer"
                   >
-                    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 transition-all duration-300 transform group-hover:scale-105 group-hover:bg-white/20 h-full">
+                    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 transition-all duration-300 transform group-hover:scale-105 group-hover:bg-white/20 h-full relative z-10">
                       <div className="text-center">
                         <div className="text-5xl mb-4">{link.icon}</div>
                         <h3 className="text-2xl font-bold text-white mb-3">
@@ -258,6 +250,13 @@ export default function PailiaqHomePage() {
                 )}
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Newsletter Signup Section */}
+        <section className="mt-20 mb-16">
+          <div className="max-w-md mx-auto">
+            <NewsletterSignup />
           </div>
         </section>
       </main>

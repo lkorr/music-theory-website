@@ -8,7 +8,10 @@
 import { jwtVerify } from 'jose';
 import { createAuditLog } from '../../../../lib/supabase.js';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET || 'your-secret-key');
+if (!process.env.AUTH_SECRET) {
+  throw new Error('AUTH_SECRET environment variable is required for JWT signing');
+}
+const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET);
 
 /**
  * Handle user logout

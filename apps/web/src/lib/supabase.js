@@ -6,9 +6,10 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { isMockAuthSafelyEnabled } from './environment-validation.js';
 
-// Check if mock auth is enabled (development only)
-const useMockAuth = process.env.USE_MOCK_AUTH === 'true' && process.env.NODE_ENV === 'development';
+// Check if mock auth is safely enabled (development only with safeguards)
+const useMockAuth = isMockAuthSafelyEnabled();
 
 // Validate required environment variables (skip in mock mode)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
