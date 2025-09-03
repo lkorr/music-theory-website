@@ -25,7 +25,6 @@ apps/web/.react-router/
 
 # Test and build cache
 .vitest/
-__create/
 generated/
 
 # IDE files
