@@ -5,7 +5,34 @@
  * to prevent injection attacks and ensure data integrity.
  */
 
-import DOMPurify from 'isomorphic-dompurify';
+import * as DOMPurify from 'isomorphic-dompurify';
+
+// Type definitions for validation results
+export interface ValidationResult<T> {
+  isValid: boolean;
+  errors: string[];
+  sanitized: T | null;
+}
+
+export interface RegistrationValidationResult {
+  isValid: boolean;
+  errors: string[];
+  sanitizedData: {
+    email?: string;
+    password?: string;
+    name?: string;
+    acceptTerms?: boolean;
+  };
+}
+
+export interface LoginValidationResult {
+  isValid: boolean;
+  errors: string[];
+  sanitizedData: {
+    email?: string;
+    password?: string;
+  };
+}
 
 /**
  * Email validation with security considerations
@@ -139,7 +166,7 @@ export function validateName(name: string): ValidationResult<string> {
  * @param {number} maxLength - Maximum allowed length
  * @returns {string} - Sanitized text
  */
-export function sanitizeTextInput(input: string, maxLength: number = 1000): ValidationResult<string> {
+export function sanitizeTextInput(input: string, maxLength: number = 1000): string {
   if (!input || typeof input !== 'string') {
     return '';
   }
@@ -169,8 +196,8 @@ export function sanitizeTextInput(input: string, maxLength: number = 1000): Vali
  */
 export function validateRegistrationData(userData: any): RegistrationValidationResult {
   const { email, password, name, acceptTerms } = userData || {};
-  const errors = [];
-  const sanitizedData = {};
+  const errors: string[] = [];
+  const sanitizedData: RegistrationValidationResult['sanitizedData'] = {};
 
   // Validate email
   const emailValidation = validateEmail(email);
@@ -221,8 +248,8 @@ export function validateRegistrationData(userData: any): RegistrationValidationR
  */
 export function validateLoginData(loginData: any): LoginValidationResult {
   const { email, password } = loginData || {};
-  const errors = [];
-  const sanitizedData = {};
+  const errors: string[] = [];
+  const sanitizedData: LoginValidationResult['sanitizedData'] = {};
 
   // Validate email
   const emailValidation = validateEmail(email);

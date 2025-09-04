@@ -9,6 +9,9 @@ import { validateLoginData } from '../../../../lib/validation.js';
 import { verifyPassword } from '../../../../lib/password.js';
 import { getUserByEmail, updateLoginTracking, createAuditLog, isAccountLocked } from '../../../../lib/supabase.js';
 import { createRateLimitMiddleware } from '../../../../lib/rateLimit.js';
+import { validateAuthCSRF, createCSRFErrorResponse } from '../../../../lib/auth-csrf.ts';
+import { applyAPISecurityHeaders } from '../../../../lib/security-headers.js';
+import { getClientIP } from '../../../../lib/network-utils.ts';
 import { SignJWT } from 'jose';
 
 if (!process.env.AUTH_SECRET) {
@@ -40,6 +43,12 @@ export async function POST(request) {
       if (rateLimitResult) {
         return rateLimitResult;
       }
+    }
+
+    // Validate CSRF token
+    const csrfValidation = await validateAuthCSRF(request, clientIP);
+    if (!csrfValidation.valid) {
+      return createCSRFErrorResponse(csrfValidation.error || 'CSRF validation failed');
     }
 
     // Parse request body
@@ -318,8 +327,7 @@ export async function POST(request) {
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
-          ...createSecurityHeaders()
+          'Content-Type': 'application/json'
         }
       }
     );
@@ -336,7 +344,7 @@ export async function POST(request) {
 
     response.headers.set('Set-Cookie', `auth-token=${token}; ${cookieOptions.join('; ')}`);
 
-    return response;
+    return applyAPISecurityHeaders(response);
 
   } catch (error) {
     console.error('Login endpoint error:', error);
@@ -405,44 +413,7 @@ async function applyRateLimit(request, type) {
   }
 }
 
-/**
- * Extract client IP address from request
- * 
- * @param {Request} request - HTTP request
- * @returns {string} - Client IP address
- */
-function getClientIP(request) {
-  const headers = [
-    'x-forwarded-for',
-    'x-real-ip',
-    'cf-connecting-ip',
-    'x-client-ip'
-  ];
 
-  for (const header of headers) {
-    const value = request.headers.get(header);
-    if (value) {
-      return value.split(',')[0].trim();
-    }
-  }
-
-  return 'unknown';
-}
-
-/**
- * Create security headers for response
- * 
- * @returns {Object} - Security headers
- */
-function createSecurityHeaders() {
-  return {
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-    'X-XSS-Protection': '1; mode=block',
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Cache-Control': 'no-store, no-cache, must-revalidate, private'
-  };
-}
 
 /**
  * Handle unsupported HTTP methods

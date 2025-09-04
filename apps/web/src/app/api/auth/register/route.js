@@ -9,6 +9,8 @@ import { validateRegistrationData } from '../../../../lib/validation.js';
 import { hashPassword, validatePasswordStrength } from '../../../../lib/password.js';
 import { createUser, createAuditLog } from '../../../../lib/supabase.js';
 import { createRateLimitMiddleware, createRateLimitHeaders } from '../../../../lib/rateLimit.js';
+import { validateAuthCSRF, createCSRFErrorResponse } from '../../../../lib/auth-csrf.ts';
+import { getClientIP } from '../../../../lib/network-utils.ts';
 
 /**
  * Handle user registration
@@ -33,6 +35,12 @@ export async function POST(request) {
       if (rateLimitResult) {
         return rateLimitResult; // Rate limit exceeded
       }
+    }
+
+    // Validate CSRF token
+    const csrfValidation = await validateAuthCSRF(request, clientIP);
+    if (!csrfValidation.valid) {
+      return createCSRFErrorResponse(csrfValidation.error || 'CSRF validation failed');
     }
 
     // Parse request body
@@ -291,29 +299,6 @@ async function applyRateLimit(request, type) {
   }
 }
 
-/**
- * Extract client IP address from request
- * 
- * @param {Request} request - HTTP request
- * @returns {string} - Client IP address
- */
-function getClientIP(request) {
-  const headers = [
-    'x-forwarded-for',
-    'x-real-ip',
-    'cf-connecting-ip',
-    'x-client-ip'
-  ];
-
-  for (const header of headers) {
-    const value = request.headers.get(header);
-    if (value) {
-      return value.split(',')[0].trim();
-    }
-  }
-
-  return 'unknown';
-}
 
 /**
  * Create security headers for response

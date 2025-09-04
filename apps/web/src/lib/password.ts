@@ -142,19 +142,71 @@ export function validatePasswordStrength(password: string): PasswordStrength {
     errors.push('Password must contain at least one special character');
   }
 
-  // Common password checks
+  // Common password checks - expanded list
   const commonPasswords = [
+    // Most common passwords
     'password', '123456', '123456789', 'qwerty', 'abc123',
-    'password123', 'admin', 'letmein', 'welcome', 'monkey'
+    'password123', 'admin', 'letmein', 'welcome', 'monkey',
+    'dragon', 'master', 'shadow', 'superman', 'michael',
+    'football', 'baseball', 'liverpool', 'jordan', 'harley',
+    'robert', 'thomas', 'daniel', 'andrew', 'joshua',
+    // Years and dates
+    '2023', '2024', '2025', '1990', '1991', '1992', '1993', '1994', '1995',
+    // Simple variations
+    'password1', 'password!', 'Password1', 'Password!',
+    'qwerty123', 'abc12345', '12345678', '87654321',
+    // Common words with numbers
+    'love123', 'god123', 'sex123', 'money123', 'beer123',
+    // Keyboard patterns (will be caught by pattern check but good to have)
+    '1q2w3e4r', 'qazwsx', '1qaz2wsx', 'zaq12wsx',
+    // Default passwords
+    'default', 'guest', 'user', 'test', 'demo',
+    'changeme', 'newpass', 'temp123', 'password1234'
   ];
 
   if (commonPasswords.includes(password.toLowerCase())) {
     errors.push('Password is too common. Please choose a more unique password');
   }
 
-  // Sequential characters check
-  if (/123456|abcdef|qwerty/i.test(password)) {
-    errors.push('Password should not contain sequential characters');
+  // Enhanced keyboard pattern and sequential characters check
+  const keyboardPatterns = [
+    // QWERTY patterns
+    'qwertyuiop', 'asdfghjkl', 'zxcvbnm',
+    'qwertyui', 'asdfghjk', 'zxcvbn',
+    'qwerty', 'asdfgh', 'zxcv',
+    // Numeric sequences
+    '1234567890', '0987654321',
+    '123456789', '987654321',
+    '12345678', '87654321',
+    '1234567', '7654321',
+    '123456', '654321',
+    '12345', '54321',
+    '1234', '4321',
+    // Alphabetical sequences
+    'abcdefghijklmnopqrstuvwxyz', 'zyxwvutsrqponmlkjihgfedcba',
+    'abcdefghijklm', 'nopqrstuvwxyz',
+    'abcdefgh', 'ijklmnop', 'qrstuvwx',
+    'abcdefg', 'hijklmn', 'opqrstu', 'vwxyz',
+    'abcdef', 'ghijkl', 'mnopqr', 'stuvwx',
+    'abcde', 'fghij', 'klmno', 'pqrst', 'uvwxy',
+    'abcd', 'efgh', 'ijkl', 'mnop', 'qrst', 'uvwx',
+    // Common substitution patterns
+    '@bcd', '3fgh', 'ijk1', 'mn0p', 'qr5t', 'uvw×',
+    // Mobile keypad patterns
+    '147258369', '963852741', '159357', '357159'
+  ];
+
+  const passwordLower = password.toLowerCase();
+  for (const pattern of keyboardPatterns) {
+    if (passwordLower.includes(pattern.toLowerCase())) {
+      errors.push('Password should not contain keyboard patterns or sequential characters');
+      break;
+    }
+  }
+
+  // Additional pattern checks for repetition
+  if (/(.)\1{2,}/.test(password)) {
+    errors.push('Password should not contain repeated characters (e.g., "aaa", "111")');
   }
 
   return {
