@@ -176,7 +176,7 @@ const result = CreateAuth({
 			name: '__Secure-auth.session-token',
 			options: {
 				httpOnly: true,
-				sameSite: 'lax',
+				sameSite: 'strict',
 				path: '/',
 				secure: authConfig.secureCookies,
 			},

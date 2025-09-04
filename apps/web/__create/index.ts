@@ -97,19 +97,19 @@ if (process.env.AUTH_SECRET) {
         csrfToken: {
           options: {
             secure: true,
-            sameSite: 'none',
+            sameSite: 'strict',
           },
         },
         sessionToken: {
           options: {
             secure: true,
-            sameSite: 'none',
+            sameSite: 'strict',
           },
         },
         callbackUrl: {
           options: {
             secure: true,
-            sameSite: 'none',
+            sameSite: 'strict',
           },
         },
       },

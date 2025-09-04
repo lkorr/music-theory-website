@@ -337,7 +337,7 @@ export async function POST(request) {
       'HttpOnly',
       // Only set Secure flag in production (HTTPS)
       ...(process.env.NODE_ENV === 'production' ? ['Secure'] : []),
-      'SameSite=Lax',
+      'SameSite=Strict',
       `Max-Age=${7 * 24 * 60 * 60}`, // 7 days
       'Path=/'
     ];
