@@ -5,6 +5,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from 'react-router';
+import CookieConsent from '../components/CookieConsent';
 
 export default function Root() {
   return (
@@ -18,6 +19,7 @@ export default function Root() {
       </head>
       <body>
         <Outlet />
+        <CookieConsent />
         <ScrollRestoration />
         <Scripts />
       </body>

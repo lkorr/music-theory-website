@@ -22,25 +22,25 @@ export default function PailiaqHomePage() {
     },
     {
       name: 'Spotify',
-      icon: '🎧',
+      icon: '/spotify-icon.png',
       url: 'https://open.spotify.com/artist/202f1kyy3iB15e5ol3b7NG',
       description: 'Stream on Spotify'
     },
     {
       name: 'Apple Music',
-      icon: '🍎',
+      icon: '/apple-music-icon.png',
       url: 'https://music.apple.com/us/artist/pailiaq/1474305623',
       description: 'Stream on Apple Music'
     },
     {
       name: 'SoundCloud',
-      icon: '☁️',
+      icon: '/soundcloud-icon.png',
       url: 'https://soundcloud.com/pailiaq',
       description: 'Latest tracks & works in progress'
     },
     {
       name: 'Tidal',
-      icon: '🌊',
+      icon: '/tidal-icon.png',
       url: 'https://tidal.com/artist/16403977',
       description: 'High-fidelity streaming'
     }
@@ -55,14 +55,20 @@ export default function PailiaqHomePage() {
       isInternal: true
     },
     {
+      name: 'Discord Community',
+      icon: '/discord-icon.png',
+      url: 'https://discord.gg/2RXZQsjBK9',
+      description: 'Join our community for music discussions & support'
+    },
+    {
       name: 'YouTube Tutorials',
-      icon: '📹',
+      icon: '/youtube-icon.png',
       url: 'https://youtube.com/@pailiaq',
       description: 'Music production tutorials & behind the scenes'
     },
     {
       name: 'Patreon',
-      icon: '💜',
+      icon: '/patreon-icon.png',
       url: 'https://patreon.com/pailiaq',
       description: 'Support my work & get exclusive content'
     }
@@ -137,7 +143,7 @@ export default function PailiaqHomePage() {
             </div>
             
             <h1 className="text-6xl font-bold text-white mb-4 tracking-wider">
-              pailiaq
+              paili<span className="inline-block scale-x-[-1] -ml-0.5 mr-0.5">a</span>q
             </h1>
             
             <p className="text-2xl text-white/80 mb-8 font-light">
@@ -178,7 +184,17 @@ export default function PailiaqHomePage() {
               >
                 <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 transition-all duration-300 transform group-hover:scale-105 group-hover:bg-white/20">
                   <div className="text-center">
-                    <div className="text-4xl mb-3">{platform.icon}</div>
+                    <div className="flex justify-center items-center mb-3 h-12">
+                      {platform.icon.startsWith('/') ? (
+                        <img 
+                          src={platform.icon} 
+                          alt={`${platform.name} icon`}
+                          className="h-12 w-12 object-contain"
+                        />
+                      ) : (
+                        <div className="text-4xl">{platform.icon}</div>
+                      )}
+                    </div>
                     <h3 className="text-xl font-bold text-white">
                       {platform.name}
                     </h3>
@@ -237,7 +253,17 @@ export default function PailiaqHomePage() {
                   >
                     <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 transition-all duration-300 transform group-hover:scale-105 group-hover:bg-white/20 h-full relative z-10">
                       <div className="text-center">
-                        <div className="text-5xl mb-4">{link.icon}</div>
+                        <div className="flex justify-center items-center mb-4 h-16">
+                          {link.icon.startsWith('/') ? (
+                            <img 
+                              src={link.icon} 
+                              alt={`${link.name} icon`}
+                              className="h-16 w-16 object-contain"
+                            />
+                          ) : (
+                            <div className="text-5xl">{link.icon}</div>
+                          )}
+                        </div>
                         <h3 className="text-2xl font-bold text-white mb-3">
                           {link.name}
                         </h3>
@@ -260,7 +286,17 @@ export default function PailiaqHomePage() {
                   >
                     <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 transition-all duration-300 transform group-hover:scale-105 group-hover:bg-white/20 h-full">
                       <div className="text-center">
-                        <div className="text-5xl mb-4">{link.icon}</div>
+                        <div className="flex justify-center items-center mb-4 h-16">
+                          {link.icon.startsWith('/') ? (
+                            <img 
+                              src={link.icon} 
+                              alt={`${link.name} icon`}
+                              className="h-16 w-16 object-contain"
+                            />
+                          ) : (
+                            <div className="text-5xl">{link.icon}</div>
+                          )}
+                        </div>
                         <h3 className="text-2xl font-bold text-white mb-3">
                           {link.name}
                         </h3>
@@ -291,7 +327,7 @@ export default function PailiaqHomePage() {
       <footer className="mt-20 bg-black/30 backdrop-blur-md border-t border-white/10 py-8">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <p className="text-white/60 text-sm">
-            © 2024 pailiaq. All rights reserved.
+            © 2025 pailiaq. All rights reserved.
           </p>
         </div>
       </footer>

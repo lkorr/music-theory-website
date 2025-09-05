@@ -5,14 +5,13 @@
  * following OWASP recommendations for password storage.
  */
 
-import argon2 from 'argon2';
-import crypto from 'crypto';
+import * as argon2 from 'argon2';
+import * as crypto from 'crypto';
 
 // Type definitions for password utilities
-export interface PasswordStrength {
-  score: number;
-  feedback: string[];
-  isStrong: boolean;
+export interface PasswordValidationResult {
+  isValid: boolean;
+  errors: string[];
 }
 
 /**
@@ -106,7 +105,7 @@ export async function verifyPassword(hashedPassword: string, plainPassword: stri
  * @param {string} password - Password to validate
  * @returns {Object} - Validation result with isValid and errors
  */
-export function validatePasswordStrength(password: string): PasswordStrength {
+export function validatePasswordStrength(password: string): PasswordValidationResult {
   const errors = [];
   
   if (!password) {

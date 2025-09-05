@@ -196,6 +196,8 @@ interface PianoRollProps {
   isPlaying: boolean;
   volume: number;
   onVolumeChange: (volume: number) => void;
+  currentBPM: number;
+  onBPMChange: (bpm: number) => void;
 }
 
 function ProgressionTranscriptionPianoRoll({ 
@@ -210,7 +212,9 @@ function ProgressionTranscriptionPianoRoll({
   onPlayProgression,
   isPlaying,
   volume,
-  onVolumeChange
+  onVolumeChange,
+  currentBPM,
+  onBPMChange
 }: PianoRollProps): JSX.Element {
   const pianoKeysRef = useRef<HTMLDivElement>(null);
   const pianoRollRef = useRef<HTMLDivElement>(null);
@@ -313,7 +317,22 @@ function ProgressionTranscriptionPianoRoll({
       <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8">
         {/* Header with controls */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-white text-center flex-1">Progression Transcription Piano Roll</h3>
+          {/* BPM Control - Top Left */}
+          <div className="flex items-center space-x-2">
+            <span className="text-white text-sm font-semibold">BPM {currentBPM}</span>
+            <input
+              type="range"
+              min="40"
+              max="200"
+              value={currentBPM}
+              onChange={(e) => onBPMChange(parseInt(e.target.value))}
+              className="w-20 h-2 bg-white/20 rounded-lg appearance-none slider"
+              disabled={isPlaying}
+              title={`Current BPM: ${currentBPM}`}
+            />
+          </div>
+          
+          {/* Right side controls */}
           <div className="flex items-center space-x-2">
             {/* Volume Control */}
             <div className="flex items-center space-x-2">
@@ -581,6 +600,16 @@ export function ChordProgressionTranscriptionGame({ levelConfig, level }: GamePr
   const [questionsCompleted, setQuestionsCompleted] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   
+  // BPM control state
+  const [currentBPM, setCurrentBPM] = useState(levelConfig?.audio.tempo || 80);
+  
+  // Sync BPM with level config changes
+  useEffect(() => {
+    if (levelConfig?.audio?.tempo) {
+      setCurrentBPM(levelConfig.audio.tempo);
+    }
+  }, [levelConfig?.audio?.tempo]);
+  
   // Progression timing
   const [progressionStartTime, setProgressionStartTime] = useState<number | null>(null);
   const [progressionTimes, setProgressionTimes] = useState<number[]>([]);
@@ -699,14 +728,19 @@ export function ChordProgressionTranscriptionGame({ levelConfig, level }: GamePr
     });
   };
 
+  // Calculate chord duration based on BPM (quarter note duration in ms)
+  const calculateChordDuration = (bpm: number): number => {
+    return Math.round((60 / bpm) * 1000); // Convert to milliseconds
+  };
+
   // Play progression
   const handlePlayProgression = async () => {
     if (!currentProgression || !currentProgression.chords || isPlaying) return;
 
     try {
       setIsPlaying(true);
-      const { tempo, chordDuration } = levelConfig.audio;
-      const chordDurationSec = chordDuration / 1000;
+      const dynamicChordDuration = calculateChordDuration(currentBPM);
+      const chordDurationSec = dynamicChordDuration / 1000;
       
       for (let i = 0; i < currentProgression.chords.length; i++) {
         const chord = currentProgression.chords[i];
@@ -717,7 +751,7 @@ export function ChordProgressionTranscriptionGame({ levelConfig, level }: GamePr
         
         // Wait for chord duration plus small pause
         if (i < currentProgression.chords.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, chordDuration + 200));
+          await new Promise(resolve => setTimeout(resolve, dynamicChordDuration + 200));
         }
       }
     } catch (error) {
@@ -821,7 +855,7 @@ export function ChordProgressionTranscriptionGame({ levelConfig, level }: GamePr
         <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4 ml-16">
-              <Link to="/chord-progression-transcription" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+              <Link to="/ear-training/chord-progression-transcription" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
               <h1 className="text-xl font-bold text-white">
@@ -848,11 +882,12 @@ export function ChordProgressionTranscriptionGame({ levelConfig, level }: GamePr
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-sm">
                     <div className="bg-white/5 rounded-lg p-3">
                       <div className="text-white/60">Tempo</div>
-                      <div className="text-white font-semibold">{levelConfig?.audio.tempo} BPM</div>
+                      <div className="text-white font-semibold">{currentBPM} BPM</div>
+                      <div className="text-xs text-white/50 mt-1">Adjustable in-game</div>
                     </div>
                     <div className="bg-white/5 rounded-lg p-3">
                       <div className="text-white/60">Duration</div>
-                      <div className="text-white font-semibold">{(levelConfig?.audio.chordDuration || 0) / 1000}s</div>
+                      <div className="text-white font-semibold">{(calculateChordDuration(currentBPM) / 1000).toFixed(1)}s</div>
                     </div>
                     <div className="bg-white/5 rounded-lg p-3">
                       <div className="text-white/60">Max Attempts</div>
@@ -909,7 +944,7 @@ export function ChordProgressionTranscriptionGame({ levelConfig, level }: GamePr
         <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4 ml-16">
-              <Link to="/chord-progression-transcription" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+              <Link to="/ear-training/chord-progression-transcription" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
                 <span className="text-white text-sm font-bold">←</span>
               </Link>
               <h1 className="text-xl font-bold text-white">
@@ -970,7 +1005,7 @@ export function ChordProgressionTranscriptionGame({ levelConfig, level }: GamePr
                 🔄 Play Again
               </button>
               <Link
-                to="/chord-progression-transcription"
+                to="/ear-training/chord-progression-transcription"
                 className={`px-6 py-3 ${theme.buttons.secondary} text-white font-semibold rounded-xl transition-colors text-center`}
               >
                 🏠 Back to Hub
@@ -998,7 +1033,7 @@ export function ChordProgressionTranscriptionGame({ levelConfig, level }: GamePr
       <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4 ml-16">
-            <Link to="/chord-progression-transcription" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+            <Link to="/ear-training/chord-progression-transcription" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <h1 className="text-xl font-bold text-white">
@@ -1059,6 +1094,8 @@ export function ChordProgressionTranscriptionGame({ levelConfig, level }: GamePr
                 isPlaying={isPlaying}
                 volume={volume}
                 onVolumeChange={setVolume}
+                currentBPM={currentBPM}
+                onBPMChange={setCurrentBPM}
               />
 
               {/* Feedback */}

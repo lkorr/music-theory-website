@@ -836,17 +836,90 @@ function getStripe({ projectGroupId, token }: GetStripeParams) {
   }
   return StripeClient;
 }
-const hasEnv =
+// Security: Check for proper Stripe configuration
+const hasCreateEnv =
   env.CREATE_TEMP_API_KEY &&
   env.NEXT_PUBLIC_PROJECT_GROUP_ID &&
-  env.NEXT_PUBLIC_CREATE_API_BASE_URL;
+  env.NEXT_PUBLIC_CREATE_API_BASE_URL &&
+  env.CREATE_TEMP_API_KEY !== 'CREATE_NOT_CONFIGURED';
 
-const stripe = hasEnv
-  ? getStripe({
-      projectGroupId: env.NEXT_PUBLIC_PROJECT_GROUP_ID,
-      token: env.CREATE_TEMP_API_KEY,
-    })
-  : regularStripe;
+const hasDirectStripeEnv = 
+  env.STRIPE_SECRET_KEY && 
+  env.STRIPE_SECRET_KEY !== 'STRIPE_NOT_CONFIGURED';
+
+// Security: Validate Stripe key format (basic check)
+const isValidStripeKey = (key: string): boolean => {
+  if (!key || key === 'STRIPE_NOT_CONFIGURED') return false;
+  // Test keys start with sk_test_, live keys with sk_live_
+  return key.startsWith('sk_test_') || key.startsWith('sk_live_');
+};
+
+// Initialize Stripe client with security checks
+let stripe: any;
+
+if (hasCreateEnv) {
+  // Use Create framework proxy
+  const StripeClient = getStripe({
+    projectGroupId: env.NEXT_PUBLIC_PROJECT_GROUP_ID!,
+    token: env.CREATE_TEMP_API_KEY!,
+  });
+  stripe = new StripeClient();
+} else if (hasDirectStripeEnv && isValidStripeKey(env.STRIPE_SECRET_KEY!)) {
+  // Use direct Stripe integration
+  stripe = new regularStripe(env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2023-10-16',
+    typescript: true,
+    telemetry: false, // Security: Disable telemetry
+  });
+} else {
+  // Security: Create a safe mock that throws meaningful errors
+  const createMockStripe = () => ({
+    checkout: {
+      sessions: {
+        create: () => {
+          throw new Error('Stripe not configured. Please set STRIPE_SECRET_KEY or CREATE_TEMP_API_KEY environment variables.');
+        },
+        list: () => {
+          throw new Error('Stripe not configured. Please set STRIPE_SECRET_KEY or CREATE_TEMP_API_KEY environment variables.');
+        },
+        retrieve: () => {
+          throw new Error('Stripe not configured. Please set STRIPE_SECRET_KEY or CREATE_TEMP_API_KEY environment variables.');
+        }
+      }
+    },
+    webhooks: {
+      constructEvent: () => {
+        throw new Error('Stripe not configured. Please set STRIPE_SECRET_KEY environment variable.');
+      }
+    },
+    customers: {
+      create: () => {
+        throw new Error('Stripe not configured. Please set STRIPE_SECRET_KEY or CREATE_TEMP_API_KEY environment variables.');
+      },
+      retrieve: () => {
+        throw new Error('Stripe not configured. Please set STRIPE_SECRET_KEY or CREATE_TEMP_API_KEY environment variables.');
+      }
+    },
+    subscriptions: {
+      retrieve: () => {
+        throw new Error('Stripe not configured. Please set STRIPE_SECRET_KEY or CREATE_TEMP_API_KEY environment variables.');
+      },
+      list: () => {
+        throw new Error('Stripe not configured. Please set STRIPE_SECRET_KEY or CREATE_TEMP_API_KEY environment variables.');
+      }
+    }
+  });
+  
+  stripe = createMockStripe();
+}
+
+// Security: Export configuration status for use in components
+export const stripeConfig = {
+  isConfigured: hasCreateEnv || (hasDirectStripeEnv && isValidStripeKey(env.STRIPE_SECRET_KEY!)),
+  isTestMode: env.STRIPE_SECRET_KEY?.startsWith('sk_test_') || env.NODE_ENV === 'development',
+  hasCreateIntegration: hasCreateEnv,
+  hasDirectIntegration: hasDirectStripeEnv && isValidStripeKey(env.STRIPE_SECRET_KEY!)
+};
 
 export default stripe;
 export { stripe as Stripe };

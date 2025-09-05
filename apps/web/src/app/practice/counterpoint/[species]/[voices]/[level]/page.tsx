@@ -154,7 +154,7 @@ export default function CounterpointExercisePage(): JSX.Element {
           <div className="flex items-center space-x-2">
             {getCurrentExerciseIndex() > 0 && (
               <Link
-                to={`/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${getCurrentExerciseIndex()}`}
+                to={`/practice/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${getCurrentExerciseIndex()}`}
                 className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
               >
                 <span className="text-white text-sm">‹</span>
@@ -162,7 +162,7 @@ export default function CounterpointExercisePage(): JSX.Element {
             )}
             {getCurrentExerciseIndex() < allExercises.length - 1 && (
               <Link
-                to={`/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${getCurrentExerciseIndex() + 2}`}
+                to={`/practice/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${getCurrentExerciseIndex() + 2}`}
                 className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
               >
                 <span className="text-white text-sm">›</span>
@@ -293,7 +293,7 @@ export default function CounterpointExercisePage(): JSX.Element {
         {/* Action Button */}
         <div className="flex justify-center mt-8">
           <Link
-            to={`/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${level}/practice`}
+            to={`/practice/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${level}/practice`}
             className="bg-green-600 hover:bg-green-700 text-white px-12 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 flex items-center space-x-3"
           >
             <span>🎹</span>
@@ -311,7 +311,7 @@ export default function CounterpointExercisePage(): JSX.Element {
               {allExercises.map((ex: Exercise, index: number) => (
                 <Link
                   key={ex.id}
-                  to={`/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${index + 1}`}
+                  to={`/practice/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${index + 1}`}
                   className={`p-3 rounded-lg text-center transition-all duration-200 ${
                     ex.id === exercise?.id
                       ? `${getSpeciesColor(speciesNumber)} text-white shadow-lg`

@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { Eye, EyeOff, Play, Volume2, VolumeX } from "lucide-react";
 import { noteNames, getMidiNoteName, isBlackKey } from "../../../core-training/chord-recognition/shared/theory/core/notes.ts";
-import { chordTypes, extendedChordTypes } from "../../../core-training/chord-recognition/shared/theory/core/constants.ts";
-import { audioManager } from "./audioManager.js";
+import { chordTypes, seventhChordTypes, extendedChordTypes } from "../../../core-training/chord-recognition/shared/theory/core/constants.ts";
+import { audioManager } from "./audioManager";
 import { CompactAuthButton } from "../../../../components/auth/AuthButton.tsx";
 import { useAuth } from "../../../../components/auth/ProtectedRoute";
 import { useStatistics } from "./hooks/useStatistics";
@@ -214,28 +214,6 @@ function TranscriptionPianoRoll({
   const containerHeight = 600;
   
   // Auto-scroll to center around middle C
-  /**
-   * Reset state when level config changes (for navigation between levels)
-   */
-  useEffect(() => {
-    setHasStarted(false);
-    setIsCompleted(false);
-    setCurrentTask(null);
-    setPlacedNotes([]);
-    setFeedback(null);
-    setIsAnswered(false);
-    setShowSolution(false);
-    setShowLabels(false);
-    setIsPlaying(false);
-    setCorrect(0);
-    setTotal(0);
-    setStreak(0);
-    setCurrentTime(0);
-    setAvgTime(0);
-    setStartTime(null);
-    setLevelResult(null);
-  }, [levelConfig.id]);
-
   useEffect(() => {
     if (pianoKeysRef.current && pianoRollRef.current) {
       const middleC = 60; // C4
@@ -283,9 +261,18 @@ function TranscriptionPianoRoll({
     const semitone = midiNote % 12;
     const rootSemitone = noteNames.indexOf(currentTask.root);
     
-    // Determine which chord types object to use
-    const isExtendedChord = ['major7', 'minor7', 'dominant7', 'diminished7', 'halfDiminished7', 'minor7b5', 'maj9', 'min9', 'dom9'].includes(currentTask.chordType);
-    const chordTypesObj = isExtendedChord ? extendedChordTypes : chordTypes;
+    // Determine which chord types object to use - check dynamically against imported objects
+    const isSeventhChord = currentTask.chordType in seventhChordTypes;
+    const isExtendedChord = currentTask.chordType in extendedChordTypes;
+    
+    let chordTypesObj;
+    if (isSeventhChord) {
+      chordTypesObj = seventhChordTypes;
+    } else if (isExtendedChord) {
+      chordTypesObj = extendedChordTypes;
+    } else {
+      chordTypesObj = chordTypes;
+    }
     
     const expectedSemitones = chordTypesObj[currentTask.chordType].intervals.map((interval: number) => 
       (rootSemitone + interval) % 12
@@ -565,6 +552,28 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
     audioManager.setVolume(volume);
   }, [volume]);
 
+  /**
+   * Reset state when level config changes (for navigation between levels)
+   */
+  useEffect(() => {
+    setHasStarted(false);
+    setIsCompleted(false);
+    setCurrentTask(null);
+    setPlacedNotes([]);
+    setFeedback(null);
+    setIsAnswered(false);
+    setShowSolution(false);
+    setShowLabels(false);
+    setIsPlaying(false);
+    setCorrect(0);
+    setTotal(0);
+    setStreak(0);
+    setCurrentTime(0);
+    setAvgTime(0);
+    setStartTime(null);
+    setLevelResult(null);
+  }, [levelConfig.id]);
+
   const generateTranscriptionTask = (previousTask: TranscriptionTask | null = null): TranscriptionTask => {
     const roots = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'Cs', 'Ds', 'Fs', 'Gs', 'As'];
     const { chordTypes: levelChordTypes, inversionRules } = levelConfig;
@@ -606,7 +615,7 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
       
       for (const testOctave of possibleOctaves) {
         try {
-          const testNotes = (audioManager as any).generateChordNotes(root, chordTypeKey, inversion, testOctave, PIANO_ROLL_MIN, PIANO_ROLL_MAX);
+          const testNotes = audioManager.generateChordNotes(root, chordTypeKey, inversion, testOctave, PIANO_ROLL_MIN, PIANO_ROLL_MAX);
           
           // Check if all notes are within piano roll range and we have the full chord
           const originalChordSize = chordTypeKey.includes('13') ? 7 : 
@@ -631,9 +640,9 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
       if (!octaveFound) {
         attempt++;
         if (attempt > 50) {
-          // Fallback to guaranteed safe chord
+          // Fallback to guaranteed safe chord - use a chord type from the current level
           root = 'C';
-          chordTypeKey = 'major';
+          chordTypeKey = levelChordTypes[0]; // Use first chord type from current level
           inversion = 0;
           baseOctave = 60;
           validChord = true;
@@ -654,7 +663,7 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
     } while (!validChord && attempt < 50);
     
     try {
-      const expectedNotes = (audioManager as any).generateChordNotes(root, chordTypeKey, inversion, baseOctave, PIANO_ROLL_MIN, PIANO_ROLL_MAX);
+      const expectedNotes = audioManager.generateChordNotes(root, chordTypeKey, inversion, baseOctave, PIANO_ROLL_MIN, PIANO_ROLL_MAX);
       
       return {
         root,
@@ -667,16 +676,32 @@ export function UniversalTranscriptionGame({ levelConfig }: UniversalTranscripti
       };
     } catch (error) {
       console.error('Error generating transcription task:', error);
-      // Fallback to guaranteed safe chord
-      return {
-        root: 'C',
-        chordType: 'major',
-        inversion: 0,
-        chordName: 'C major',
-        description: 'C major',
-        expectedNotes: [60, 64, 67], // C4 major triad - guaranteed to be in range
-        baseOctave: 60
-      };
+      // Fallback to guaranteed safe chord using current level's chord types
+      const fallbackChordType = levelChordTypes[0]; // Use first chord type from current level
+      try {
+        const fallbackNotes = audioManager.generateChordNotes('C', fallbackChordType, 0, 60, 36, 84);
+        return {
+          root: 'C',
+          chordType: fallbackChordType,
+          inversion: 0,
+          chordName: `C ${fallbackChordType}`,
+          description: `C ${fallbackChordType}`,
+          expectedNotes: fallbackNotes,
+          baseOctave: 60
+        };
+      } catch (fallbackError) {
+        console.error('Even fallback chord generation failed:', fallbackError);
+        // Last resort - C major triad
+        return {
+          root: 'C',
+          chordType: 'major',
+          inversion: 0,
+          chordName: 'C major',
+          description: 'C major',
+          expectedNotes: [60, 64, 67], // C4 major triad - guaranteed to be in range
+          baseOctave: 60
+        };
+      }
     }
   };
 

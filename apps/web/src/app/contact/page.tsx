@@ -278,7 +278,7 @@ export default function ContactPage() {
       <footer className="bg-black/30 backdrop-blur-md border-t border-white/10 py-8">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <p className="text-white/60 text-sm">
-            © 2024 pailiaq. All rights reserved.
+            © 2025 pailiaq. All rights reserved.
           </p>
         </div>
       </footer>

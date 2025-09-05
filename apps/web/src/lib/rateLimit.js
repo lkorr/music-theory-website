@@ -113,6 +113,21 @@ export const RATE_LIMIT_CONFIGS = {
     message: 'Too many password reset attempts. Please try again later.'
   },
 
+  // Billing endpoints (moderate limits)
+  billing: {
+    windowMs: 5 * 60 * 1000,      // 5 minutes
+    maxAttempts: 10,              // 10 requests per 5 minutes
+    blockDuration: 10 * 60 * 1000, // 10 minutes block
+    message: 'Too many billing requests. Please try again later.'
+  },
+
+  checkout: {
+    windowMs: 15 * 60 * 1000,     // 15 minutes
+    maxAttempts: 3,               // 3 checkout attempts per 15 minutes
+    blockDuration: 30 * 60 * 1000, // 30 minutes block
+    message: 'Too many checkout attempts. Please try again later.'
+  },
+
   // API endpoints (more lenient)
   api: {
     windowMs: 60 * 1000,          // 1 minute

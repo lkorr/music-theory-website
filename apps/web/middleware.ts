@@ -7,20 +7,17 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-// Temporarily disable middleware to test server
-// import { validateCSRFHeader } from './src/lib/csrf.js';
-// import { getAuthFromCookie, getClientIP } from './src/lib/auth-utils.js';
+import { validateCSRFHeader } from './src/lib/csrf.js';
+import { getAuthFromCookie, getClientIP } from './src/lib/auth-utils.js';
 
 /**
  * CSRF protection middleware
  * Validates CSRF tokens for all state-changing requests
  */
 export async function middleware(request: NextRequest) {
-  // Temporarily disabled for server startup testing
   console.log(`Middleware called for: ${request.method} ${request.nextUrl.pathname}`);
-  return NextResponse.next();
   
-  /* TODO: Re-enable CSRF protection after fixing imports
+  // CSRF protection now re-enabled
   const { pathname, method } = request.nextUrl;
 
   // Skip CSRF protection for safe methods
@@ -104,7 +101,6 @@ export async function middleware(request: NextRequest) {
   }
 
   return NextResponse.next();
-  */
 }
 
 /**

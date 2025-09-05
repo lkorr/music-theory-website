@@ -7,6 +7,9 @@
 
 import { jwtVerify } from 'jose';
 import { supabaseAdmin } from '../../../../lib/supabase.js';
+import { validateCSRFHeader } from '../../../../lib/csrf.js';
+import { validateName } from '../../../../lib/validation.js';
+import { createRateLimitMiddleware } from '../../../../lib/rateLimit.js';
 
 if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET environment variable is required for JWT signing');
@@ -59,42 +62,55 @@ export async function POST(request) {
     }
 
     const user = authResult.user;
+
+    // Apply rate limiting
+    const rateLimitMiddleware = createRateLimitMiddleware('api');
+    const rateLimitResult = await rateLimitMiddleware(request, {});
+    if (rateLimitResult) {
+      return rateLimitResult;
+    }
+
+    // Validate CSRF token
+    const csrfValid = validateCSRFHeader(request, user.id);
+    if (!csrfValid) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'CSRF validation failed',
+          code: 'CSRF_VALIDATION_FAILED' 
+        }),
+        { 
+          status: 403,
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-Content-Type-Options': 'nosniff'
+          }
+        }
+      );
+    }
+
     const body = await request.json();
     
     const { name } = body;
 
-    // Validate input
-    if (!name || typeof name !== 'string') {
+    // Validate and sanitize input using comprehensive validation
+    const nameValidation = validateName(name);
+    if (!nameValidation.isValid) {
       return new Response(
-        JSON.stringify({ error: 'Name is required and must be a string' }),
+        JSON.stringify({ 
+          error: 'Name validation failed',
+          details: nameValidation.errors
+        }),
         { 
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-Content-Type-Options': 'nosniff'
+          }
         }
       );
     }
 
-    const trimmedName = name.trim();
-
-    if (!trimmedName) {
-      return new Response(
-        JSON.stringify({ error: 'Name cannot be empty' }),
-        { 
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    if (trimmedName.length > 50) {
-      return new Response(
-        JSON.stringify({ error: 'Name must be 50 characters or less' }),
-        { 
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
+    const sanitizedName = nameValidation.sanitized;
 
     // Check if mock auth is enabled
     const useMockAuth = process.env.USE_MOCK_AUTH === 'true' && process.env.NODE_ENV === 'development';
@@ -122,7 +138,7 @@ export async function POST(request) {
     const { data, error } = await supabaseAdmin
       .from('users')
       .update({ 
-        name: trimmedName,
+        name: sanitizedName,
         updated_at: new Date().toISOString()
       })
       .eq('id', user.id)

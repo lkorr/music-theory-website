@@ -78,7 +78,7 @@ export default function StorePage() {
             </div>
             
             <h1 className="text-6xl font-bold text-white mb-4 tracking-wider">
-              pailiaq
+              paili<span className="inline-block scale-x-[-1] -ml-0.5 mr-0.5">a</span>q
             </h1>
             
             <p className="text-2xl text-white/80 mb-8 font-light">

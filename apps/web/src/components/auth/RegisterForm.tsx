@@ -21,6 +21,7 @@ interface FormData {
   password: string;
   confirmPassword: string;
   acceptTerms: boolean;
+  consentToDataProcessing: boolean;
 }
 
 interface Errors {
@@ -29,6 +30,7 @@ interface Errors {
   password?: string;
   confirmPassword?: string;
   acceptTerms?: string;
+  consentToDataProcessing?: string;
   general?: string;
 }
 
@@ -44,7 +46,8 @@ export default function RegisterForm(): React.ReactNode {
     email: '',
     password: '',
     confirmPassword: '',
-    acceptTerms: false
+    acceptTerms: false,
+    consentToDataProcessing: false
   });
   const [errors, setErrors] = useState<Errors>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -146,6 +149,11 @@ export default function RegisterForm(): React.ReactNode {
       newErrors.acceptTerms = 'You must accept the terms and conditions';
     }
 
+    // GDPR data processing consent validation
+    if (!formData.consentToDataProcessing) {
+      newErrors.consentToDataProcessing = 'You must consent to data processing to create an account';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -167,7 +175,8 @@ export default function RegisterForm(): React.ReactNode {
         name: DOMPurify.sanitize(formData.name.trim()),
         email: DOMPurify.sanitize(formData.email.trim().toLowerCase()),
         password: formData.password, // Never sanitize passwords
-        acceptTerms: formData.acceptTerms
+        acceptTerms: formData.acceptTerms,
+        consentToDataProcessing: formData.consentToDataProcessing
       };
 
       const response = await fetch('/api/auth/register', {
@@ -451,10 +460,38 @@ export default function RegisterForm(): React.ReactNode {
               <p className="text-red-400 text-sm -mt-4">{errors.acceptTerms}</p>
             )}
 
+            {/* GDPR Data Processing Consent */}
+            <div className="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="consentToDataProcessing"
+                name="consentToDataProcessing"
+                checked={formData.consentToDataProcessing}
+                onChange={handleInputChange}
+                className="mt-1 h-4 w-4 rounded border-white/20 bg-white/10 text-blue-600 focus:ring-2 focus:ring-blue-500/50 focus:border-transparent"
+                disabled={isLoading}
+              />
+              <label htmlFor="consentToDataProcessing" className="text-white/90 text-sm">
+                I consent to the collection and processing of my personal data as described in the{' '}
+                <Link
+                  to="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 underline"
+                >
+                  Privacy Policy
+                </Link>
+                . This includes storing my progress, providing personalized learning experiences, and improving our services.
+              </label>
+            </div>
+            {errors.consentToDataProcessing && (
+              <p className="text-red-400 text-sm -mt-4">{errors.consentToDataProcessing}</p>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading || passwordStrength.score < 60 || !formData.acceptTerms}
+              disabled={isLoading || passwordStrength.score < 60 || !formData.acceptTerms || !formData.consentToDataProcessing}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800/50 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:cursor-not-allowed"
             >
               {isLoading ? (

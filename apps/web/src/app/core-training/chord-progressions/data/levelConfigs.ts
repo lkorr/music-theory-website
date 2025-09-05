@@ -117,7 +117,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     
     // Navigation
     nextLevelPath: '/chord-progressions/2',
-    backPath: '/chord-progressions'
+    backPath: '/core-training/chord-progressions'
   },
 
   // ============================================================================
@@ -170,7 +170,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     },
     
     nextLevelPath: '/chord-progressions/3',
-    backPath: '/chord-progressions'
+    backPath: '/core-training/chord-progressions'
   },
 
   // ============================================================================
@@ -225,7 +225,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     },
     
     nextLevelPath: '/chord-progressions/4',
-    backPath: '/chord-progressions'
+    backPath: '/core-training/chord-progressions'
   },
 
   // ============================================================================
@@ -280,7 +280,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     },
     
     nextLevelPath: null, // No next level yet
-    backPath: '/chord-progressions'
+    backPath: '/core-training/chord-progressions'
   }
 };
 

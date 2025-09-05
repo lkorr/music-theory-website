@@ -80,8 +80,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     },
     
     // Navigation
-    nextLevelPath: '/chord-construction/basic-triads/2',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/basic-triads/2',
+    backPath: '/core-training/chord-construction'
   },
 
   'basic-triads-2': {
@@ -109,8 +109,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: 'first' // Force first inversion
     },
     
-    nextLevelPath: '/chord-construction/basic-triads/3',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/basic-triads/3',
+    backPath: '/core-training/chord-construction'
   },
 
   'basic-triads-3': {
@@ -138,8 +138,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null // Allow any inversion
     },
     
-    nextLevelPath: '/chord-construction/basic-triads/4',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/basic-triads/4',
+    backPath: '/core-training/chord-construction'
   },
 
   'basic-triads-4': {
@@ -167,8 +167,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null
     },
     
-    nextLevelPath: '/chord-construction/seventh-chords/1',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/seventh-chords/1',
+    backPath: '/core-training/chord-construction'
   },
 
   // ============================================================================
@@ -200,8 +200,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null
     },
     
-    nextLevelPath: '/chord-construction/seventh-chords/2',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/seventh-chords/2',
+    backPath: '/core-training/chord-construction'
   },
 
   'seventh-chords-2': {
@@ -229,8 +229,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: 'first'
     },
     
-    nextLevelPath: '/chord-construction/seventh-chords/3',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/seventh-chords/3',
+    backPath: '/core-training/chord-construction'
   },
 
   'seventh-chords-3': {
@@ -258,8 +258,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null
     },
     
-    nextLevelPath: '/chord-construction/seventh-chords/4',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/seventh-chords/4',
+    backPath: '/core-training/chord-construction'
   },
 
   'seventh-chords-4': {
@@ -287,8 +287,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: 'third' // Force third inversion
     },
     
-    nextLevelPath: '/chord-construction/seventh-chords/5',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/seventh-chords/5',
+    backPath: '/core-training/chord-construction'
   },
 
   'seventh-chords-5': {
@@ -316,8 +316,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null
     },
     
-    nextLevelPath: '/chord-construction/extended-chords/1',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/extended-chords/1',
+    backPath: '/core-training/chord-construction'
   },
 
   // ============================================================================
@@ -349,8 +349,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null
     },
     
-    nextLevelPath: '/chord-construction/extended-chords/2',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/extended-chords/2',
+    backPath: '/core-training/chord-construction'
   },
 
   'extended-chords-2': {
@@ -378,8 +378,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null
     },
     
-    nextLevelPath: '/chord-construction/extended-chords/3',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/extended-chords/3',
+    backPath: '/core-training/chord-construction'
   },
 
   'extended-chords-3': {
@@ -407,8 +407,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null
     },
     
-    nextLevelPath: '/chord-construction/extended-chords/4',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/extended-chords/4',
+    backPath: '/core-training/chord-construction'
   },
 
   'extended-chords-4': {
@@ -436,8 +436,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null // Allow any inversion
     },
     
-    nextLevelPath: '/chord-construction/extended-chords/5',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/extended-chords/5',
+    backPath: '/core-training/chord-construction'
   },
 
   'extended-chords-5': {
@@ -465,8 +465,8 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
       requireSpecificInversion: null
     },
     
-    nextLevelPath: '/chord-construction/extended-chords/6',
-    backPath: '/chord-construction'
+    nextLevelPath: '/core-training/chord-construction/extended-chords/6',
+    backPath: '/core-training/chord-construction'
   },
 
   'extended-chords-6': {
@@ -495,7 +495,7 @@ export const LEVEL_CONFIGS: Record<string, LevelConfig> = {
     },
     
     nextLevelPath: null, // Final level
-    backPath: '/chord-construction'
+    backPath: '/core-training/chord-construction'
   }
 };
 

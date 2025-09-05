@@ -4,12 +4,12 @@
  * This single file handles ALL 4 chord progression levels through dynamic routing.
  * Replaces the need for 4+ individual level page files with one universal handler.
  * 
- * Route Pattern: /chord-progressions/[level]
+ * Route Pattern: /core-training/core-training/chord-progressions/[level]
  * Examples:
- * - /chord-progressions/1 → Level 1 (Basic Progressions)
- * - /chord-progressions/2 → Level 2 (Progressions with Inversions)  
- * - /chord-progressions/3 → Level 3 (Non-Diatonic Chords)
- * - /chord-progressions/4 → Level 4 (Non-Diatonic with Inversions)
+ * - /core-training/core-training/chord-progressions/1 → Level 1 (Basic Progressions)
+ * - /core-training/core-training/chord-progressions/2 → Level 2 (Progressions with Inversions)  
+ * - /core-training/core-training/chord-progressions/3 → Level 3 (Non-Diatonic Chords)
+ * - /core-training/core-training/chord-progressions/4 → Level 4 (Non-Diatonic with Inversions)
  * 
  * Architecture Benefits:
  * - 75% reduction in page files (1 vs 4+)
@@ -77,7 +77,7 @@ function LevelNotFoundError({ level }: ErrorComponentProps) {
         
         <div className="mt-6 text-xs text-white/40">
           <p>Available levels: 1, 2, 3, 4</p>
-          <p>Examples: /chord-progressions/1, /chord-progressions/2</p>
+          <p>Examples: /core-training/chord-progressions/1, /core-training/chord-progressions/2</p>
         </div>
       </div>
     </div>
@@ -207,16 +207,16 @@ export default function ChordProgressions2LevelPage(): JSX.Element {
  * This component handles these URL patterns:
  * 
  * Level 1: Basic Progressions
- * - /chord-progressions/1 → level1 config
+ * - /core-training/chord-progressions/1 → level1 config
  * 
  * Level 2: Progressions with Inversions
- * - /chord-progressions/2 → level2 config
+ * - /core-training/chord-progressions/2 → level2 config
  * 
  * Level 3: Non-Diatonic Chords
- * - /chord-progressions/3 → level3 config
+ * - /core-training/chord-progressions/3 → level3 config
  * 
  * Level 4: Non-Diatonic with Inversions
- * - /chord-progressions/4 → level4 config
+ * - /core-training/chord-progressions/4 → level4 config
  * 
  * Error Handling:
  * - Invalid level number → LevelNotFoundError

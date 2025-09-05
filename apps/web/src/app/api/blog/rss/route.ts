@@ -1,4 +1,4 @@
-import { generateRSSFeed } from "../../../lib/blog";
+import { generateRSSFeed } from "@/lib/blog";
 
 export async function GET(): Promise<Response> {
   try {

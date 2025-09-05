@@ -5,7 +5,7 @@
  * Reuses existing music theory utilities to avoid code duplication
  */
 
-import { noteNames } from "../../../core-training/chord-recognition/shared/theory/core/notes.ts";
+import { noteNames, normalizeNoteName } from "../../../core-training/chord-recognition/shared/theory/core/notes.ts";
 import { chordTypes, seventhChordTypes, extendedChordTypes } from "../../../core-training/chord-recognition/shared/theory/core/constants.ts";
 
 // Type definitions
@@ -115,6 +115,37 @@ const ROMAN_NUMERAL_MAPPING: RomanNumeralMapping = {
     'vi7': { degree: 5, type: 'minor7' },
     'vii7': { degree: 6, type: 'halfDiminished7' },
     
+    // Dominant 7th chords (blues style - all dominant 7ths)
+    'I7dom': { degree: 0, type: 'dominant7' },  // I as dominant 7th (blues)
+    'II7dom': { degree: 1, type: 'dominant7' },  // II as dominant 7th
+    'III7dom': { degree: 2, type: 'dominant7' }, // III as dominant 7th  
+    'IV7dom': { degree: 3, type: 'dominant7' },  // IV as dominant 7th (blues)
+    'V7dom': { degree: 4, type: 'dominant7' },   // V as dominant 7th (same as V7)
+    'VI7dom': { degree: 5, type: 'dominant7' },  // VI as dominant 7th
+    'VII7dom': { degree: 6, type: 'dominant7' }, // VII as dominant 7th
+    
+    // Suspended chords
+    'Isus2': { degree: 0, type: 'sus2' },
+    'Isus4': { degree: 0, type: 'sus4' },
+    'V7sus4': { degree: 4, type: 'sus4' },
+    'IVsus2': { degree: 3, type: 'sus2' },
+    'IVsus4': { degree: 3, type: 'sus4' },
+    'IV7dom': { degree: 3, type: 'dominant7' }, // IV as dominant 7th (blues)
+    
+    // Diminished chords
+    'vii°': { degree: 6, type: 'diminished' },
+    'ii°': { degree: 1, type: 'diminished' },   // For minor keys
+    '#iv°': { degree: 3, type: 'diminished', accidental: 1 }, // Raised iv diminished
+    '#ii°': { degree: 1, type: 'diminished', accidental: 1 }, // Raised ii diminished
+    
+    // Augmented chords  
+    'I+': { degree: 0, type: 'augmented' },
+    'V+': { degree: 4, type: 'augmented' },
+    '#IV+': { degree: 3, type: 'augmented', accidental: 1 }, // Augmented on raised 4th
+    
+    // Additional borrowed chords
+    'biii': { degree: 2, type: 'minor', accidental: -1 }, // Borrowed iii minor
+    
     // Borrowed chords (from parallel minor)
     'bII': { degree: 1, type: 'major', accidental: -1 },
     'bIII': { degree: 2, type: 'major', accidental: -1 },
@@ -195,12 +226,11 @@ function generateChordFromRomanNumeral(romanNumeral: string, key: string, baseOc
   
   const chordInfo = mapping[chord];
   
-  // Get root note index
-  console.log(`Looking for keyRoot "${keyRoot}" in noteNames:`, noteNames);
-  const keyRootIndex = noteNames.indexOf(keyRoot as any);
-  console.log(`keyRootIndex: ${keyRootIndex}`);
+  // Get root note index (normalize flat keys to sharp)
+  const normalizedKeyRoot = normalizeNoteName(keyRoot);
+  const keyRootIndex = noteNames.indexOf(normalizedKeyRoot as any);
   if (keyRootIndex === -1) {
-    console.error(`Key root "${keyRoot}" not found in noteNames array`);
+    console.error(`Key root "${keyRoot}" (normalized: "${normalizedKeyRoot}") not found in noteNames array`);
     throw new Error(`Invalid key: ${key}`);
   }
   

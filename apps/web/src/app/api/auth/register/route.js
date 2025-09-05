@@ -11,6 +11,8 @@ import { createUser, createAuditLog } from '../../../../lib/supabase.js';
 import { createRateLimitMiddleware, createRateLimitHeaders } from '../../../../lib/rateLimit.js';
 import { validateAuthCSRF, createCSRFErrorResponse } from '../../../../lib/auth-csrf.ts';
 import { getClientIP } from '../../../../lib/network-utils.ts';
+import { generateEmailToken } from '../../../../lib/email-tokens.js';
+import { sendVerificationEmail } from '../../../../lib/email.ts';
 
 /**
  * Handle user registration
@@ -28,9 +30,19 @@ export async function POST(request) {
     clientIP = getClientIP(request);
     userAgent = request.headers.get('user-agent') || 'Unknown';
 
-    // Apply rate limiting (skip in development with mock auth)
+    // Apply rate limiting (relaxed limits in development with mock auth)
     const useMockAuth = process.env.USE_MOCK_AUTH === 'true' && process.env.NODE_ENV === 'development';
-    if (!useMockAuth) {
+    if (useMockAuth) {
+      // Apply basic rate limiting even in development to prevent abuse
+      const basicRateLimitResult = await applyRateLimit(request, 'register-dev', {
+        maxRequests: 20, // Higher limit for development
+        windowMs: 60000  // 1 minute window
+      });
+      if (basicRateLimitResult) {
+        return basicRateLimitResult;
+      }
+    } else {
+      // Normal production rate limiting
       const rateLimitResult = await applyRateLimit(request, 'register');
       if (rateLimitResult) {
         return rateLimitResult; // Rate limit exceeded
@@ -206,6 +218,35 @@ export async function POST(request) {
       );
     }
 
+    // Send email verification
+    let emailSent = false;
+    try {
+      const verificationToken = generateEmailToken(newUser.email); // 2 hours expiry
+      emailSent = await sendVerificationEmail({
+        email: newUser.email,
+        name: newUser.name || 'Music Learner',
+        verificationToken
+      });
+
+      if (emailSent) {
+        console.log(`Verification email sent to ${newUser.email}`);
+      }
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      // Don't fail registration if email fails, but log it
+      await createAuditLog({
+        user_id: newUser.id,
+        action: 'EMAIL_VERIFICATION_FAILED',
+        metadata: {
+          email: newUser.email,
+          error: emailError.message,
+          ip_address: clientIP
+        },
+        severity: 'WARN',
+        category: 'email'
+      });
+    }
+
     // Log successful registration
     await createAuditLog({
       user_id: newUser.id,
@@ -226,14 +267,18 @@ export async function POST(request) {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Registration successful',
+        message: emailSent 
+          ? 'Registration successful! Please check your email to verify your account.' 
+          : 'Registration successful! Email verification not sent - please contact support.',
         user: {
           id: newUser.id,
           email: newUser.email,
           name: newUser.name,
           role: newUser.role,
-          created_at: newUser.created_at
-        }
+          created_at: newUser.created_at,
+          emailVerified: false
+        },
+        emailSent: emailSent
       }),
       {
         status: 201,

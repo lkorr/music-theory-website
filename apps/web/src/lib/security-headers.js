@@ -5,19 +5,30 @@
  * XSS, clickjacking, MIME sniffing, and other web vulnerabilities.
  */
 
+import crypto from 'crypto';
+
+/**
+ * Generate a cryptographically secure nonce
+ * @returns {string} Random nonce
+ */
+export function generateNonce() {
+  return crypto.randomBytes(16).toString('base64');
+}
+
 /**
  * Generate Content Security Policy header value
  * @param {boolean} isDevelopment - Whether running in development mode
+ * @param {string} nonce - Optional nonce for inline scripts/styles
  * @returns {string} CSP header value
  */
-function generateCSP(isDevelopment = false) {
+function generateCSP(isDevelopment = false, nonce = null) {
   const policies = {
     'default-src': ["'self'"],
     'script-src': [
       "'self'",
       isDevelopment ? "'unsafe-eval'" : '', // Only allow eval in development
       isDevelopment ? "'unsafe-inline'" : '', // Only allow inline scripts in dev
-      "'sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='", // Placeholder for nonce-based CSP
+      nonce ? `'nonce-${nonce}'` : '', // Dynamic nonce for inline scripts
       'https://cdn.jsdelivr.net', // For CDN libraries
       'https://unpkg.com' // For package CDN
     ].filter(Boolean),
@@ -91,7 +102,7 @@ export function applySecurityHeaders(response, options = {}) {
   
   const securityHeaders = {
     // Content Security Policy
-    'Content-Security-Policy': generateCSP(isDevelopment),
+    'Content-Security-Policy': generateCSP(isDevelopment, options.nonce),
     
     // XSS Protection
     'X-XSS-Protection': '1; mode=block',

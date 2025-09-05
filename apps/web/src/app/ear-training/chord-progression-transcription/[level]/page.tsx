@@ -54,10 +54,10 @@ interface LevelConfig {
  * Dynamic Chord Progression Transcription Level Route Handler
  * 
  * Handles all progression transcription level routes:
- * - /chord-progression-transcription/level1
- * - /chord-progression-transcription/level2
- * - /chord-progression-transcription/level3
- * - /chord-progression-transcription/level4
+ * - /ear-training/chord-progression-transcription/level1
+ * - /ear-training/chord-progression-transcription/level2
+ * - /ear-training/chord-progression-transcription/level3
+ * - /ear-training/chord-progression-transcription/level4
  * 
  * This single component replaces what would have been 4 separate page files,
  * demonstrating clean architecture that minimizes tech debt.
@@ -132,7 +132,7 @@ export default function ChordProgressionTranscriptionLevelPage(): JSX.Element {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => navigate('/chord-progression-transcription')}
+              onClick={() => navigate('/ear-training/chord-progression-transcription')}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors"
             >
               Back to Progression Hub

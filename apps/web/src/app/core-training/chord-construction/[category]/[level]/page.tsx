@@ -4,11 +4,11 @@
  * This single file handles ALL 9 chord construction levels through dynamic routing.
  * Replaces the need for 9+ individual level page files with one universal handler.
  * 
- * Route Pattern: /chord-construction/[category]/[level]
+ * Route Pattern: /core-training/chord-construction/[category]/[level]
  * Examples:
- * - /chord-construction/basic-triads/1
- * - /chord-construction/seventh-chords/2
- * - /chord-construction/extended-chords/3
+ * - /core-training/chord-construction/basic-triads/1
+ * - /core-training/chord-construction/seventh-chords/2
+ * - /core-training/chord-construction/extended-chords/3
  * 
  * Architecture Benefits:
  * - 90% reduction in page files (1 vs 9+)
@@ -194,19 +194,19 @@ export default function ChordConstructionLevelPage(): JSX.Element {
  * This component handles these URL patterns:
  * 
  * Basic Triads:
- * - /chord-construction/basic-triads/1 → basic-triads-1 config
- * - /chord-construction/basic-triads/2 → basic-triads-2 config  
- * - /chord-construction/basic-triads/3 → basic-triads-3 config
+ * - /core-training/chord-construction/basic-triads/1 → basic-triads-1 config
+ * - /core-training/chord-construction/basic-triads/2 → basic-triads-2 config  
+ * - /core-training/chord-construction/basic-triads/3 → basic-triads-3 config
  * 
  * Seventh Chords:
- * - /chord-construction/seventh-chords/1 → seventh-chords-1 config
- * - /chord-construction/seventh-chords/2 → seventh-chords-2 config
- * - /chord-construction/seventh-chords/3 → seventh-chords-3 config
+ * - /core-training/chord-construction/seventh-chords/1 → seventh-chords-1 config
+ * - /core-training/chord-construction/seventh-chords/2 → seventh-chords-2 config
+ * - /core-training/chord-construction/seventh-chords/3 → seventh-chords-3 config
  * 
  * Extended Chords:
- * - /chord-construction/extended-chords/1 → extended-chords-1 config
- * - /chord-construction/extended-chords/2 → extended-chords-2 config
- * - /chord-construction/extended-chords/3 → extended-chords-3 config
+ * - /core-training/chord-construction/extended-chords/1 → extended-chords-1 config
+ * - /core-training/chord-construction/extended-chords/2 → extended-chords-2 config
+ * - /core-training/chord-construction/extended-chords/3 → extended-chords-3 config
  * 
  * Error Handling:
  * - Invalid category → LevelNotFoundError

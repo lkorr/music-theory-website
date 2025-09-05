@@ -103,28 +103,7 @@ function updateAuthState(newState: Partial<AuthState>): void {
   notifyAuthListeners();
 }
 
-/**
- * Get authentication token from secure HTTP-only cookie
- * 
- * @returns {string|null} - Authentication token or null
- */
-function getTokenFromCookie() {
-  if (typeof document === 'undefined') return null;
-  
-  try {
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'auth-token') {
-        return value;
-      }
-    }
-  } catch (error) {
-    console.error('Error reading auth cookie:', error);
-  }
-  
-  return null;
-}
+// Note: Client-side cookie reading removed for security - authentication handled via server-side HttpOnly cookies
 
 // JWT verification is handled server-side via /api/auth/me endpoint
 
@@ -351,21 +330,7 @@ export function isAdmin(): boolean {
   return hasRole('ADMIN');
 }
 
-/**
- * Get authorization header for API requests
- * 
- * @returns {Object} - Authorization headers
- */
-export function getAuthHeaders(): Record<string, string> {
-  if (!authState.token) {
-    return {};
-  }
-  
-  return {
-    'Authorization': `Bearer ${authState.token}`,
-    'X-Requested-With': 'XMLHttpRequest'
-  };
-}
+// Note: Bearer token headers removed for security - using HttpOnly cookies with credentials: 'include' instead
 
 /**
  * Make authenticated API request

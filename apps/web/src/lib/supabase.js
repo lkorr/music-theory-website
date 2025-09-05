@@ -69,7 +69,9 @@ export async function getUserByEmail(email) {
       last_login_at: null,
       login_attempts: 0,
       locked_until: null,
-      deleted_at: null
+      deleted_at: null,
+      email_verified: false,
+      email_verified_at: null
     };
   }
 
@@ -256,4 +258,139 @@ export async function isAccountLocked(userId) {
   const now = new Date();
 
   return lockUntil > now;
+}
+
+// Update user profile (server-side only)
+export async function updateUser(userId, updateData) {
+  if (!userId) {
+    throw new Error('User ID is required');
+  }
+
+  if (!updateData || typeof updateData !== 'object' || Object.keys(updateData).length === 0) {
+    throw new Error('Update data is required');
+  }
+
+  // Mock mode for development
+  if (useMockAuth) {
+    console.log(`Mock updateUser: ${userId}`, updateData);
+    return {
+      id: userId,
+      email: updateData.email || 'mock@example.com',
+      name: updateData.name || 'Mock User',
+      role: 'FREE',
+      created_at: new Date().toISOString(),
+      last_login_at: null,
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  // Add updated_at timestamp
+  const dataToUpdate = {
+    ...updateData,
+    updated_at: new Date().toISOString()
+  };
+
+  const { data, error } = await supabaseAdmin
+    .from('users')
+    .update(dataToUpdate)
+    .eq('id', userId)
+    .select('id, email, name, role, created_at, last_login_at, updated_at')
+    .single();
+
+  if (error) {
+    if (error.code === '23505') { // Unique constraint violation
+      throw new Error('Email address is already in use');
+    }
+    console.error('Database error in updateUser:', error);
+    throw new Error('Failed to update user');
+  }
+
+  if (!data) {
+    throw new Error('User not found');
+  }
+
+  return data;
+}
+
+// Update user email verification status
+export async function updateUserEmailVerified(userId, verified = true) {
+  if (!userId) {
+    throw new Error('User ID is required');
+  }
+
+  // Mock mode for development
+  if (useMockAuth) {
+    console.log(`Mock updateUserEmailVerified: ${userId}, verified: ${verified}`);
+    return {
+      id: userId,
+      emailVerified: verified,
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('users')
+    .update({
+      email_verified: verified,
+      email_verified_at: verified ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', userId)
+    .select('id, email_verified, email_verified_at')
+    .single();
+
+  if (error) {
+    console.error('Database error in updateUserEmailVerified:', error);
+    throw new Error('Failed to update email verification status');
+  }
+
+  if (!data) {
+    throw new Error('User not found');
+  }
+
+  return data;
+}
+
+// Update user password
+export async function updateUserPassword(userId, passwordHash) {
+  if (!userId) {
+    throw new Error('User ID is required');
+  }
+
+  if (!passwordHash) {
+    throw new Error('Password hash is required');
+  }
+
+  // Mock mode for development
+  if (useMockAuth) {
+    console.log(`Mock updateUserPassword: ${userId}`);
+    return {
+      id: userId,
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('users')
+    .update({
+      password: passwordHash,
+      updated_at: new Date().toISOString(),
+      // Clear login attempts and lock status when password is reset
+      login_attempts: 0,
+      locked_until: null
+    })
+    .eq('id', userId)
+    .select('id, updated_at')
+    .single();
+
+  if (error) {
+    console.error('Database error in updateUserPassword:', error);
+    throw new Error('Failed to update password');
+  }
+
+  if (!data) {
+    throw new Error('User not found');
+  }
+
+  return data;
 }

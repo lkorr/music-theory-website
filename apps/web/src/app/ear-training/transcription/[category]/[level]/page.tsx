@@ -48,16 +48,16 @@ interface LevelConfig {
  * Dynamic Transcription Level Route Handler
  * 
  * Handles all transcription level routes:
- * - /transcription/basic-triads/1
- * - /transcription/basic-triads/2  
- * - /transcription/basic-triads/3
- * - /transcription/seventh-chords/1
- * - /transcription/seventh-chords/2
- * - /transcription/seventh-chords/3
- * - /transcription/extended-chords/1
- * - /transcription/extended-chords/2
- * - /transcription/extended-chords/3
- * - /transcription/jazz-chords/1
+ * - /ear-training/transcription/basic-triads/1
+ * - /ear-training/transcription/basic-triads/2  
+ * - /ear-training/transcription/basic-triads/3
+ * - /ear-training/transcription/seventh-chords/1
+ * - /ear-training/transcription/seventh-chords/2
+ * - /ear-training/transcription/seventh-chords/3
+ * - /ear-training/transcription/extended-chords/1
+ * - /ear-training/transcription/extended-chords/2
+ * - /ear-training/transcription/extended-chords/3
+ * - /ear-training/transcription/jazz-chords/1
  * 
  * This single component replaces what would have been 10 separate page files,
  * demonstrating the clean architecture approach that minimizes tech debt.

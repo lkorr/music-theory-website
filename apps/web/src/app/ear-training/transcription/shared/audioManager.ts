@@ -5,7 +5,7 @@
 
 // Import chord logic from the main music theory utilities
 import { noteNames, normalizeNoteName } from "../../../core-training/chord-recognition/shared/theory/core/notes.ts";
-import { chordTypes, extendedChordTypes } from "../../../core-training/chord-recognition/shared/theory/core/constants.ts";
+import { chordTypes, seventhChordTypes, extendedChordTypes } from "../../../core-training/chord-recognition/shared/theory/core/constants.ts";
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -220,12 +220,18 @@ class AudioManager {
     minNote: number = 21, 
     maxNote: number = 108
   ): number[] {
-    // Determine which chord types object to use
-    const isExtendedChord = ['major7', 'minor7', 'dominant7', 'diminished7', 'halfDiminished7', 'minor7b5', 
-                             'maj9', 'min9', 'dom9', 'maj11', 'min11', 'dom11', 
-                             'maj13', 'min13', 'dom13', 'maj7#11', 'alt7', 'dim7', 'sus2', 'sus4'].includes(chordType);
+    // Determine which chord types object to use - check dynamically against imported objects
+    const isSeventhChord = chordType in seventhChordTypes;
+    const isExtendedChord = chordType in extendedChordTypes;
     
-    const chordTypesObj: ChordTypes = isExtendedChord ? extendedChordTypes : chordTypes;
+    let chordTypesObj: ChordTypes;
+    if (isSeventhChord) {
+      chordTypesObj = seventhChordTypes;
+    } else if (isExtendedChord) {
+      chordTypesObj = extendedChordTypes;
+    } else {
+      chordTypesObj = chordTypes;
+    }
     const chordInfo = chordTypesObj[chordType];
 
     if (!chordInfo) {

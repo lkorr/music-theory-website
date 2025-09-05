@@ -9,6 +9,7 @@
 import { generateCSRFToken } from '../../../lib/csrf.js';
 import { jwtVerify } from 'jose';
 import { applyAPISecurityHeaders } from '../../../lib/security-headers.js';
+import { createRateLimitMiddleware } from '../../../lib/rateLimit.js';
 
 if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET environment variable is required for JWT signing');
@@ -20,6 +21,13 @@ const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET);
  */
 export async function GET(request) {
   try {
+    // Apply rate limiting
+    const rateLimitMiddleware = createRateLimitMiddleware('api');
+    const rateLimitResult = await rateLimitMiddleware(request, {});
+    if (rateLimitResult) {
+      return rateLimitResult;
+    }
+
     // Get session ID from JWT token
     const cookieHeader = request.headers.get('cookie');
     if (!cookieHeader) {

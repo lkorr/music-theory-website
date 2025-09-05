@@ -6,7 +6,7 @@
  * but uses dynamic routing and configuration-driven level management.
  * 
  * Key Improvements:
- * - Dynamic links point to new route structure (/chord-progressions/1, /2, etc.)
+ * - Dynamic links point to new route structure (/core-training/chord-progressions/1, /2, etc.)
  * - Configuration-driven level information from levelConfigs.ts
  * - Clean separation of concerns
  * - Maintained identical visual design
@@ -87,7 +87,7 @@ export default function ChordProgressions2Page() {
         id: levelConfig.id,
         title: levelConfig.title,
         description: levelConfig.description,
-        path: `/chord-progressions/${levelConfig.level}`
+        path: `/core-training/chord-progressions/${levelConfig.level}`
       }]
     };
   });

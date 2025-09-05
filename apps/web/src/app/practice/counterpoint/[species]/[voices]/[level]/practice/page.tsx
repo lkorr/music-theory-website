@@ -243,7 +243,7 @@ export default function CounterpointPracticePage(): JSX.Element {
             <p className="text-red-300/80">{error}</p>
           </div>
           <Link
-            to={`/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${level}`}
+            to={`/practice/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${level}`}
             className="inline-block bg-white/20 hover:bg-white/30 border border-white/30 rounded-xl px-6 py-3 text-white font-semibold transition-all duration-300"
           >
             ← Back to Exercise
@@ -263,7 +263,7 @@ export default function CounterpointPracticePage(): JSX.Element {
       <header className="bg-black/20 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4 ml-16">
-            <Link to={`/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${level}`} className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+            <Link to={`/practice/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${level}`} className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
               <span className="text-white text-sm font-bold">←</span>
             </Link>
             <div>
@@ -339,7 +339,7 @@ export default function CounterpointPracticePage(): JSX.Element {
             Clear All Notes
           </button>
           <Link
-            to={`/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${level}`}
+            to={`/practice/counterpoint/species-${speciesNumber}/${voiceCategory}/level-${level}`}
             className="bg-white/20 hover:bg-white/30 border border-white/30 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-300"
           >
             Back to Exercise Info

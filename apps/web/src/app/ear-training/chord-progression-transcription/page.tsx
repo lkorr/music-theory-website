@@ -39,7 +39,7 @@ export default function ChordProgressionTranscriptionHub(): JSX.Element {
           id: 'level1',
           title: 'Level 1: Basic 4-Chord Progressions',
           description: 'Listen to and transcribe common progressions like I-V-vi-IV using piano roll',
-          path: '/chord-progression-transcription/level1'
+          path: '/ear-training/chord-progression-transcription/level1'
         }
       ]
     },
@@ -55,7 +55,7 @@ export default function ChordProgressionTranscriptionHub(): JSX.Element {
           id: 'level2',
           title: 'Level 2: Progressions with Inversions',
           description: 'Transcribe progressions with inverted chords for smooth voice leading',
-          path: '/chord-progression-transcription/level2'
+          path: '/ear-training/chord-progression-transcription/level2'
         }
       ]
     },
@@ -71,7 +71,7 @@ export default function ChordProgressionTranscriptionHub(): JSX.Element {
           id: 'level3',
           title: 'Level 3: Non-Diatonic Progressions',
           description: 'Transcribe progressions with borrowed chords and chromatic harmony',
-          path: '/chord-progression-transcription/level3'
+          path: '/ear-training/chord-progression-transcription/level3'
         }
       ]
     },
@@ -87,7 +87,7 @@ export default function ChordProgressionTranscriptionHub(): JSX.Element {
           id: 'level4',
           title: 'Level 4: Complex Harmonic Progressions',
           description: 'Master transcription of sophisticated chord progressions with multiple techniques',
-          path: '/chord-progression-transcription/level4'
+          path: '/ear-training/chord-progression-transcription/level4'
         }
       ]
     }
@@ -261,7 +261,7 @@ export default function ChordProgressionTranscriptionHub(): JSX.Element {
             ← Back to Dashboard
           </Link>
           <Link
-            to="/transcription"
+            to="/ear-training/transcription"
             className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-colors"
           >
             Single Chord Transcription →

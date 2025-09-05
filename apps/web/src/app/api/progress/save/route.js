@@ -6,6 +6,7 @@
 import { jwtVerify } from 'jose';
 import { recordGameSession } from '../../../../lib/statistics';
 import { validateCSRFHeader } from '../../../../lib/csrf.js';
+import { createRateLimitMiddleware } from '../../../../lib/rateLimit.js';
 
 if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET environment variable is required for JWT signing');
@@ -45,6 +46,13 @@ async function verifyJWT(request) {
 
 export async function POST(request) {
   try {
+    // Apply rate limiting
+    const rateLimitMiddleware = createRateLimitMiddleware('api');
+    const rateLimitResult = await rateLimitMiddleware(request, {});
+    if (rateLimitResult) {
+      return rateLimitResult;
+    }
+
     // Verify JWT token and get user
     const authResult = await verifyJWT(request);
     if (!authResult.valid || !authResult.user) {

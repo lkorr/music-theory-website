@@ -41,25 +41,25 @@ export default function TranscriptionHub() {
           id: 'level1',
           title: 'Level 1: Root Position Triads',
           description: 'Transcribe major and minor triads in root position',
-          path: '/transcription/basic-triads/1'
+          path: '/ear-training/transcription/basic-triads/1'
         },
         {
           id: 'level2',
           title: 'Level 2: First Inversions',
           description: 'Transcribe triads with first inversion',
-          path: '/transcription/basic-triads/2'
+          path: '/ear-training/transcription/basic-triads/2'
         },
         {
           id: 'level3',
           title: 'Level 3: All Inversions',
           description: 'Transcribe root, first, and second inversions',
-          path: '/transcription/basic-triads/3'
+          path: '/ear-training/transcription/basic-triads/3'
         },
         {
           id: 'level4',
           title: 'Level 4: Triads + Sus Chords',
           description: 'All triads, sus chords, and quartal harmony with inversions',
-          path: '/transcription/basic-triads/4'
+          path: '/ear-training/transcription/basic-triads/4'
         }
       ]
     },
@@ -75,31 +75,31 @@ export default function TranscriptionHub() {
           id: 'level1',
           title: 'Level 1: Basic Seventh Chords',
           description: 'All 7th chord types in root position',
-          path: '/transcription/seventh-chords/1'
+          path: '/ear-training/transcription/seventh-chords/1'
         },
         {
           id: 'level2',
           title: 'Level 2: First Inversions',
           description: '7th chords with first inversion',
-          path: '/transcription/seventh-chords/2'
+          path: '/ear-training/transcription/seventh-chords/2'
         },
         {
           id: 'level3',
           title: 'Level 3: First and Second Inversions',
           description: '7th chords with first and second inversions',
-          path: '/transcription/seventh-chords/3'
+          path: '/ear-training/transcription/seventh-chords/3'
         },
         {
           id: 'level4',
           title: 'Level 4: All Inversions',
           description: '7th chords with all inversions',
-          path: '/transcription/seventh-chords/4'
+          path: '/ear-training/transcription/seventh-chords/4'
         },
         {
           id: 'level5',
           title: 'Level 5: Mixed Triads and 7th Chords',
           description: 'Both triads and 7th chords with all inversions',
-          path: '/transcription/seventh-chords/5'
+          path: '/ear-training/transcription/seventh-chords/5'
         }
       ]
     },
@@ -115,43 +115,43 @@ export default function TranscriptionHub() {
           id: 'level1',
           title: 'Level 1: 9th Chords',
           description: 'Major 9th, minor 9th, dominant 9th',
-          path: '/transcription/extended-chords/1'
+          path: '/ear-training/transcription/extended-chords/1'
         },
         {
           id: 'level2',
           title: 'Level 2: 11th Chords',
           description: 'Major 11th, minor 11th variations',
-          path: '/transcription/extended-chords/2'
+          path: '/ear-training/transcription/extended-chords/2'
         },
         {
           id: 'level3',
           title: 'Level 3: 13th Chords',
           description: 'Major 13th, minor 13th variations',
-          path: '/transcription/extended-chords/3'
+          path: '/ear-training/transcription/extended-chords/3'
         },
         {
           id: 'level4',
           title: 'Level 4: 9th Chord Inversions',
           description: '9th chords with all inversions',
-          path: '/transcription/extended-chords/4'
+          path: '/ear-training/transcription/extended-chords/4'
         },
         {
           id: 'level5',
           title: 'Level 5: 11th Chord Inversions',
           description: '11th chords with all inversions',
-          path: '/transcription/extended-chords/5'
+          path: '/ear-training/transcription/extended-chords/5'
         },
         {
           id: 'level6',
           title: 'Level 6: 13th Chord Inversions',
           description: '13th chords with all inversions',
-          path: '/transcription/extended-chords/6'
+          path: '/ear-training/transcription/extended-chords/6'
         },
         {
           id: 'level7',
           title: 'Level 7: All Chord Types',
           description: 'Master level: All triads, sus, 7th, and extended chords',
-          path: '/transcription/extended-chords/7'
+          path: '/ear-training/transcription/extended-chords/7'
         }
       ]
     }
@@ -353,10 +353,10 @@ export default function TranscriptionHub() {
             ← Back to Dashboard
           </Link>
           <Link
-            to="/chord-recognition"
+            to="/ear-training/chord-progression-transcription"
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors"
           >
-            Try Chord Recognition →
+            Try Chord Progressions →
           </Link>
         </div>
       </main>

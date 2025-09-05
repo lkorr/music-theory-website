@@ -16,10 +16,34 @@ type Pages = {
   "/about": {
     params: {};
   };
+  "/account": {
+    params: {};
+  };
+  "/account/billing": {
+    params: {};
+  };
+  "/account/profile": {
+    params: {};
+  };
+  "/account/security": {
+    params: {};
+  };
+  "/account/settings": {
+    params: {};
+  };
+  "/auth/forgot-password": {
+    params: {};
+  };
   "/auth/login": {
     params: {};
   };
   "/auth/register": {
+    params: {};
+  };
+  "/auth/reset-password": {
+    params: {};
+  };
+  "/auth/verify-email": {
     params: {};
   };
   "/blog": {
@@ -99,7 +123,13 @@ type Pages = {
       "level": string;
     };
   };
+  "/privacy": {
+    params: {};
+  };
   "/store": {
+    params: {};
+  };
+  "/terms": {
     params: {};
   };
   "/unauthorized": {
@@ -115,7 +145,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/about" | "/auth/login" | "/auth/register" | "/blog" | "/blog/:slug" | "/contact" | "/core-training/chord-construction" | "/core-training/chord-construction/:category/:level" | "/core-training/chord-progressions" | "/core-training/chord-progressions/:level" | "/core-training/chord-recognition" | "/core-training/chord-recognition/:category/:level" | "/dashboard" | "/ear-training/chord-progression-transcription" | "/ear-training/chord-progression-transcription/:level" | "/ear-training/transcription" | "/ear-training/transcription/:category/:level" | "/leaderboard" | "/practice/counterpoint" | "/practice/counterpoint/:species/:voices/:level" | "/practice/counterpoint/:species/:voices/:level/practice" | "/store" | "/unauthorized" | "/*";
+    page: "/" | "/about" | "/account" | "/account/billing" | "/account/profile" | "/account/security" | "/account/settings" | "/auth/forgot-password" | "/auth/login" | "/auth/register" | "/auth/reset-password" | "/auth/verify-email" | "/blog" | "/blog/:slug" | "/contact" | "/core-training/chord-construction" | "/core-training/chord-construction/:category/:level" | "/core-training/chord-progressions" | "/core-training/chord-progressions/:level" | "/core-training/chord-recognition" | "/core-training/chord-recognition/:category/:level" | "/dashboard" | "/ear-training/chord-progression-transcription" | "/ear-training/chord-progression-transcription/:level" | "/ear-training/transcription" | "/ear-training/transcription/:category/:level" | "/leaderboard" | "/practice/counterpoint" | "/practice/counterpoint/:species/:voices/:level" | "/practice/counterpoint/:species/:voices/:level/practice" | "/privacy" | "/store" | "/terms" | "/unauthorized" | "/*";
   };
   "./page.tsx": {
     id: "page";
@@ -125,6 +155,30 @@ type RouteFiles = {
     id: "about/page";
     page: "/about";
   };
+  "./account/page.tsx": {
+    id: "account/page";
+    page: "/account";
+  };
+  "./account/billing/page.tsx": {
+    id: "account/billing/page";
+    page: "/account/billing";
+  };
+  "./account/profile/page.tsx": {
+    id: "account/profile/page";
+    page: "/account/profile";
+  };
+  "./account/security/page.tsx": {
+    id: "account/security/page";
+    page: "/account/security";
+  };
+  "./account/settings/page.tsx": {
+    id: "account/settings/page";
+    page: "/account/settings";
+  };
+  "./auth/forgot-password/page.tsx": {
+    id: "auth/forgot-password/page";
+    page: "/auth/forgot-password";
+  };
   "./auth/login/page.tsx": {
     id: "auth/login/page";
     page: "/auth/login";
@@ -132,6 +186,14 @@ type RouteFiles = {
   "./auth/register/page.tsx": {
     id: "auth/register/page";
     page: "/auth/register";
+  };
+  "./auth/reset-password/page.tsx": {
+    id: "auth/reset-password/page";
+    page: "/auth/reset-password";
+  };
+  "./auth/verify-email/page.tsx": {
+    id: "auth/verify-email/page";
+    page: "/auth/verify-email";
   };
   "./blog/page.tsx": {
     id: "blog/page";
@@ -205,9 +267,17 @@ type RouteFiles = {
     id: "practice/counterpoint/[species]/[voices]/[level]/practice/page";
     page: "/practice/counterpoint/:species/:voices/:level/practice";
   };
+  "./privacy/page.tsx": {
+    id: "privacy/page";
+    page: "/privacy";
+  };
   "./store/page.tsx": {
     id: "store/page";
     page: "/store";
+  };
+  "./terms/page.tsx": {
+    id: "terms/page";
+    page: "/terms";
   };
   "./unauthorized/page.tsx": {
     id: "unauthorized/page";

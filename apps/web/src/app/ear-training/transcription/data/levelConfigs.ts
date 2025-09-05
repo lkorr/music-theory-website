@@ -72,8 +72,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 20,
     theme: "emerald",
     difficulty: "Beginner",
-    nextLevelPath: "/transcription/basic-triads/2",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/basic-triads/2",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 120,
       noteDuration: 1000, // 1 second per chord
@@ -97,8 +97,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 20,
     theme: "teal",
     difficulty: "Beginner",
-    nextLevelPath: "/transcription/basic-triads/3",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/basic-triads/3",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 120,
       noteDuration: 1000,
@@ -122,8 +122,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 20,
     theme: "cyan",
     difficulty: "Beginner",
-    nextLevelPath: "/transcription/basic-triads/4",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/basic-triads/4",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 120,
       noteDuration: 1000,
@@ -147,8 +147,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 25,
     theme: "cyan",
     difficulty: "Beginner",
-    nextLevelPath: "/transcription/seventh-chords/1",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/seventh-chords/1",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 110,
       noteDuration: 1100,
@@ -173,8 +173,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 20,
     theme: "emerald",
     difficulty: "Intermediate",
-    nextLevelPath: "/transcription/seventh-chords/2",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/seventh-chords/2",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 100, // Slower for complexity
       noteDuration: 1200,
@@ -198,8 +198,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 20,
     theme: "teal",
     difficulty: "Intermediate",
-    nextLevelPath: "/transcription/seventh-chords/3",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/seventh-chords/3",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 100,
       noteDuration: 1200,
@@ -223,8 +223,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 20,
     theme: "cyan",
     difficulty: "Intermediate",
-    nextLevelPath: "/transcription/seventh-chords/4",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/seventh-chords/4",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 100,
       noteDuration: 1200,
@@ -248,8 +248,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 22,
     theme: "cyan",
     difficulty: "Intermediate",
-    nextLevelPath: "/transcription/seventh-chords/5",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/seventh-chords/5",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 95,
       noteDuration: 1300,
@@ -273,8 +273,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 25,
     theme: "cyan",
     difficulty: "Intermediate",
-    nextLevelPath: "/transcription/extended-chords/1",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/extended-chords/1",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 90,
       noteDuration: 1400,
@@ -299,8 +299,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 15,
     theme: "purple",
     difficulty: "Advanced",
-    nextLevelPath: "/transcription/extended-chords/2",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/extended-chords/2",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 90,
       noteDuration: 1500,
@@ -324,8 +324,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 15,
     theme: "purple",
     difficulty: "Advanced",
-    nextLevelPath: "/transcription/extended-chords/3",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/extended-chords/3",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 90,
       noteDuration: 1500,
@@ -349,8 +349,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 15,
     theme: "purple",
     difficulty: "Advanced",
-    nextLevelPath: "/transcription/extended-chords/4",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/extended-chords/4",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 80,
       noteDuration: 1800,
@@ -375,8 +375,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 18,
     theme: "purple",
     difficulty: "Advanced",
-    nextLevelPath: "/transcription/extended-chords/5",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/extended-chords/5",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 75,
       noteDuration: 2000,
@@ -400,8 +400,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 18,
     theme: "purple",
     difficulty: "Advanced", 
-    nextLevelPath: "/transcription/extended-chords/6",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/extended-chords/6",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 75,
       noteDuration: 2000,
@@ -425,8 +425,8 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     totalProblems: 15,
     theme: "purple", 
     difficulty: "Advanced",
-    nextLevelPath: "/transcription/extended-chords/7",
-    backPath: "/transcription",
+    nextLevelPath: "/ear-training/transcription/extended-chords/7",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 70,
       noteDuration: 2200,
@@ -458,7 +458,7 @@ export const LEVEL_CONFIGS: LevelConfigs = {
     theme: "purple", 
     difficulty: "Expert",
     nextLevelPath: null, // Final level
-    backPath: "/transcription",
+    backPath: "/ear-training/transcription",
     audio: {
       tempo: 65,
       noteDuration: 2500,

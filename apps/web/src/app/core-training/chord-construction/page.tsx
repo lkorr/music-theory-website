@@ -48,7 +48,7 @@ export default function ChordConstruction2Page(): React.ReactNode {
       id: `level${level.level}`,
       title: level.title,
       description: level.description,
-      path: `/chord-construction/${category.id}/${level.level}`,
+      path: `/core-training/chord-construction/${category.id}/${level.level}`,
       available: true
     }))
   }));

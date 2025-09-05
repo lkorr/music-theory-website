@@ -187,7 +187,7 @@ export default function CounterpointPage(): JSX.Element {
                       {exercises.map((exercise: any, index: number) => (
                         <Link
                           key={exercise.id}
-                          to={`/counterpoint/species-${selectedSpecies}/${voiceUrl}/level-${index + 1}`}
+                          to={`/practice/counterpoint/species-${selectedSpecies}/${voiceUrl}/level-${index + 1}`}
                           className="bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg p-3 text-center transition-colors duration-200"
                         >
                           <div className="text-white text-sm font-semibold">
